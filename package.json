@@ -2,8 +2,8 @@
   "name": "soundcloudscraperdesktop",
   "version": "2.2.0",
   "main": "dist-electron/main/index.js",
-  "description": "Electron Vite React boilerplate.",
-  "author": "草鞋没号 <308487730@qq.com>",
+  "description": "Download SoundCloud Songs",
+  "author": "Emil Sharkov",
   "license": "MIT",
   "private": true,
   "debug": {

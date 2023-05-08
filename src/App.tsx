@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import Update from '@/components/update'
 import logoVite from './assets/logo-vite.svg'
 import logoElectron from './assets/logo-electron.svg'
 import './App.scss'
@@ -31,8 +30,6 @@ function App() {
       <div className='flex-center'>
         Place static files into the<code>/public</code> folder <img style={{ width: '5em' }} src='./node.svg' alt='Node logo' />
       </div>
-
-      <Update />
     </div>
   )
 }
