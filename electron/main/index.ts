@@ -2,6 +2,7 @@ import { app, BrowserWindow, shell, ipcMain } from 'electron'
 import { release } from 'node:os'
 import { join } from 'node:path'
 import { update } from './update'
+import { getElectronHandlers } from './electronHandlers'
 
 // The built directory structure
 //
@@ -44,7 +45,6 @@ const indexHtml = join(process.env.DIST, 'index.html')
 async function createWindow() {
   win = new BrowserWindow({
     title: 'Main window',
-    icon: join(process.env.PUBLIC, 'favicon.ico'),
     webPreferences: {
       preload,
       // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
@@ -57,7 +57,6 @@ async function createWindow() {
 
   if (url) { // electron-vite-vue#298
     win.loadURL(url)
-    // Open devTool if the app is not packaged
     win.webContents.openDevTools()
   } else {
     win.loadFile(indexHtml)
@@ -76,6 +75,7 @@ async function createWindow() {
 
   // Apply electron-updater
   update(win)
+  getElectronHandlers()
 }
 
 app.whenReady().then(createWindow)
