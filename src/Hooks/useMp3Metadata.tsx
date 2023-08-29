@@ -1,17 +1,12 @@
 import { useState, useEffect } from "react"
-import { Song } from "@/Interfaces/Song";
 const { ipcRenderer } = window.require('electron');
-const DEFAULT_SONG_NAME = ''
 
-export const useSongSuggestions = () => {
-    const [songSuggestions,setSongSuggestions] = useState<Song[]>([])
-    const [songName,setSongName] = useState<string>(DEFAULT_SONG_NAME)
-    const [receivedSuggestions,setReceivedSuggestions] = useState<boolean>(true)
+export const useMp3Metadata = () => {
+    const [songName,setSongName] = useState<string>()
+    const [mp3ActionComplete,setMp3ActionComplete] = useState<boolean>(true)
 
     useEffect(() => {
-        if(songName !== DEFAULT_SONG_NAME) {
-            setReceivedSuggestions(false)
-        }
+        setReceivedSuggestions(false)
     },[songName])
 
     useEffect(() => {
@@ -21,7 +16,6 @@ export const useSongSuggestions = () => {
                 const content = await ipcRenderer.invoke('search-song-name',songName);
                 setSongSuggestions(content)
                 setSongName(DEFAULT_SONG_NAME)
-                setReceivedSuggestions(true)
             } catch (error) {
                 console.error('Error communicating with main process:', error);
             }
@@ -29,5 +23,5 @@ export const useSongSuggestions = () => {
         getSongSuggestions()
     },[receivedSuggestions])
     
-    return {songSuggestions,receivedSuggestions,setSongName}
+    return {}
 }

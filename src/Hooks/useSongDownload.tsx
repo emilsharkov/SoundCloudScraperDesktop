@@ -4,12 +4,18 @@ const DEFAULT_SONG_URL = ''
 
 export const useSongDownload = () => {
     const [songURL,setSongURL] = useState<string>(DEFAULT_SONG_URL)
-    const [isDownloaded,setIsDownloaded] = useState<boolean>(false);
+    const [isDownloaded,setIsDownloaded] = useState<boolean>(true);
+
+    useEffect(() => {
+        if(songURL !== DEFAULT_SONG_URL) { 
+            setIsDownloaded(false) 
+        }
+    },[songURL])
 
     useEffect(() => {
         const downloadSong = async() => {
             try {
-                if (songURL === DEFAULT_SONG_URL) { return }
+                if (!(songURL !== DEFAULT_SONG_URL && !isDownloaded)) { return }
                 await ipcRenderer.invoke('download-song',songURL)
                 setIsDownloaded(true)
                 setSongURL(DEFAULT_SONG_URL)
@@ -18,7 +24,7 @@ export const useSongDownload = () => {
             }
         }
         downloadSong()
-    },[songURL])
+    },[isDownloaded])
     
     return {isDownloaded,setSongURL}
 }

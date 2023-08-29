@@ -5,24 +5,30 @@ const { ipcRenderer } = window.require('electron')
 
 export const useFileDialog = () => {
     const [path,setPath] = useState<FileDialogResult>()
-    const [isDone,setIsDone] = useState<boolean>(false);
+    const [dialogClosed,setDialogClosed] = useState<boolean>(true);
     const [openDialog, setOpenDialog] = useState<boolean>(false)
+
+    useEffect(() => {
+        if(openDialog) { 
+            setDialogClosed(false) 
+        }
+    },[openDialog])
 
     useEffect(() => {
         const getFilePath = async() => {
             try {
-                if (!openDialog) { return }
+                if (!(openDialog && !dialogClosed)) { return }
                 const content = await ipcRenderer.invoke('open-file-dialog');
                 console.log(content)
                 setPath(content)
-                setIsDone(true)
+                setDialogClosed(true)
                 setOpenDialog(false)
             } catch (error) {
                 console.error('Error communicating with main process:', error);
             }
         }
         getFilePath()
-    },[openDialog])
+    },[dialogClosed])
     
-    return {path,isDone,setOpenDialog}
+    return {path,dialogClosed,setOpenDialog}
 }
