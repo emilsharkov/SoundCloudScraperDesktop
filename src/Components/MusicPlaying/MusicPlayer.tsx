@@ -12,15 +12,15 @@ import './MusicPlayer.css'
 export const MusicPlayer = () => {
     const [currentSongIndex,setCurrentSongIndex] = useState<number|null>(null)
     const [playing,setPlaying] = useState<boolean>(false)
-    // const []
     const {songs,setSongs} = useContext<MusicCtxt>(MusicContext)
 
     return(
         <div>
             <audio controls>
-                <source src="C:/Users/emosh/vscode/CLISoundCloudDownloader/here.mp3" type="audio/mpeg" />
+                <source src="http://localhost:3000/songs/Im Gonna Rip Out Your Spine!.mp3" type="audio/mpeg" />
                 Your browser does not support the audio element.
             </audio>
+            <img src='http://localhost:3000/images/Im Gonna Rip Out Your Spine!.jpg'></img>
             {/* <img onClick={() => play()} src={pause} alt="Pause" />
             <img onClick={() => play()} src={play} alt="Play" />
             <img onClick={() => play()} src={repeat} alt="Repeat" />

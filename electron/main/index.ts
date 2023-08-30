@@ -2,7 +2,11 @@ import { app, BrowserWindow, shell, ipcMain } from 'electron'
 import { release } from 'node:os'
 import { join } from 'node:path'
 import { update } from './update'
-import { getElectronHandlers } from './electronHandlers'
+import { applyElectronHandlers } from './electronHandlers'
+import { workingDir, sendSongImage } from './utils'
+import { Request, Response, NextFunction } from 'express';
+
+const express = require('express');
 
 // The built directory structure
 //
@@ -73,9 +77,13 @@ async function createWindow() {
     return { action: 'deny' }
   })
 
-  // Apply electron-updater
   update(win)
-  getElectronHandlers()
+  applyElectronHandlers()
+
+  const expressServer = express();
+  expressServer.use('/songs',express.static(`${workingDir}/songs`));
+  expressServer.use('/images/:fileName', (req: Request, res: Response, next: NextFunction) => sendSongImage(req,res,next))
+  expressServer.listen(3000);
 }
 
 app.whenReady().then(createWindow)
