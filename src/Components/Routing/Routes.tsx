@@ -13,5 +13,9 @@ export const Routes = (props: RoutesProps) => {
     const routes = Children.toArray(props.children) as React.ReactElement<RouteProps>[]
     const toRender = routes.filter((child) => child.props.path === currentRoute) as React.ReactElement<RouteProps>[]
 
-    return <>{toRender.length === 1 ? toRender[0].props.component: null}</>
+    return (
+        <div className={props.className}>
+            {toRender.length === 1 ? toRender[0].props.component: null}
+        </div>
+    )
 }

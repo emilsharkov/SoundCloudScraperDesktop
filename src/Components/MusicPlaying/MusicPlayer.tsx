@@ -23,11 +23,13 @@ export const MusicPlayer = (props: MusicPlayerProps) => {
     }
 
     return(
-        <div className='music-bar-container'>
-            <audio className='music-bar' controls>
-                <source src={songs.length ? getMp3Url(songs[0]): ''} type='audio/mpeg' />
-                Your browser does not support the audio element.
-            </audio>
+        <div className={props.className}>
+            <div className='music-bar-container'>
+                <audio className='music-bar' controls>
+                    <source src={songs.length ? getMp3Url(songs[0]): ''} type='audio/mpeg' />
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
         </div>
     )
 }

@@ -10,7 +10,7 @@ export const Navbar = (props: NavbarProps) => {
     const {currentRoute,setCurrentRoute} = useContext<RouterCtxt>(RouterContext)
 
     return (
-        <nav>
+        <nav className={props.className}>
             <button onClick={() => setCurrentRoute('SearchSongs')}>Search Songs</button>
             <button onClick={() => setCurrentRoute('Downloads')}>Downloads</button>
             <button onClick={() => setCurrentRoute('Playlists')}>Playlists</button>

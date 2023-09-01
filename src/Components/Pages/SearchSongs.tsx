@@ -6,7 +6,6 @@ import { useFileDialog } from "@/Hooks/useFileDialog";
 export const SearchSongs = () => {
 
     return(
-        <div>
-        </div>
+        <div>Search Songs</div>
     )
 }

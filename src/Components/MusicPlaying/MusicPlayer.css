@@ -1,8 +1,7 @@
 .music-bar {
-    width: 95vw
+    /* width: 300%; */
 }
 
 .music-bar-container {
-    display: flex;
-    justify-content: center;
+
 }

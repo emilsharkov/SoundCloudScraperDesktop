@@ -3,19 +3,32 @@ body {
 }
 
 .app-container {
-    display: flex;
     width: 100vw;
     height: 100vh;
+    display: grid;
+    grid-template-columns: repeat(5, 20vw);
+    grid-template-rows: repeat(5, 20vh);
+    grid-template-areas: 
+        "navbar pages pages pages pages"
+        "navbar pages pages pages pages"
+        "navbar pages pages pages pages"
+        "navbar pages pages pages pages"
+        "navbar music music music music";
 }
 
 .page-component {
-
+    grid-area: pages;
+    background-color: red;
 }
 
 .navbar-component {
+    grid-area: navbar;
+    background-color: green;
 
 }
 
 .music-player-component {
-    
+    grid-area: music;
+    background-color: blue;
+
 }
