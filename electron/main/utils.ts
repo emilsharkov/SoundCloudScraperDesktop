@@ -59,6 +59,28 @@ export const editMp3CoverArt = async (songName: string, imagePath: string) => {
             fs.renameSync(tempSongPath,songPath)
         })
         .run()
+
+    copyLocalImageToImages(imagePath)
+}
+
+const copyLocalImageToImages = (path: string) => {
+    const fileNameArr: string[] = path.split('/')
+    const fileName: string = fileNameArr[fileNameArr.length - 1]
+    const copyPath = `${workingDir}/images/${fileName}`
+
+    fs.readFile(path, (err: NodeJS.ErrnoException | null, data: Buffer) => {
+        if (err) {
+          console.error('Error reading the source image:', err);
+          return;
+        }
+      
+        fs.writeFile(copyPath, data, (err: NodeJS.ErrnoException | null) => {
+          if (err) {
+            console.error('Error writing the destination image:', err);
+            return;
+          }
+        });
+    });
 }
 
 export const sendSongImage = (req: Request, res: Response, next: NextFunction) => {

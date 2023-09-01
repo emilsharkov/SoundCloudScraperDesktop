@@ -1,8 +1,8 @@
-img {
-    width: 2rem;
+.music-bar {
+    width: 95vw
 }
 
-img:hover{
-    transform: scale(1.05);
-    transition: .5s
+.music-bar-container {
+    display: flex;
+    justify-content: center;
 }

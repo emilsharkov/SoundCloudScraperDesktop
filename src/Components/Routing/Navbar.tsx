@@ -1,9 +1,12 @@
 import { useState, useContext } from 'react';
 import { RouterContext } from '@/App';
-import { RouterCtxt } from '@/context/RouterContext';
-const { ipcRenderer } = window.require('electron');
+import { RouterCtxt } from '@/Context/RouterContext';
 
-export const Navbar = () => {
+export interface NavbarProps {
+    className?: string;
+}
+
+export const Navbar = (props: NavbarProps) => {
     const {currentRoute,setCurrentRoute} = useContext<RouterCtxt>(RouterContext)
 
     return (

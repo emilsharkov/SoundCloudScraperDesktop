@@ -10,6 +10,8 @@ import { MusicPlayer } from './Components/MusicPlaying/MusicPlayer'
 import { MusicCtxt } from './Context/MusicProvider'
 import { RouterCtxt } from './Context/RouterContext'
 
+const routePaths = ['SearchSongs', 'Playlists', 'Downloads']
+
 export const RouterContext = createContext<RouterCtxt>({
   currentRoute: '',
   setCurrentRoute: (route: string) => {}
@@ -21,20 +23,20 @@ export const MusicContext = createContext<MusicCtxt>({
 })
 
 const App = () => {
-  const [currentRoute,setCurrentRoute] = useState<string>('SearchSongs')
+  const [currentRoute,setCurrentRoute] = useState<string>(routePaths[0])
   const [songs,setSongs] = useState<string[]>([])
 
   return (
     <div className='app-container'>
       <MusicContext.Provider value={{songs,setSongs}}>
         <RouterContext.Provider value={{currentRoute,setCurrentRoute}}>
-          <Routes>
-            <Route path="SearchSongs" component={<SearchSongs/>}/>
-            <Route path="Playlists" component={<Playlists/>}/>
-            <Route path="Downloads" component={<Downloads/>}/>
+          <Routes className='page-component'>
+            <Route path={routePaths[0]} component={<SearchSongs/>}/>
+            <Route path={routePaths[1]} component={<Playlists/>}/>
+            <Route path={routePaths[2]} component={<Downloads/>}/>
           </Routes>
-          <Navbar/>
-          <MusicPlayer/>  
+          <Navbar className='navbar-component'/>
+          <MusicPlayer className='music-player-component'/>  
         </RouterContext.Provider>
       </MusicContext.Provider>
     </div>

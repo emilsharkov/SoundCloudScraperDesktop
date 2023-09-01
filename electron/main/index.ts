@@ -83,7 +83,7 @@ async function createWindow() {
   const expressServer = express();
   expressServer.use('/songs',express.static(`${workingDir}/songs`));
   expressServer.use('/images/:fileName', (req: Request, res: Response, next: NextFunction) => sendSongImage(req,res,next))
-  expressServer.listen(3000);
+  expressServer.listen(3000)
 }
 
 app.whenReady().then(createWindow)
