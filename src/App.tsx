@@ -10,8 +10,6 @@ import { MusicPlayer } from './Components/MusicPlaying/MusicPlayer'
 import { MusicCtxt } from './Context/MusicProvider'
 import { RouterCtxt } from './Context/RouterContext'
 
-const routePaths = ['SearchSongs', 'Playlists', 'Downloads']
-
 export const RouterContext = createContext<RouterCtxt>({
   currentRoute: '',
   setCurrentRoute: (route: string) => {}
@@ -21,6 +19,8 @@ export const MusicContext = createContext<MusicCtxt>({
   songs: [],
   setSongs: (route: string[]) => {}
 })
+
+const routePaths = ['SearchSongs', 'Playlists', 'Downloads']
 
 const App = () => {
   const [currentRoute,setCurrentRoute] = useState<string>(routePaths[0])
