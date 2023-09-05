@@ -1,34 +1,38 @@
 body {
-    margin: 0
+    margin: 0;
+    font-family: 'Poppins', sans-serif !important;
+    font-weight: 400 !important;
 }
 
 .app-container {
     width: 100vw;
     height: 100vh;
     display: grid;
-    grid-template-columns: repeat(5, 20vw);
-    grid-template-rows: repeat(5, 20vh);
+    grid-template-columns: repeat(7, calc(100vw/7));
+    grid-template-rows: repeat(5, calc(100vh/5));
     grid-template-areas: 
-        "navbar pages pages pages pages"
-        "navbar pages pages pages pages"
-        "navbar pages pages pages pages"
-        "navbar pages pages pages pages"
-        "navbar music music music music";
+        "navbar navbar pages pages pages pages pages"
+        "navbar navbar pages pages pages pages pages"
+        "navbar navbar pages pages pages pages pages"
+        "navbar navbar pages pages pages pages pages"
+        "navbar navbar music music music music music";
 }
 
 .page-component {
     grid-area: pages;
-    background-color: red;
+    border: 2px solid black;
 }
 
 .navbar-component {
     grid-area: navbar;
-    background-color: green;
-
+    /* background-color: gainsboro; */
+    display: flex;
+    align-items: center;
+    flex-direction: column;
 }
 
 .music-player-component {
     grid-area: music;
-    background-color: blue;
+    background-color: gray;
 
 }

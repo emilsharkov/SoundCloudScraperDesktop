@@ -2,10 +2,10 @@ import { useState, createContext } from 'react'
 import './App.css'
 import { Routes } from './Components/Routing/Routes'
 import { Route } from './Components/Routing/Route'
-import { Navbar } from './Components/Routing/Navbar'
-import { Downloads } from './Components/Pages/Downloads'
-import { Playlists } from './Components/Pages/Playlists'
-import { SearchSongs } from './Components/Pages/SearchSongs'
+import { Navbar } from './Components/Navbar/Navbar'
+import Downloads from './Components/Pages/Downloads/Downloads'
+import Playlists from './Components/Pages/Playlists/Playlists'
+import Search from './Components/Pages/Search/Search'
 import { MusicPlayer } from './Components/MusicPlaying/MusicPlayer'
 import { MusicCtxt } from './Context/MusicProvider'
 import { RouterCtxt } from './Context/RouterContext'
@@ -20,20 +20,25 @@ export const MusicContext = createContext<MusicCtxt>({
   setSongs: (route: string[]) => {}
 })
 
-const routePaths = ['SearchSongs', 'Playlists', 'Downloads']
+const paths = [
+  'Search', 
+  'Playlists', 
+  'Downloads'
+]
 
 const App = () => {
-  const [currentRoute,setCurrentRoute] = useState<string>(routePaths[0])
-  const [songs,setSongs] = useState<string[]>([])
+  const [currentRoute,setCurrentRoute] = useState<string>(paths[0])
+  const [songs,setSongs] = useState<string[]>(['test1','test2','test3'])
+  // const [songs,setSongs] = useState<string[]>([])
 
   return (
     <div className='app-container'>
       <MusicContext.Provider value={{songs,setSongs}}>
         <RouterContext.Provider value={{currentRoute,setCurrentRoute}}>
           <Routes className='page-component'>
-            <Route path={routePaths[0]} component={<SearchSongs/>}/>
-            <Route path={routePaths[1]} component={<Playlists/>}/>
-            <Route path={routePaths[2]} component={<Downloads/>}/>
+            <Route path={paths[0]} component={<Search/>}/>
+            <Route path={paths[1]} component={<Playlists/>}/>
+            <Route path={paths[2]} component={<Downloads/>}/>
           </Routes>
           <Navbar className='navbar-component'/>
           <MusicPlayer className='music-player-component'/>  

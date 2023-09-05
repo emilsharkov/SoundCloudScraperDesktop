@@ -1,7 +1,11 @@
-.music-bar {
-    /* width: 300%; */
+.music-bar-container {
+    height: 100%;
 }
 
-.music-bar-container {
+.audio-player {
+    height: 100%;
+}
 
+.rhap_total-time, .rhap_current-time{
+    font-family: 'Courier New', Courier, monospace !important;
 }
