@@ -1,6 +1,9 @@
+import { Mp3Metadata } from 'electron/interfaces/Mp3Metadata';
 import { Request, Response, NextFunction } from 'express';
 
 const fs = require('fs')
+const mm = require("music-metadata")
+const nid3 = require('node-id3')
 const { Readable } = require('stream');
 const { finished } = require('stream/promises');
 const ffmpegStatic = require('ffmpeg-static');
@@ -90,7 +93,31 @@ export const sendSongImage = (req: Request, res: Response, next: NextFunction) =
     fs.readdir(imagePath, (err: Error, files: string[]) => {
       if (err) { return res.status(500).send('Internal Server Error') }
 
-      const matchingFile = files.find(file => file.startsWith(fileName));
-      return matchingFile ? res.sendFile(`${imagePath}/${fileName}`): res.status(404).send('File not found')
+      const matchingFile = files.find(file => {
+        const tokens = file.split(fileName)
+        return tokens[0] === '' && tokens[1][0] === '.'
+      });
+      
+      return matchingFile ? res.sendFile(`${imagePath}/${matchingFile}`): res.status(404).send('File not found')
     })
+}
+
+export const editMp3Metadata = async(metadata: Mp3Metadata) => {
+    const path = `${workingDir}/songs/${metadata.title}.mp3`
+    const mp3Metadata = await mm.parseFile(path, { native: true });
+    
+    if(metadata.title != mp3Metadata.common.title) {
+        mp3Metadata.common.title = metadata.title;
+    }
+
+    if(metadata.artist != null) {
+        mp3Metadata.common.artist = metadata.artist;
+    }
+
+    if(metadata.imgPath != null) {
+        editMp3CoverArt(metadata.title, metadata.imgPath)
+    }
+
+    nid3.update(mp3Metadata.common, path)
+    return await mm.parseFile(path, { native: true })
 }

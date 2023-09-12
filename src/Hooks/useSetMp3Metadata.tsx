@@ -2,17 +2,11 @@ import { Mp3Metadata } from "@/Interfaces/Mp3Metadata";
 import { useState, useEffect } from "react"
 const { ipcRenderer } = window.require('electron');
 
-const defaultMp3Metadata: Mp3Metadata = {
-    title: 'Initialized',
-    artist: 'Initialized',
-    imgPath: 'Initialized'
-}
-
 export const useSetMp3Metadata = () => {
     const [title,setTitle] = useState<string>('')
     const [artist,setArtist] = useState<string | null>(null)
     const [imgPath,setImgPath] = useState<string | null>(null)
-    const [updatedMp3Metadata,setUpdatedMp3Metadata] = useState<Mp3Metadata>(defaultMp3Metadata)
+    const [updatedMp3Metadata,setUpdatedMp3Metadata] = useState<Mp3Metadata | null>(null)
     const [getData,setGetData] = useState<boolean>(false)
 
     useEffect(() => {

@@ -2,12 +2,11 @@ import { ipcMain, dialog } from 'electron'
 import { Song } from '../interfaces/Song'
 import { Suggestion } from '../interfaces/Suggestion'
 import { Mp3Metadata } from '../interfaces/Mp3Metadata'
-import { downloadThumbnail, editMp3CoverArt, getImgPathFromURL, initDirs, workingDir} from './utils'
+import { downloadThumbnail, editMp3CoverArt, editMp3Metadata, getImgPathFromURL, initDirs, workingDir} from './utils'
 
 const fs = require('fs')
 const mm = require("music-metadata")
 const SoundCloud = require("soundcloud-scraper");
-const nid3 = require('node-id3')
 initDirs()
 
 export const applyElectronHandlers = () => {
@@ -32,28 +31,13 @@ export const applyElectronHandlers = () => {
         return songSuggestions.filter(song => song !== null)
     })
 
-    ipcMain.handle('get-mp3-metadata', async (event, path: string) => {
+    ipcMain.handle('get-mp3-metadata', async (event, songName: string) => {
+        const path = `${workingDir}/songs/${songName}.mp3`
         return await mm.parseFile(path, { native: true });
     })
 
     ipcMain.handle('edit-mp3-metadata', async (event, metadata: Mp3Metadata) => {
-        const path = `${workingDir}/songs/${metadata.title}.mp3`
-        const mp3Metadata = await mm.parseFile(path, { native: true });
-        
-        if(metadata.title != mp3Metadata.common.title) {
-            mp3Metadata.common.title = metadata.title;
-        }
-
-        if(metadata.artist != null) {
-            mp3Metadata.common.artist = metadata.artist;
-        }
-
-        if(metadata.imgPath != null) {
-            editMp3CoverArt(metadata.title, metadata.imgPath)
-        }
-
-        nid3.update(mp3Metadata.common, path)
-        return await mm.parseFile(path, { native: true })
+        return await editMp3Metadata(metadata)
     })
 
     ipcMain.handle('download-song', async (event, songURL: string) => {
@@ -65,7 +49,13 @@ export const applyElectronHandlers = () => {
             const writer = stream.pipe(fs.createWriteStream(`${workingDir}/songs/${song.title}.mp3`));
             writer.on("finish", async() => { 
                 await downloadThumbnail(song.title,song.thumbnail)
-                await editMp3CoverArt(song.title,getImgPathFromURL(song.title,song.thumbnail))
+                
+                const metadata: Mp3Metadata = {
+                    title: song.title,
+                    imgPath: getImgPathFromURL(song.title,song.thumbnail),
+                    artist: null
+                }
+                await editMp3Metadata(metadata)
                 resolve() 
             })
         })
@@ -77,11 +67,12 @@ export const applyElectronHandlers = () => {
 
         let fileNames: string[] = []
         files.forEach(file => {
-            const filePath = `${workingDir}/${file}`
+            const filePath = `${songsDir}/${file}`
             const stats = fs.statSync(filePath);
 
             if (stats.isFile()) {
-                fileNames.push(file);
+                const songName = file.split('.mp3')[0]
+                fileNames.push(songName);
             }
         })
         return fileNames

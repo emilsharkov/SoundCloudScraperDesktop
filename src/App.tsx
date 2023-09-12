@@ -9,6 +9,7 @@ import Search from './Components/Pages/Search/Search'
 import { MusicPlayer } from './Components/MusicPlaying/MusicPlayer'
 import { MusicCtxt } from './Context/MusicProvider'
 import { RouterCtxt } from './Context/RouterContext'
+import { useSongLibrary } from './Hooks/useSongLibrary'
 
 export const RouterContext = createContext<RouterCtxt>({
   currentRoute: '',
@@ -28,8 +29,7 @@ const paths = [
 
 const App = () => {
   const [currentRoute,setCurrentRoute] = useState<string>(paths[0])
-  const [songs,setSongs] = useState<string[]>(['test1','test2','test3'])
-  // const [songs,setSongs] = useState<string[]>([])
+  const [songs,setSongs] = useState<string[]>([])
 
   return (
     <div className='app-container'>

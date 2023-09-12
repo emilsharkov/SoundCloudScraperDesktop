@@ -35,7 +35,7 @@ const Search = () => {
                 itemComponent={({ value, id }) => <div>{value}</div>}
                 data={autoCompleteData}
                 filter={(value): boolean => true}
-                limit={100}
+                limit={10}
             />
             <pre>{JSON.stringify(autoCompleteData,null,4)}</pre>
         </div>
