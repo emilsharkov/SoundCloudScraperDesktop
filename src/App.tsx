@@ -35,7 +35,7 @@ const App = () => {
     <div className='app-container'>
       <MusicContext.Provider value={{songs,setSongs}}>
         <RouterContext.Provider value={{currentRoute,setCurrentRoute}}>
-          <Routes className='page-component'>
+          <Routes className='page-component overflow-auto'>
             <Route path={paths[0]} component={<Search/>}/>
             <Route path={paths[1]} component={<Playlists/>}/>
             <Route path={paths[2]} component={<Downloads/>}/>

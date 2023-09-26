@@ -1,7 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 body {
     margin: 0;
-    font-family: 'Poppins', sans-serif !important;
-    font-weight: 400 !important;
+    /* font-family: 'Poppins', sans-serif !important; */
+    /* font-weight: 400 !important; */
 }
 
 .app-container {
@@ -20,12 +24,11 @@ body {
 
 .page-component {
     grid-area: pages;
-    border: 2px solid black;
+    border: 2px dotted black;
 }
 
 .navbar-component {
     grid-area: navbar;
-    /* background-color: gainsboro; */
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -33,6 +36,4 @@ body {
 
 .music-player-component {
     grid-area: music;
-    background-color: gray;
-
 }

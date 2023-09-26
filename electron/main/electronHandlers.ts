@@ -1,6 +1,6 @@
 import { ipcMain, dialog } from 'electron'
+import { SongSuggestion } from '../interfaces/SongSuggestion'
 import { Song } from '../interfaces/Song'
-import { Suggestion } from '../interfaces/Suggestion'
 import { Mp3Metadata } from '../interfaces/Mp3Metadata'
 import { downloadThumbnail, editMp3CoverArt, editMp3Metadata, getImgPathFromURL, initDirs, workingDir} from './utils'
 
@@ -23,8 +23,8 @@ export const applyElectronHandlers = () => {
 
     ipcMain.handle('search-song', async (event, songName: string) => {
         const client = new SoundCloud.Client();
-        const suggestions: Suggestion[] = await client.search(songName)
-        const songSuggestions: Song[] = await Promise.all(suggestions.map(async(song: Suggestion) => {
+        const songs: Song[] = await client.search(songName)
+        const songSuggestions: SongSuggestion[] = await Promise.all(songs.map(async(song: Song) => {
             return song.type == 'track' ? await client.getSongInfo(song.url): null
         }))
 

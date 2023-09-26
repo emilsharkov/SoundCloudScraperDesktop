@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Song } from "@/Interfaces/Song";
+import { Song } from "@/Interfaces/SongSuggestion";
 const { ipcRenderer } = window.require('electron');
 const DEFAULT_SONG_NAME = ''
 

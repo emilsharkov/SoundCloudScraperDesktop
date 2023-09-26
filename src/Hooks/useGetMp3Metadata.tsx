@@ -11,7 +11,6 @@ export const useGetMp3Metadata = () => {
             try {
                 if (!songName) { return }
                 const content = await ipcRenderer.invoke('get-mp3-metadata',songName)
-                console.log(content)
                 setMp3Metadata(content)
             } catch (error) {
                 console.error('Error communicating with main process:', error);

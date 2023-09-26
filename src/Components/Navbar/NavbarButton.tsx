@@ -22,7 +22,7 @@ const NavbarButton = (props: NavbarButtonProps) => {
     return(
         <>
             <ListItem disablePadding>
-                <ListItemButton sx={{...selectedTextClass,...styles.navbarItemButton}}onClick={props.onClick}>
+                <ListItemButton sx={{...selectedTextClass,...styles.navbarItemButton}} onClick={props.onClick}>
                     <ListItemIcon sx={selectedIconClass}>{props.icon}</ListItemIcon>
                     <ListItemText primary={props.label} />
                 </ListItemButton>
