@@ -22,9 +22,9 @@ const Search = (): JSX.Element => {
     },[debouncedValue])
 
     return(
-        <div className='flex flex-col w-full h-full bg-gray-50'>
+        <div className='flex flex-col w-full h-full bg-gray-25'>
             <input 
-                className='border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow outline-none focus:outline-none focus:ring w-11/12 pl-6 self-center mt-3'
+                className='border-0 px-3 py-3 placeholder-gray-300 text-gray-600 bg-white rounded text-sm shadow outline-none focus:outline-none focus:ring w-11/12 pl-6 self-center my-3 table-fixed'
                 placeholder="Enter Song Name"
                 value={searchBarInput}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchBarInput(e.target.value)}
@@ -32,11 +32,11 @@ const Search = (): JSX.Element => {
             <table className='block h-full w-11/12 self-center overflow-hidden items-center bg-transparent border-collapse break-words bg-white shadow-lg rounded'>
                 <thead>
                     <tr className='bg-gray-100'>
-                        <th className='w-2/12 text-gray-500 align-middle border border-solid border-gray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left'></th>
-                        <th className='w-6/12 text-gray-500 align-middle border border-solid border-gray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left'>Title</th>
-                        <th className='w-2/12 text-gray-500 align-middle border border-solid border-gray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left'>Artist</th>
-                        <th className='w-1/12 align-middle border border-solid border-gray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left'><img className='h-5' src={clock} /></th>
-                        <th className='w-1/12 align-middle border border-solid border-gray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left'><img className='h-6' src={heart} /></th>
+                        <th className='max-w-2/12 align-middle border border-solid border-gray-100 py-3 text-xs uppercase border-l-0 border-r-0 truncate font-semibold text-left text-gray-500'></th>
+                        <th className='max-w-6/12 align-middle border border-solid border-gray-100 py-3 text-xs uppercase border-l-0 border-r-0 truncate font-semibold text-left text-gray-500'>Title</th>
+                        <th className='max-w-2/12 align-middle border border-solid border-gray-100 py-3 text-xs uppercase border-l-0 border-r-0 truncate font-semibold text-left text-gray-500'>Artist</th>
+                        <th className='max-w-1/12 align-middle border border-solid border-gray-100 py-3 text-xs uppercase border-l-0 border-r-0 truncate font-semibold text-left'><div className='flex justify-center'><img className='h-5' src={clock}/></div></th>
+                        <th className='max-w-1/12 align-middle border border-solid border-gray-100 py-3 text-xs uppercase border-l-0 border-r-0 truncate font-semibold text-left'><div className='flex justify-center'><img className='h-5' src={heart}/></div></th>
                     </tr>
                 </thead>
                 <tbody>

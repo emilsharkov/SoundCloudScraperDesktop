@@ -21,12 +21,12 @@ const SongSuggestionTile = (props: SongSuggestionProps) => {
     },[props.duration])
 
     return (
-        <tr className=''>
-            <td className='h-10 border-t-0 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap text-left'><img className='h-8' src={props.thumbnail}/></td>
-            <td className='h-10 border-t-0 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap text-left'>{props.title}</td>
-            <td className='h-10 border-t-0 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap text-left'>{props.artist}</td>
-            <td className='h-10 border-t-0 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap text-left'>{durationFormatted}</td>
-            <td className='h-10 border-t-0 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap text-left'>{props.likes}</td>
+        <tr>
+            <td className='w-2/12 h-14 border-t-0 align-middle border-l-0 border-r-0 text-xs truncate text-left text-black-500'><div className='w-full justify-center flex'><img className='h-8' src={props.thumbnail}/></div></td>
+            <td className='w-6/12 h-14 border-t-0 align-middle border-l-0 border-r-0 text-xs truncate text-left text-black-500 font-semibold'>{props.title}</td>
+            <td className='w-2/12 h-14 border-t-0 align-middle border-l-0 border-r-0 text-xs truncate text-left text-black-500'>{props.artist}</td>
+            <td className='w-1/12 h-14 border-t-0 align-middle border-l-0 border-r-0 text-xs truncate text-center text-black-500'>{durationFormatted}</td>
+            <td className='w-1/12 h-14 border-t-0 align-middle border-l-0 border-r-0 text-xs truncate text-center text-black-500'>{props.likes}</td>
         </tr>
     )
 }
