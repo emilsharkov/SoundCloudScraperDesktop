@@ -51,7 +51,7 @@ const Search = (): JSX.Element => {
                                 duration={songSuggestion.duration}
                                 likes={songSuggestion.likes}
                                 artist={songSuggestion.author.name}
-                            />
+                                url={songSuggestion.url}                            />
                         )
                     })}
                 </tbody>

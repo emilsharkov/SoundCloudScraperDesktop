@@ -1,4 +1,6 @@
-import { useCallback, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useCallback, useRef } from 'react'
+import { useSongDownload } from '@/Hooks/useSongDownload';
+import Spinner from './Spinner';
 
 interface SongSuggestionProps {
     title: string;
@@ -6,13 +8,24 @@ interface SongSuggestionProps {
     duration: number;
     likes: string;
     artist: string;
+    url: string;
 }
 
 const MILLISECONDS_PER_SECOND = 1000
 const SECONDS_PER_MINUTE = 60
 
 const SongSuggestionTile = (props: SongSuggestionProps) => {
-    
+    const rowRef = useRef<HTMLTableRowElement>(null)
+    const [isClicked,setIsClicked] = useState<boolean>(false)
+    const {isDownloaded,setSongURL} = useSongDownload()
+
+    useEffect(() => {
+        if(!isClicked) { return }
+        const row = rowRef.current
+        row!.className = 'bg-gray-300'
+        setSongURL(props.url)
+    },[isClicked])
+
     const durationFormatted = useMemo(() => {
         const durationInSeconds = Math.trunc(props.duration / MILLISECONDS_PER_SECOND)
         const minutes = Math.trunc(durationInSeconds / SECONDS_PER_MINUTE)
@@ -21,8 +34,12 @@ const SongSuggestionTile = (props: SongSuggestionProps) => {
     },[props.duration])
 
     return (
-        <tr>
-            <td className='w-2/12 h-14 border-t-0 align-middle border-l-0 border-r-0 text-xs truncate text-left text-black-500'><div className='w-full justify-center flex'><img className='h-8' src={props.thumbnail}/></div></td>
+        <tr ref={rowRef} className='transition duration-150 hover:bg-gray-200' onClick={() => setIsClicked(true)}>
+            <td className='w-2/12 h-14 border-t-0 align-middle border-l-0 border-r-0 text-xs truncate text-left text-black-500'>
+                <div className='w-full justify-center flex'>
+                    {(!isDownloaded && isClicked) ? <Spinner />: <img className='h-8' src={props.thumbnail}/>}
+                </div>
+            </td>
             <td className='w-6/12 h-14 border-t-0 align-middle border-l-0 border-r-0 text-xs truncate text-left text-black-500 font-semibold'>{props.title}</td>
             <td className='w-2/12 h-14 border-t-0 align-middle border-l-0 border-r-0 text-xs truncate text-left text-black-500'>{props.artist}</td>
             <td className='w-1/12 h-14 border-t-0 align-middle border-l-0 border-r-0 text-xs truncate text-center text-black-500'>{durationFormatted}</td>
