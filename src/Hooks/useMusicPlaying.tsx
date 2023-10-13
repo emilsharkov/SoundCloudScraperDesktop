@@ -16,6 +16,6 @@ const useMusicPlayer = () => {
         setMusicQueue(songs)
     },[songs])
 
-    return {songs,musicQueue,currentQueueIndex,setMusicQueue,setCurrentQueueIndex}
+    return {audioRef,songs,musicQueue,currentQueueIndex,setMusicQueue,setCurrentQueueIndex}
 }
 export default useMusicPlayer

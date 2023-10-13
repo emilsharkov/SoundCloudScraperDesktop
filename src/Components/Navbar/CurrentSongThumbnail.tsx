@@ -8,7 +8,7 @@ interface CurrentSongThumbnailProps {
 }
 
 const CurrentSongThumbnail = (props: CurrentSongThumbnailProps) => {
-    const {songs,setSongs,currentSongIndex,setCurrentSongIndex} = useContext<MusicCtxt>(MusicContext)
+    const {songs,setSongs} = useContext<MusicCtxt>(MusicContext)
     const songImageSource: string = songs.length ? `http://localhost/${songs[currentSongIndex]}`: DefaultThumbnail
 
     return (

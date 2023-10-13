@@ -1,48 +1,54 @@
-import React, { useState, useContext } from 'react';
-import { RouterContext } from '@/App';
+import React, { useContext } from 'react';
+import NavbarButtonComponent from './NavbarButton'
+import Search from '../../Assets/search.svg'
+import Downloads from '../../Assets/downloads.svg'
+import Playlists from '../../Assets/playlists.svg'
 import { RouterCtxt } from '@/Context/RouterContext';
-import { List, Divider } from '@mui/material';
-import { FileDownload,Search,LibraryMusicOutlined } from '@mui/icons-material'
-import NavbarButton from './NavbarButton';
-import Logo from './Logo';
-import { styles } from './Styles';
-import './Navbar.css'
+import { RouterContext } from '@/App';
+import CurrentSongThumbnail from './CurrentSongThumbnail';
 
-export interface NavbarProps {
+interface NavbarComponentProps {
     className?: string;
 }
 
-interface NavbarItemData {
-    label: string;
-    icon: React.ReactNode;
+export interface NavbarItemData {
+    title: string;
+    icon: string;
 }
 
 const navbarItemList: NavbarItemData[] = [
-    {label: 'Search', icon: <Search/>},
-    {label: 'Downloads', icon: <FileDownload/>},
-    {label: 'Playlists', icon: <LibraryMusicOutlined/>}
+    {title: 'Search', icon: Search},
+    {title: 'Downloads', icon: Downloads},
+    {title: 'Playlists', icon: Playlists}
 ]
 
-export const Navbar = (props: NavbarProps) => {
+const NavbarComponent = (props: NavbarComponentProps) => {
     const {currentRoute,setCurrentRoute} = useContext<RouterCtxt>(RouterContext)
 
     return (
         <div className={props.className}>
-            <Logo/>
-            <Divider/>
-            <List sx={styles.navbarList}>
-                {navbarItemList.map((navbarItem) => (
-                    <NavbarButton 
-                        key={navbarItem.label}
-                        currentRoute={currentRoute}
-                        label={navbarItem.label}
-                        icon={navbarItem.icon}
-                        onClick={() => setCurrentRoute(navbarItem.label)}
-                    />
-                ))}
-            </List>
+            <div className='flex flex-col justify-between h-screen p-3 bg-white overflow-auto'>
+                <div className='space-y-3'>
+                    <div className='flex items-center'>
+                        <h2 className='text-xl font-bold'>SoundCloudScraper</h2>
+                    </div>
+                    <div className='flex-1'>
+                        <ul className='pt-2 pb-4 space-y-1 text-sm'>
+                            {navbarItemList.map((navbarItem: NavbarItemData) => {
+                                return (
+                                    <NavbarButtonComponent 
+                                        title={navbarItem.title} 
+                                        icon={navbarItem.icon}
+                                        onClick={() => setCurrentRoute(navbarItem.title)}
+                                    />
+                                )
+                            })}
+                        </ul>
+                    </div>
+                </div>
+                <CurrentSongThumbnail />
+            </div>
         </div>
     )
 }
-
-export default Navbar;
+export default NavbarComponent

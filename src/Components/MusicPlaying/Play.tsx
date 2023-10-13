@@ -1,22 +1,32 @@
 import { useEffect, useState } from "react"
+import { Button } from "../ui/button"
+import play from '../../Assets/play.svg'
+import pause from '../../Assets/pause.svg'
 
 interface PlayProps {
     audioRef: React.MutableRefObject<HTMLAudioElement | null>;
+    isPlaying: boolean;
+    setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const Play = (props: PlayProps) => {
-    const [isPlaying,setIsPlaying] = useState<boolean>(false)
+    const {audioRef,isPlaying,setIsPlaying} = props
+    const buttonSVG = isPlaying ? pause: play
     
     useEffect(() => {
-        if(isPlaying) {
-            props.audioRef.current?.pause()
-        } else{
-            props.audioRef.current?.play()
+        if(audioRef.current?.src) {
+            if(isPlaying) {
+                audioRef.current?.play()
+            } else{
+                audioRef.current?.pause()
+            }
         }
-    },[isPlaying])
+    },[audioRef,isPlaying])
 
     return (
-        {}
+        <Button className="p-2" size="icon" variant="ghost">
+            <img src={buttonSVG}/>
+        </Button>
     )
 }
 export default Play

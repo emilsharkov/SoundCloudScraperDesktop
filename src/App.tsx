@@ -7,8 +7,8 @@ import Playlists from './Components/Pages/Playlists/Playlists'
 import Search from './Components/Pages/Search/Search'
 import { MusicCtxt } from './Context/MusicContext'
 import { RouterCtxt } from './Context/RouterContext'
-import MusicPlayerComponent from './Components/MusicPlaying/MusicPlayerComponent'
-import NavbarComponent from './Components/Navbar/NavbarComponent'
+import MusicPlayerComponent from './Components/MusicPlaying/MusicPlayer'
+import NavbarComponent from './Components/Navbar/Navbar'
 
 export const RouterContext = createContext<RouterCtxt>({
   currentRoute: '',

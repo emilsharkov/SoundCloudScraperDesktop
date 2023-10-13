@@ -1,52 +1,78 @@
-import { useState, useEffect, useContext, useCallback, useMemo } from 'react'
-import { MusicContext } from '@/App'
-import { MusicCtxt } from '@/Context/MusicContext'
-import AudioPlayer from 'react-h5-audio-player'
-import 'react-h5-audio-player/lib/styles.css'
-import './MusicPlayer.css'
+import { Slider } from "@/Components/ui/slider"
+import { Button } from "@/Components/ui/button"
+import Skip from "./Skip"
+import Replay from './Replay'
+import Shuffle from './Shuffle'
+import SongSlider from "./SongSlider"
+import useMusicPlayer from "@/Hooks/useMusicPlaying"
+import Play from "./Play"
+import { useEffect, useState } from "react"
+import useMusicQueue from "@/Hooks/useMusicQueue"
 
-export interface MusicPlayerProps {
-    className?: string;
+export interface MusicPlayerComponentProps {
+  className?: string;
 }
 
-export const MusicPlayer = (props: MusicPlayerProps) => {
-    const [currentSongIndex,setCurrentSongIndex] = useState<number>(0)
-    const {songs,setSongs} = useContext<MusicCtxt>(MusicContext)
+const MusicPlayerComponent = (props: MusicPlayerComponentProps) => {
+  const {
+    audioRef,
+    songs,
+    musicQueue,
+    currentQueueIndex,
+    setMusicQueue,
+    setCurrentQueueIndex
+  } = useMusicPlayer()
 
-    const getMp3Url = useCallback((song: string) => {
-        return `http://localhost:3000/songs/${song}.mp3`
-    },[songs])
+  const [isPlaying,setIsPlaying] = useState<boolean>(false)
+  const [replayingType,setReplayingType] = useState<number>(0)
 
-    const source = useMemo(() => {
-        return songs.length ? getMp3Url(songs[currentSongIndex]): ''
-    },[songs,currentSongIndex])
+  useMusicQueue(
+    audioRef,
+    isPlaying,
+    replayingType,
+    musicQueue,
+    currentQueueIndex,
+    setMusicQueue,
+    setCurrentQueueIndex
+  )
 
-    const skipForward = useCallback((e: React.SyntheticEvent) => {
-        currentSongIndex !== songs.length - 1 ? setCurrentSongIndex(currentSongIndex + 1): null
-    },[currentSongIndex])
-
-    const skipBackward = useCallback((e: React.SyntheticEvent) => {
-        currentSongIndex !== 0 ? setCurrentSongIndex(currentSongIndex - 1): null
-    },[currentSongIndex])
-
-    const songEnded = useCallback((e: Event) => {
-        currentSongIndex !== songs.length - 1 ? setCurrentSongIndex(currentSongIndex + 1): null
-    },[currentSongIndex])
-
-    return(
-        <div className={props.className}>
-            <div className='music-bar-container'>
-                <AudioPlayer 
-                    src={source} 
-                    className='audio-player'
-                    layout="stacked-reverse" 
-                    showJumpControls={false} 
-                    showSkipControls={true}
-                    onClickPrevious={skipBackward}
-                    onClickNext={skipForward}
-                    onEnded={songEnded}
-                />
-            </div>
+  return (
+    <div className={props.className}>
+      <div className="flex flex-col space-y-4 p-4">
+        <div className="flex items-center justify-between">
+          <Shuffle 
+            songs={songs}
+            musicQueue={musicQueue}
+            currentQueueIndex={currentQueueIndex}
+            setMusicQueue={setMusicQueue}
+            setCurrentQueueIndex={setCurrentQueueIndex}
+          />
+          <Skip 
+            skipForward={false}
+            musicQueue={musicQueue}
+            currentQueueIndex={currentQueueIndex}
+            setCurrentQueueIndex={setCurrentQueueIndex}
+          />
+          <Play
+            audioRef={audioRef}
+            isPlaying={isPlaying}
+            setIsPlaying={setIsPlaying}
+          />
+          <Skip 
+            skipForward={true}
+            musicQueue={musicQueue}
+            currentQueueIndex={currentQueueIndex}
+            setCurrentQueueIndex={setCurrentQueueIndex}
+          />
+          <Replay 
+            replayingType={replayingType}
+            setReplayingType={setReplayingType}
+          />
         </div>
-    )
+        <SongSlider audioRef={audioRef}/>
+      </div>
+    </div>
+    
+  )
 }
+export default MusicPlayerComponent

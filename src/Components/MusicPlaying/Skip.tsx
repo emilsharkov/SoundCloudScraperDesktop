@@ -6,21 +6,23 @@ import useMusicPlaying from '@/Hooks/useMusicPlaying';
 
 interface skipProps {
     skipForward: boolean;
+    musicQueue: string[],
+    currentQueueIndex: number,
+    setCurrentQueueIndex: React.Dispatch<React.SetStateAction<number>>,
 }
 
 const Skip = (props: skipProps) => {
-    const {musicQueue,currentQueueIndex,setCurrentQueueIndex} = useMusicPlaying()
-    const buttonSVG = useMemo(() => props.skipForward ? SkipForward: SkipBack, [props.skipForward])
+    const { skipForward,musicQueue,currentQueueIndex,setCurrentQueueIndex } = props
+    const buttonSVG = skipForward ? SkipForward: SkipBack
+    const disabled = skipForward ? currentQueueIndex >= musicQueue.length: currentQueueIndex <= 0
 
     const skip = useCallback(() => {
-        const move: number = props.skipForward ? 1: -1
-        if(!(move + currentQueueIndex <= musicQueue.length || move + currentQueueIndex <= -1)) {
-            setCurrentQueueIndex(currentQueueIndex + move)
-        }
-    },[props.skipForward])
+        const move: number = skipForward ? 1: -1
+        setCurrentQueueIndex(currentQueueIndex + move)
+    },[skipForward])
 
     return (
-        <Button size="icon" variant="ghost" onClick={() => skip()}>
+        <Button size="icon" variant="ghost" disabled={disabled} onClick={() => skip()}>
             <img src={buttonSVG}/>
         </Button>
     )

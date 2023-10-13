@@ -1,34 +1,20 @@
-import { useMemo } from 'react'
-import { ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material"
-import './Navbar.css'
-import { styles } from './Styles'
-
-export interface NavbarButtonProps {
-    currentRoute: string;
-    label: string;
-    icon: React.ReactNode;
+interface NavbarButtonProps {
+    title: string;
+    icon: string;
     onClick: () => void
 }
 
-const NavbarButton = (props: NavbarButtonProps) => {
-    const selectedTextClass = useMemo(() => {
-        return props.currentRoute === props.label ? styles.selectedNavbarItemButton: {}
-    },[props.currentRoute,props.label])
-
-    const selectedIconClass = useMemo(() => {
-        return props.currentRoute === props.label ? styles.selectedNavbarItemIcon: {}
-    },[props.currentRoute,props.label])
-
-    return(
-        <>
-            <ListItem disablePadding>
-                <ListItemButton sx={{...selectedTextClass,...styles.navbarItemButton}} onClick={props.onClick}>
-                    <ListItemIcon sx={selectedIconClass}>{props.icon}</ListItemIcon>
-                    <ListItemText primary={props.label} />
-                </ListItemButton>
-            </ListItem>
-        </>
+const NavbarButtonComponent = (props: NavbarButtonProps) => {
+    return (
+        <li>
+            <button 
+                className='flex text-lg font-medium items-center p-2 py-3 space-x-3 rounded-md transform hover:translate-x-2 transition-transform ease-in duration-200'
+                onClick={props.onClick} 
+            >
+                <img className='w-5' src={props.icon}/>
+                <span>{props.title}</span>
+            </button>
+        </li>
     )
 }
-
-export default NavbarButton
+export default NavbarButtonComponent
