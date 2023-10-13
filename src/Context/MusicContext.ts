@@ -1,4 +1,4 @@
 export type MusicCtxt = {
     songs: string[];
-    setSongs: (route: string[]) => void;
+    setSongs: (routes: string[]) => void;
 }

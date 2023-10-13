@@ -1,5 +1,5 @@
 import { MusicContext } from "@/App";
-import { MusicCtxt } from "@/Context/MusicProvider";
+import { MusicCtxt } from "@/Context/MusicContext";
 import { useGetMp3Metadata } from "@/Hooks/useGetMp3Metadata"
 import { useContext, useEffect, useMemo } from "react";
 import { Song } from "soundcloud-scraper";

@@ -24,12 +24,12 @@ const Search = (): JSX.Element => {
     return(
         <div className='flex flex-col w-full h-full bg-gray-25'>
             <input 
-                className='border-0 px-3 py-3 placeholder-gray-300 text-gray-600 bg-white rounded text-sm shadow outline-none focus:outline-none focus:ring w-11/12 pl-6 self-center my-3 table-fixed'
+                className='border-0 px-3 py-3 placeholder-gray-300 text-gray-600 bg-white rounded text-sm shadow outline-none focus:outline-none focus:ring w-full pl-6 self-center my-3 table-fixed'
                 placeholder="Enter Song Name"
                 value={searchBarInput}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchBarInput(e.target.value)}
             />
-            <table className='block h-full w-11/12 self-center overflow-hidden items-center bg-transparent border-collapse break-words bg-white shadow-lg rounded'>
+            <table className='block h-full w-full self-center overflow-hidden items-center bg-transparent border-collapse break-words bg-white shadow-lg rounded'>
                 <thead>
                     <tr className='bg-gray-100'>
                         <th className='max-w-2/12 align-middle border border-solid border-gray-100 py-3 text-xs uppercase border-l-0 border-r-0 truncate font-semibold text-left text-gray-500'></th>

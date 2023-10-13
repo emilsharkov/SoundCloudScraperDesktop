@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext, useCallback, useMemo } from 'react'
 import { MusicContext } from '@/App'
-import { MusicCtxt } from '@/Context/MusicProvider'
+import { MusicCtxt } from '@/Context/MusicContext'
 import AudioPlayer from 'react-h5-audio-player'
 import 'react-h5-audio-player/lib/styles.css'
 import './MusicPlayer.css'
