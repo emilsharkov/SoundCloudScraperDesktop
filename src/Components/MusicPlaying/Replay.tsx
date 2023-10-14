@@ -1,31 +1,32 @@
 import { Button } from "@/Components/ui/button"
 import replay from '../../Assets/replay.svg'
 import { useState } from "react"
+import { ReplayingType } from "./MusicPlayer";
 
 interface ReplayProps {
-    replayingType: number;
-    setReplayingType: React.Dispatch<React.SetStateAction<number>>;
+    replayingType: ReplayingType;
+    setReplayingType: React.Dispatch<React.SetStateAction<ReplayingType>>;
 }
 
 const Replay = (props: ReplayProps) => {
     const {replayingType,setReplayingType} = props
-    const replayColor = replayingType === 0 ? '' : replayingType === 1 ? 'text-orange' : 'text-red'
+    const replayColor = replayingType === 'NO_REPLAY' ? '' : replayingType === 'REPLAY_PLAYLIST' ? 'fill-orange-300	' : 'fill-red-300	'
 
     const changeReplayingType = () => {
-        let newReplayingType = null
-        if(replayingType === 0){
-            newReplayingType = 1
-        } else if(replayingType === 1){
-            newReplayingType = 2
+        let newReplayingType: ReplayingType | null = null
+        if(replayingType === 'NO_REPLAY'){
+            newReplayingType = 'REPLAY_PLAYLIST'
+        } else if(replayingType === 'REPLAY_PLAYLIST'){
+            newReplayingType = 'REPLAY_SONG'
         } else{
-            newReplayingType = 0
+            newReplayingType = 'NO_REPLAY'
         }
         setReplayingType(newReplayingType)
     }
 
     return (
         <Button size="icon" variant="ghost" onClick={() => changeReplayingType()}>
-            <img src={replay}/>
+            <img className={replayColor} src={replay}/>
         </Button>
     )
 }

@@ -14,12 +14,12 @@ interface skipProps {
 const Skip = (props: skipProps) => {
     const { skipForward,musicQueue,currentQueueIndex,setCurrentQueueIndex } = props
     const buttonSVG = skipForward ? SkipForward: SkipBack
-    const disabled = skipForward ? currentQueueIndex >= musicQueue.length: currentQueueIndex <= 0
+    const disabled = skipForward ? currentQueueIndex === musicQueue.length - 1 || currentQueueIndex === 0: currentQueueIndex === 0
 
-    const skip = useCallback(() => {
+    const skip = () => {
         const move: number = skipForward ? 1: -1
         setCurrentQueueIndex(currentQueueIndex + move)
-    },[skipForward])
+    }
 
     return (
         <Button size="icon" variant="ghost" disabled={disabled} onClick={() => skip()}>

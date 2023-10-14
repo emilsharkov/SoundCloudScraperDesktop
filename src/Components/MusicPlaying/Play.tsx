@@ -12,6 +12,7 @@ interface PlayProps {
 const Play = (props: PlayProps) => {
     const {audioRef,isPlaying,setIsPlaying} = props
     const buttonSVG = isPlaying ? pause: play
+    const disabled = audioRef.current?.src === '' || audioRef.current?.src === null
     
     useEffect(() => {
         if(audioRef.current?.src) {
@@ -24,7 +25,13 @@ const Play = (props: PlayProps) => {
     },[audioRef,isPlaying])
 
     return (
-        <Button className="p-2" size="icon" variant="ghost">
+        <Button 
+            className="p-2" 
+            size="icon" 
+            variant="ghost" 
+            disabled={disabled} 
+            onClick={() => setIsPlaying(!isPlaying)}
+        >
             <img src={buttonSVG}/>
         </Button>
     )

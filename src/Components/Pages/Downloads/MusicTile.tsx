@@ -2,7 +2,6 @@ import { MusicContext } from "@/App";
 import { MusicCtxt } from "@/Context/MusicContext";
 import { useGetMp3Metadata } from "@/Hooks/useGetMp3Metadata"
 import { useContext, useEffect, useMemo } from "react";
-import { Song } from "soundcloud-scraper";
 
 export interface MusicTileProps {
     songName: string;
@@ -21,9 +20,9 @@ const MusicTile = (props: MusicTileProps) => {
 
     return(
         <div className='' onClick={() => setSongs(props.onClickQueue)}>
-            <img className='downloads-song-image' src={imagePath}/>
-            <p className='downloads-title-text'>title{mp3Metadata?.title}</p>
-            <p className='downloads-artist-text'>artist{mp3Metadata?.artist}</p>
+            <img className='' src={imagePath}/>
+            <p className=''>title{mp3Metadata?.title}</p>
+            <p className=''>artist{mp3Metadata?.artist}</p>
         </div>
     )
 }

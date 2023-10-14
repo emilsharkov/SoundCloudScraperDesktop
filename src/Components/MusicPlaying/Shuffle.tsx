@@ -21,23 +21,27 @@ const Shuffle = (props: ShuffleProps) => {
     const [isShuffled,setIsShuffled] = useState<boolean>(false)
 
     useEffect(() => {
-        if(isShuffled) {
-            const songsWithoutCurrent = musicQueue.filter(song => song !== musicQueue[currentQueueIndex])
-            const shuffledSongs: string[] = songsWithoutCurrent
-                .map((value: string) => ({ value, sort: Math.random() }))
-                .sort((a, b) => a.sort - b.sort)
-                .map(({ value }) => value)
-            setMusicQueue( [musicQueue[currentQueueIndex],...shuffledSongs] ) 
-        } else {
-            const indexOfSong = songs.indexOf(musicQueue[currentQueueIndex])
-            setCurrentQueueIndex(indexOfSong)
-            setMusicQueue(songs)
+        console.log(isShuffled)
+        if(musicQueue.length) {
+            if(isShuffled) {
+                const songsWithoutCurrent = musicQueue.filter(song => song !== musicQueue[currentQueueIndex])
+                const shuffledSongs: string[] = songsWithoutCurrent
+                    .map((value: string) => ({ value, sort: Math.random() }))
+                    .sort((a, b) => a.sort - b.sort)
+                    .map(({ value }) => value)
+                setMusicQueue( [musicQueue[currentQueueIndex],...shuffledSongs] ) 
+            } else {
+                const indexOfSong = songs.indexOf(musicQueue[currentQueueIndex])
+                setCurrentQueueIndex(indexOfSong)
+                setMusicQueue(songs)
+            }
         }
-    },[musicQueue,isShuffled])
+        
+    },[songs,isShuffled])
 
     return (
         <Button size="icon" variant="ghost" onClick={() => setIsShuffled(!isShuffled)}>
-            <img className={isShuffled ? 'text-orange': 'text-black'} src={shuffle}/>
+            <img className={isShuffled ? 'fill-orange-300': ''} src={shuffle}/>
         </Button>
     )
 }

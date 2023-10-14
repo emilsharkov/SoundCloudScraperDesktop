@@ -8,8 +8,8 @@ interface CurrentSongThumbnailProps {
 }
 
 const CurrentSongThumbnail = (props: CurrentSongThumbnailProps) => {
-    const {songs,setSongs} = useContext<MusicCtxt>(MusicContext)
-    const songImageSource: string = songs.length ? `http://localhost/${songs[currentSongIndex]}`: DefaultThumbnail
+    const { currentSong } = useContext<MusicCtxt>(MusicContext)
+    const songImageSource: string = currentSong !== '' ? `http://localhost/images/${currentSong}`: DefaultThumbnail
 
     return (
         <div className='flex justify-center w-full'>

@@ -4,7 +4,7 @@ interface NavbarButtonProps {
     onClick: () => void
 }
 
-const NavbarButtonComponent = (props: NavbarButtonProps) => {
+const NavbarButton = (props: NavbarButtonProps) => {
     return (
         <li>
             <button 
@@ -17,4 +17,4 @@ const NavbarButtonComponent = (props: NavbarButtonProps) => {
         </li>
     )
 }
-export default NavbarButtonComponent
+export default NavbarButton

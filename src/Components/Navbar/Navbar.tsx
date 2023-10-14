@@ -7,7 +7,7 @@ import { RouterCtxt } from '@/Context/RouterContext';
 import { RouterContext } from '@/App';
 import CurrentSongThumbnail from './CurrentSongThumbnail';
 
-interface NavbarComponentProps {
+interface NavbarProps {
     className?: string;
 }
 
@@ -22,7 +22,7 @@ const navbarItemList: NavbarItemData[] = [
     {title: 'Playlists', icon: Playlists}
 ]
 
-const NavbarComponent = (props: NavbarComponentProps) => {
+const Navbar = (props: NavbarProps) => {
     const {currentRoute,setCurrentRoute} = useContext<RouterCtxt>(RouterContext)
 
     return (
@@ -51,4 +51,4 @@ const NavbarComponent = (props: NavbarComponentProps) => {
         </div>
     )
 }
-export default NavbarComponent
+export default Navbar
