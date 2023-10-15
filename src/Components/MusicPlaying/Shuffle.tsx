@@ -21,7 +21,6 @@ const Shuffle = (props: ShuffleProps) => {
     const [isShuffled,setIsShuffled] = useState<boolean>(false)
 
     useEffect(() => {
-        console.log(isShuffled)
         if(musicQueue.length) {
             if(isShuffled) {
                 const songsWithoutCurrent = musicQueue.filter(song => song !== musicQueue[currentQueueIndex])
@@ -36,7 +35,6 @@ const Shuffle = (props: ShuffleProps) => {
                 setMusicQueue(songs)
             }
         }
-        
     },[songs,isShuffled])
 
     return (

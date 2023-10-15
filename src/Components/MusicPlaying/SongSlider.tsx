@@ -25,7 +25,8 @@ const SongSlider = (props: SongSliderProps) => {
     return (
         <Slider 
             className="flex-1" 
-            defaultValue={[seconds]}
+            defaultValue={[0]}
+            value={[seconds]}
             max={duration}
             step={1}
             onValueChange={(value) => seek(value)}

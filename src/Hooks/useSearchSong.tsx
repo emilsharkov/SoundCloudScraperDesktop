@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react"
-import { Song } from "@/Interfaces/SongSuggestion";
+import { SongSuggestion } from "@/Interfaces/SongSuggestion";
 const { ipcRenderer } = window.require('electron');
 const DEFAULT_SONG_NAME = ''
 
 export const useSearchSong = () => {
-    const [songSuggestions,setSongSuggestions] = useState<Song[]>([])
+    const [songSuggestions,setSongSuggestions] = useState<SongSuggestion[]>([])
     const [songName,setSongName] = useState<string>(DEFAULT_SONG_NAME)
     const [receivedSuggestions,setReceivedSuggestions] = useState<boolean>(true)
 

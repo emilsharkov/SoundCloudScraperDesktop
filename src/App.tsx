@@ -30,7 +30,8 @@ const paths = [
 
 const App = () => {
   const [currentRoute,setCurrentRoute] = useState<string>(paths[0])
-  const [songs,setSongs] = useState<string[]>([])
+  const [songs,setSongs] = useState<string[]>(['Clovis Reyes - Fluxxwave (Ultra Slowed)'])
+  // const [songs,setSongs] = useState<string[]>([])
   const [currentSong,setCurrentSong] = useState<string>('')
 
   return (
