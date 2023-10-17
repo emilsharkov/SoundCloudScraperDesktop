@@ -1,7 +1,6 @@
-import { useContext, Children } from "react"
-import { RouterContext } from "@/App"
-import { RouterCtxt } from "@/Context/RouterContext"
-import { RouteProps } from "./Route";
+import { Children } from "react"
+import { useAppSelector, useAppDispatch } from '@/Redux/hooks'
+import { RouteProps } from "./Route"
 
 export interface RoutesProps {
     className?: string;
@@ -9,7 +8,7 @@ export interface RoutesProps {
 }
 
 export const Routes = (props: RoutesProps) => {
-    const {currentRoute,setCurrentRoute} = useContext<RouterCtxt>(RouterContext)
+    const currentRoute = useAppSelector((state) => state.currentRoute.value)
     const routes = Children.toArray(props.children) as React.ReactElement<RouteProps>[]
     const toRender = routes.filter((child) => child.props.path === currentRoute) as React.ReactElement<RouteProps>[]
 

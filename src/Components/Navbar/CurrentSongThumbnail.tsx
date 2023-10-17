@@ -1,6 +1,5 @@
 import { useContext } from "react"
-import { MusicContext } from "@/App"
-import { MusicCtxt } from "@/Context/MusicContext"
+import { useAppSelector, useAppDispatch } from '@/Redux/hooks'
 import DefaultThumbnail from '@/Assets/default-thumbnail.png'
 
 interface CurrentSongThumbnailProps {
@@ -8,7 +7,7 @@ interface CurrentSongThumbnailProps {
 }
 
 const CurrentSongThumbnail = (props: CurrentSongThumbnailProps) => {
-    const { currentSong } = useContext<MusicCtxt>(MusicContext)
+    const currentSong = useAppSelector((state) => state.currentSong.value)
     const songImageSource: string = currentSong !== '' ? `http://localhost:3000/images/${currentSong}`: DefaultThumbnail
 
     return (

@@ -21,6 +21,6 @@ export const currentSongSlice = createSlice({
 
 export const { setCurrentSong } = currentSongSlice.actions
 
-export const selectCurrentSong = (state: RootState) => state.counter.value
+export const selectCurrentSong = (state: RootState) => state.currentSong.value
 
 export default currentSongSlice.reducer

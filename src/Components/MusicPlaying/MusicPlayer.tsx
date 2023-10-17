@@ -6,6 +6,7 @@
   import Play from "./Play"
   import { useEffect, useState } from "react"
   import useMusicQueue from "@/Hooks/useMusicQueue"
+  import { useAppSelector, useAppDispatch } from '@/Redux/hooks'
 
   export type ReplayingType = 'NO_REPLAY' | 'REPLAY_PLAYLIST' | 'REPLAY_SONG'
 
@@ -16,15 +17,15 @@
   const MusicPlayer = (props: MusicPlayerProps) => {
     const {
       audioRef,
-      songs,
       musicQueue,
       currentQueueIndex,
       setMusicQueue,
       setCurrentQueueIndex
     } = useMusicPlayer()
 
-    const [isPlaying,setIsPlaying] = useState<boolean>(false)
-    const [replayingType,setReplayingType] = useState<ReplayingType>('NO_REPLAY')
+    const songs = useAppSelector((state) => state.songs.value)
+    const isPlaying = useAppSelector((state) => state.isPlaying.value)
+    const replayingType = useAppSelector((state) => state.replayingType.value)
 
     useMusicQueue(
       audioRef,
@@ -54,8 +55,6 @@
             />
             <Play
               audioRef={audioRef}
-              isPlaying={isPlaying}
-              setIsPlaying={setIsPlaying}
             />
             <Skip 
               skipForward={true}
@@ -63,10 +62,7 @@
               currentQueueIndex={currentQueueIndex}
               setCurrentQueueIndex={setCurrentQueueIndex}
             />
-            <Replay 
-              replayingType={replayingType}
-              setReplayingType={setReplayingType}
-            />
+            <Replay/>
           </div>
           <SongSlider audioRef={audioRef}/>
         </div>

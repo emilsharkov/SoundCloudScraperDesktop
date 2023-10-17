@@ -2,18 +2,24 @@ import { useEffect, useState } from "react"
 import { Button } from "../ui/button"
 import play from '../../Assets/play.svg'
 import pause from '../../Assets/pause.svg'
+import { useAppSelector, useAppDispatch } from '@/Redux/hooks'
+import { setIsPlaying } from "@/Redux/Slices/isPlayingSlice"
 
 interface PlayProps {
     audioRef: React.MutableRefObject<HTMLAudioElement | null>;
-    isPlaying: boolean;
-    setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const Play = (props: PlayProps) => {
-    const {audioRef,isPlaying,setIsPlaying} = props
+    const { audioRef } = props
+    const isPlaying = useAppSelector((state) => state.isPlaying.value)
+    const dispatch = useAppDispatch()
     const buttonSVG = isPlaying ? pause: play
-    const disabled = audioRef.current?.src === '' || audioRef.current?.src === null
-    
+    const [disabled,setDisabled] = useState<boolean>(audioRef.current?.src === window.location.href)
+
+    useEffect(() => {
+        setDisabled(audioRef.current?.src === window.location.href)
+    }, [audioRef.current])
+
     useEffect(() => {
         if(audioRef.current?.src) {
             if(isPlaying) {
@@ -30,7 +36,7 @@ const Play = (props: PlayProps) => {
             size="icon" 
             variant="ghost" 
             disabled={disabled} 
-            onClick={() => setIsPlaying(!isPlaying)}
+            onClick={() => dispatch(setIsPlaying(!isPlaying))}
         >
             <img src={buttonSVG}/>
         </Button>

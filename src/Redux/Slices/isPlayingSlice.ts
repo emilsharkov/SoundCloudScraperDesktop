@@ -21,6 +21,6 @@ export const isPlayingSlice = createSlice({
 
 export const { setIsPlaying } = isPlayingSlice.actions
 
-export const selectIsPlaying = (state: RootState) => state.counter.value
+export const selectIsPlaying = (state: RootState) => state.isPlaying.value
 
 export default isPlayingSlice.reducer

@@ -3,9 +3,9 @@ import NavbarButtonComponent from './NavbarButton'
 import Search from '../../Assets/search.svg'
 import Downloads from '../../Assets/downloads.svg'
 import Playlists from '../../Assets/playlists.svg'
-import { RouterCtxt } from '@/Context/RouterContext';
-import { RouterContext } from '@/App';
 import CurrentSongThumbnail from './CurrentSongThumbnail';
+import { setCurrentRoute } from '@/Redux/Slices/currentRouteSlice';
+import { useAppDispatch } from '@/Redux/hooks';
 
 interface NavbarProps {
     className?: string;
@@ -23,7 +23,7 @@ const navbarItemList: NavbarItemData[] = [
 ]
 
 const Navbar = (props: NavbarProps) => {
-    const {currentRoute,setCurrentRoute} = useContext<RouterCtxt>(RouterContext)
+    const dispatch = useAppDispatch()
 
     return (
         <div className={props.className}>
@@ -39,7 +39,7 @@ const Navbar = (props: NavbarProps) => {
                                     <NavbarButtonComponent 
                                         title={navbarItem.title} 
                                         icon={navbarItem.icon}
-                                        onClick={() => setCurrentRoute(navbarItem.title)}
+                                        onClick={() => dispatch(setCurrentRoute(navbarItem.title))}
                                     />
                                 )
                             })}

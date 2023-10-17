@@ -23,6 +23,6 @@ export const replayingTypeSlice = createSlice({
 
 export const { setReplayingType } = replayingTypeSlice.actions
 
-export const selectReplayingType = (state: RootState) => state.counter.value
+export const selectReplayingType = (state: RootState) => state.replayingType.value
 
 export default replayingTypeSlice.reducer

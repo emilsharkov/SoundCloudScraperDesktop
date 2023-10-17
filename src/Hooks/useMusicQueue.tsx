@@ -1,6 +1,6 @@
-import { MusicContext } from "@/App"
 import { ReplayingType } from "@/Components/MusicPlaying/MusicPlayer"
-import { MusicCtxt } from "@/Context/MusicContext"
+import { setCurrentSong } from "@/Redux/Slices/currentSongSlice"
+import { useAppSelector, useAppDispatch } from '@/Redux/hooks'
 import { useContext, useEffect } from "react"
 
 const useMusicQueue = (
@@ -12,20 +12,20 @@ const useMusicQueue = (
         setCurrentQueueIndex: React.Dispatch<React.SetStateAction<number>>
     ) => {
     
-    const { setCurrentSong } = useContext<MusicCtxt>(MusicContext)
+    const dispatch = useAppDispatch()
 
     useEffect(() => {
-        if(audioRef.current && musicQueue.length && currentQueueIndex >= 0 && currentQueueIndex <= musicQueue.length - 1) {
+        if(audioRef.current && musicQueue.length && currentQueueIndex >= 0 && currentQueueIndex <= musicQueue.length - 1 && musicQueue[currentQueueIndex] !== '') {
             const currentSong = musicQueue[currentQueueIndex]
             audioRef.current.src = `http://localhost:3000/songs/${currentSong}.mp3`
-            setCurrentSong(currentSong)
+            dispatch(setCurrentSong(currentSong))
         } else {
-            setCurrentSong('')
             if(audioRef.current){
                 audioRef.current.src = ''
             }
+            dispatch(setCurrentSong(''))
         }
-    },[audioRef,musicQueue,currentQueueIndex])
+    },[musicQueue,currentQueueIndex])
 
     useEffect(() => {
         const handleSongEnded = () => {

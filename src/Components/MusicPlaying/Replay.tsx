@@ -2,14 +2,12 @@ import { Button } from "@/Components/ui/button"
 import replay from '../../Assets/replay.svg'
 import { useState } from "react"
 import { ReplayingType } from "./MusicPlayer";
+import { useAppDispatch, useAppSelector } from "@/Redux/hooks";
+import { setReplayingType } from "@/Redux/Slices/replayingTypeSlice";
 
-interface ReplayProps {
-    replayingType: ReplayingType;
-    setReplayingType: React.Dispatch<React.SetStateAction<ReplayingType>>;
-}
-
-const Replay = (props: ReplayProps) => {
-    const {replayingType,setReplayingType} = props
+const Replay = () => {
+    const replayingType = useAppSelector((state) => state.replayingType.value)
+    const dispatch = useAppDispatch()
     const replayColor = replayingType === 'NO_REPLAY' ? '' : replayingType === 'REPLAY_PLAYLIST' ? 'fill-orange-300	' : 'fill-red-300	'
 
     const changeReplayingType = () => {
@@ -21,7 +19,7 @@ const Replay = (props: ReplayProps) => {
         } else{
             newReplayingType = 'NO_REPLAY'
         }
-        setReplayingType(newReplayingType)
+        dispatch(setReplayingType(newReplayingType))
     }
 
     return (

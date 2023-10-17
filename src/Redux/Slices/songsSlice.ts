@@ -6,7 +6,8 @@ interface SongsState {
 }
 
 const initialState: SongsState = {
-  value: [],
+  // value: [''],
+  value: ['Clovis Reyes - Fluxxwave (Ultra Slowed)'],
 }
 
 export const songsSlice = createSlice({
@@ -21,6 +22,6 @@ export const songsSlice = createSlice({
 
 export const { setSongs } = songsSlice.actions
 
-export const selectSongs = (state: RootState) => state.counter.value
+export const selectSongs = (state: RootState) => state.songs.value
 
 export default songsSlice.reducer

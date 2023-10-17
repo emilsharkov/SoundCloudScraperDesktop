@@ -1,7 +1,7 @@
-import { MusicContext } from "@/App";
-import { MusicCtxt } from "@/Context/MusicContext";
 import { useGetMp3Metadata } from "@/Hooks/useGetMp3Metadata"
 import { useContext, useEffect, useMemo } from "react";
+import { useAppSelector, useAppDispatch } from '@/Redux/hooks'
+import { setSongs } from "@/Redux/Slices/songsSlice";
 
 export interface MusicTileProps {
     songName: string;
@@ -10,8 +10,8 @@ export interface MusicTileProps {
 
 const MusicTile = (props: MusicTileProps) => {
     const {mp3Metadata,setSongName} = useGetMp3Metadata()
-    const {songs,setSongs} = useContext<MusicCtxt>(MusicContext)
-
+    const songs = useAppSelector((state) => state.songs.value)
+    const dispatch = useAppDispatch()
     useEffect(() => setSongName(props.songName),[props.songName])
 
     const imagePath = useMemo(() => {
@@ -19,7 +19,7 @@ const MusicTile = (props: MusicTileProps) => {
     },[props.songName])
 
     return(
-        <div className='' onClick={() => setSongs(props.onClickQueue)}>
+        <div className='' onClick={() => dispatch(setSongs(props.onClickQueue))}>
             <img className='' src={imagePath}/>
             <p className=''>title{mp3Metadata?.title}</p>
             <p className=''>artist{mp3Metadata?.artist}</p>
