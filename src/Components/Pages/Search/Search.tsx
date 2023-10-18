@@ -3,12 +3,9 @@ import { useSearchSong } from "@/Hooks/useSearchSong"
 import { useDebounce } from "@/Hooks/useDebounce"
 import SongSuggestionTile from "./SongSuggestionTile"
 import { SongSuggestion } from '../../../Interfaces/SongSuggestion'
-
+import { Table,TableBody,TableCell,TableHead,TableHeader,TableRow } from "@/Components/ui/table"
 import clock from '../../../Assets/clock.svg'
 import heart from '../../../Assets/heart.svg'
-
-import suggestionsConst from './songSuggestionConstants'
-import Baki from '../../../Assets/baki.jpg'
 
 const Search = (): JSX.Element => {
     const [searchBarInput,setSearchBarInput] = useState<string>('')
@@ -29,33 +26,30 @@ const Search = (): JSX.Element => {
                 value={searchBarInput}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchBarInput(e.target.value)}
             />
-            <table className='block h-full w-full self-center overflow-hidden items-center bg-transparent border-collapse break-words bg-white shadow-lg rounded'>
-                <thead>
-                    <tr className='bg-gray-100'>
-                        <th className='max-w-2/12 align-middle border border-solid border-gray-100 py-3 text-xs uppercase border-l-0 border-r-0 truncate font-semibold text-left text-gray-500'></th>
-                        <th className='max-w-6/12 align-middle border border-solid border-gray-100 py-3 text-xs uppercase border-l-0 border-r-0 truncate font-semibold text-left text-gray-500'>Title</th>
-                        <th className='max-w-2/12 align-middle border border-solid border-gray-100 py-3 text-xs uppercase border-l-0 border-r-0 truncate font-semibold text-left text-gray-500'>Artist</th>
-                        <th className='max-w-1/12 align-middle border border-solid border-gray-100 py-3 text-xs uppercase border-l-0 border-r-0 truncate font-semibold text-left'><div className='flex justify-center'><img className='h-5' src={clock}/></div></th>
-                        <th className='max-w-1/12 align-middle border border-solid border-gray-100 py-3 text-xs uppercase border-l-0 border-r-0 truncate font-semibold text-left'><div className='flex justify-center'><img className='h-5' src={heart}/></div></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {suggestionsConst.map((songSuggestion: SongSuggestion) => {
-                    // {songSuggestions.map((songSuggestion: SongSuggestion) => {
-                        return (
-                            <SongSuggestionTile 
-                                key={songSuggestion.id}
-                                title={songSuggestion.title}
-                                // thumbnail={songSuggestion.thumbnail}
-                                thumbnail={Baki}
-                                duration={songSuggestion.duration}
-                                likes={songSuggestion.likes}
-                                artist={songSuggestion.author.name}
-                                url={songSuggestion.url}                            />
-                        )
-                    })}
-                </tbody>
-            </table>
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead className="w-[100px]"></TableHead>
+                        <TableHead>Title</TableHead>
+                        <TableHead>Artist</TableHead>
+                        <TableHead><img src={clock}/></TableHead>
+                        <TableHead><img src={heart}/></TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {songSuggestions.map((songSuggestion: SongSuggestion) => (                    
+                        <SongSuggestionTile 
+                            key={songSuggestion.id}
+                            title={songSuggestion.title}
+                            thumbnail={songSuggestion.thumbnail}
+                            duration={songSuggestion.duration}
+                            likes={songSuggestion.likes}
+                            artist={songSuggestion.author.name}
+                            url={songSuggestion.url}                            
+                        />
+                    ))}
+                </TableBody>
+            </Table>
         </div>
     )
 }
