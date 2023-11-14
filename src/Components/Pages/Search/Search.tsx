@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react"
-import { useSearchSong } from "@/Hooks/useSearchSong"
+import { useSearchSong } from "@/Hooks/Electron/useSearchSong"
 import { useDebounce } from "@/Hooks/useDebounce"
 import SongSuggestionTile from "./SongSuggestionTile"
 import { SongSuggestion } from '../../../Interfaces/SongSuggestion'
@@ -32,8 +32,8 @@ const Search = (): JSX.Element => {
                         <TableHead className="w-[100px]"></TableHead>
                         <TableHead>Title</TableHead>
                         <TableHead>Artist</TableHead>
-                        <TableHead><img src={clock}/></TableHead>
-                        <TableHead><img src={heart}/></TableHead>
+                        <TableHead><img className='h-8' src={clock}/></TableHead>
+                        <TableHead><img className='h-8' src={heart}/></TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>

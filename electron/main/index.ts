@@ -3,11 +3,9 @@ import { release } from 'node:os'
 import { join } from 'node:path'
 import { update } from './update'
 import { applyElectronHandlers } from './electronHandlers'
-import { workingDir, sendSongImage } from './utils'
-import { Request, Response, NextFunction } from 'express';
-
-const express = require('express');
-
+import { setupDatabase } from './database'
+import { setupServer } from './server'
+import sqlite3 from 'sqlite3'
 // The built directory structure
 //
 // ├─┬ dist-electron
@@ -78,12 +76,9 @@ async function createWindow() {
   })
 
   update(win)
+  const db: sqlite3.Database = setupDatabase()
+  setupServer(db)
   applyElectronHandlers()
-
-  const expressServer = express();
-  expressServer.use('/songs',express.static(`${workingDir}/songs`));
-  expressServer.use('/images/:fileName', (req: Request, res: Response, next: NextFunction) => sendSongImage(req,res,next))
-  expressServer.listen(3000)
 }
 
 app.whenReady().then(createWindow)

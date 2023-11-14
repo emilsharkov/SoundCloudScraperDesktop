@@ -1,10 +1,8 @@
 import { useState, useEffect } from "react"
 const { ipcRenderer } = window.require('electron');
 
-const DEFAULT_PLAYLIST_LIBRARY: string[] = []
-
-export const usePlaylistLibrary = () => {  
-    const [playlists,setPlaylists] = useState<string[]>(DEFAULT_PLAYLIST_LIBRARY)
+export const useGetPlaylists = () => {  
+    const [playlists,setPlaylists] = useState<string[]>([])
     const [receivedPlaylists,setReceivedPlaylists] = useState<boolean>(true);
 
     useEffect(() => {

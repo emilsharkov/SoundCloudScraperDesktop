@@ -8,7 +8,7 @@ interface CurrentSongThumbnailProps {
 
 const CurrentSongThumbnail = (props: CurrentSongThumbnailProps) => {
     const currentSong = useAppSelector((state) => state.currentSong.value)
-    const songImageSource: string = currentSong !== '' ? `http://localhost:3000/images/${currentSong}`: DefaultThumbnail
+    const songImageSource: string = currentSong !== '' ? `http://localhost:11738/images/${currentSong}`: DefaultThumbnail
 
     return (
         <div className='flex justify-center w-full'>

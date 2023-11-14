@@ -3,7 +3,7 @@ import { FileDialogResult } from "@/Interfaces/FileDialogResult"
 const { ipcRenderer } = window.require('electron')
 
 
-export const useFileDialog = () => {
+export const useOpenFileDialog = () => {
     const [path,setPath] = useState<FileDialogResult>()
     const [dialogClosed,setDialogClosed] = useState<boolean>(true);
     const [openDialog, setOpenDialog] = useState<boolean>(false)

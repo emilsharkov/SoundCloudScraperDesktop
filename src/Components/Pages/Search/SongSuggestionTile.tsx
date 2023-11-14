@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react'
-import { useSongDownload } from '@/Hooks/useSongDownload';
+import { useSongDownload } from '@/Hooks/Electron/useDownloadSong';
 import { TableCell,TableRow } from '@/Components/ui/table';
 import Spinner from './Spinner';
 
@@ -20,6 +20,7 @@ const SongSuggestionTile = (props: SongSuggestionProps) => {
     const rowRef = useRef<HTMLTableRowElement>(null)
     const [isClicked,setIsClicked] = useState<boolean>(false)
     const {isDownloaded,setSongURL} = useSongDownload()
+    const songIcon = isClicked && !isDownloaded ? <Spinner/>: <img className='h-8' src={thumbnail}/>
 
     useEffect(() => {
         if(!isClicked) { return }
@@ -37,7 +38,7 @@ const SongSuggestionTile = (props: SongSuggestionProps) => {
 
     return (
         <TableRow ref={rowRef} key={url} onClick={() => setIsClicked(true)}>
-            <TableCell className="font-medium"><img src={thumbnail}/></TableCell>
+            <TableCell className="font-medium">{songIcon}</TableCell>
             <TableCell>{title}</TableCell>
             <TableCell>{artist}</TableCell>
             <TableCell>{durationFormatted}</TableCell>

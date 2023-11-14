@@ -2,7 +2,7 @@ import { Mp3Metadata } from "@/Interfaces/Mp3Metadata";
 import { useState, useEffect } from "react"
 const { ipcRenderer } = window.require('electron');
 
-export const useSetMp3Metadata = () => {
+export const useEditMp3Metadata = () => {
     const [title,setTitle] = useState<string>('')
     const [artist,setArtist] = useState<string | null>(null)
     const [imgPath,setImgPath] = useState<string | null>(null)

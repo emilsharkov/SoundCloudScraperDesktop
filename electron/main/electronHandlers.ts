@@ -2,7 +2,8 @@ import { ipcMain, dialog } from 'electron'
 import { SongSuggestion } from '../interfaces/SongSuggestion'
 import { Song } from '../interfaces/Song'
 import { Mp3Metadata } from '../interfaces/Mp3Metadata'
-import { downloadThumbnail, editMp3CoverArt, editMp3Metadata, getImgPathFromURL, initDirs, workingDir} from './utils'
+import { downloadThumbnail, editMp3Metadata, getImgPathFromURL, initDirs, workingDir} from './utils'
+import sqlite3 from 'sqlite3'
 
 const fs = require('fs')
 const mm = require("music-metadata")
@@ -10,7 +11,7 @@ const SoundCloud = require("soundcloud-scraper");
 initDirs()
 
 export const applyElectronHandlers = () => {
-    ipcMain.handle('open-file-dialog', async (event) => {
+    ipcMain.handle('open-file-dialog', async (event: Electron.IpcMainInvokeEvent) => {
         const result = await dialog.showOpenDialog({
             properties: ['openFile'],
             filters: [
@@ -21,7 +22,7 @@ export const applyElectronHandlers = () => {
         return result;
     })
 
-    ipcMain.handle('search-song', async (event, songName: string) => {
+    ipcMain.handle('search-song', async (event: Electron.IpcMainInvokeEvent, songName: string) => {
         const client = new SoundCloud.Client();
         const songs: Song[] = await client.search(songName)
         const songSuggestions: SongSuggestion[] = await Promise.all(songs.map(async(song: Song) => {
@@ -31,16 +32,16 @@ export const applyElectronHandlers = () => {
         return songSuggestions.filter(song => song !== null)
     })
 
-    ipcMain.handle('get-mp3-metadata', async (event, songName: string) => {
+    ipcMain.handle('get-mp3-metadata', async (event: Electron.IpcMainInvokeEvent, songName: string) => {
         const path = `${workingDir}/songs/${songName}.mp3`
         return await mm.parseFile(path, { native: true });
     })
 
-    ipcMain.handle('edit-mp3-metadata', async (event, metadata: Mp3Metadata) => {
+    ipcMain.handle('edit-mp3-metadata', async (event: Electron.IpcMainInvokeEvent, metadata: Mp3Metadata) => {
         return await editMp3Metadata(metadata)
     })
 
-    ipcMain.handle('download-song', async (event, songURL: string) => {
+    ipcMain.handle('download-song', async (event: Electron.IpcMainInvokeEvent, songURL: string) => {
         return new Promise<void> (async resolve => {
             const client = new SoundCloud.Client();
             const song = await client.getSongInfo(songURL)
@@ -56,57 +57,81 @@ export const applyElectronHandlers = () => {
                     artist: null
                 }
                 await editMp3Metadata(metadata)
+                
                 resolve() 
             })
         })
     })
 
-    ipcMain.handle('get-songs', async (event) => {
-        const songsDir = `${workingDir}/songs`
-        const files: string[] = fs.readdirSync(songsDir)
-
-        let fileNames: string[] = []
-        files.forEach(file => {
-            const filePath = `${songsDir}/${file}`
-            const stats = fs.statSync(filePath);
-
-            if (stats.isFile()) {
-                const songName = file.split('.mp3')[0]
-                fileNames.push(songName);
-            }
-        })
-        return fileNames
+    ipcMain.handle('get-downloads', async (event: Electron.IpcMainInvokeEvent) => {
+        const response = await fetch('localhost:11738/songs')
+        const data: SQLRowResultSong[] = await response.json()
+        const songs = data.map(sqlRow => sqlRow.song_name)
+        return songs
     })
 
-    ipcMain.handle('get-playlist-names', async (event) => {
-        const playlistsDir = `${workingDir}/playlists`
-        const files: string[] = fs.readdirSync(playlistsDir)
-
-        let playlistNames: string[] = []
-        files.forEach(file => {
-            const filePath = `${workingDir}/${file}`
-            const stats = fs.statSync(filePath);
-
-            if (stats.isDirectory()) {
-                playlistNames.push(file);
-            }
+    ipcMain.handle('delete-song', async (event: Electron.IpcMainInvokeEvent, songName: string) => {
+        const params = { songName: songName }
+        const response = await fetch('localhost:11738/songs' + new URLSearchParams(params),{
+            method: 'DELETE'
         })
-        return playlistNames
+        const data: SQLRowResultSong[] = await response.json()
+        const songs = data.map(sqlRow => sqlRow.song_name)
+        return songs
     })
 
-    ipcMain.handle('get-songs-in-playlist', async (event, playlist: string) => {
-        const playlistDir = `${workingDir}/playlists/${playlist}`
-        const files: string[] = fs.readdirSync(playlistDir)
+    ipcMain.handle('get-playlists', async (event: Electron.IpcMainInvokeEvent) => {
+        const response = await fetch('localhost:11738/playlists')
+        return await response.json()
+    })
 
-        let fileNames: string[] = []
-        files.forEach(file => {
-            const filePath = `${workingDir}/${file}`
-            const stats = fs.statSync(filePath);
+    ipcMain.handle('get-playlist-songs', async (event: Electron.IpcMainInvokeEvent, playlistName: string) => {
+        const params = { playlistName: playlistName}
+        const response = await fetch('localhost:11738/playlists' + new URLSearchParams(params))
+        return await response.json()
+    })
 
-            if (stats.isFile()) {
-                fileNames.push(file);
-            }
+    ipcMain.handle('create-playlist', async (event: Electron.IpcMainInvokeEvent, playlistName: string, songName: string) => {
+        const response = await fetch('localhost:11738/playlists',{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                playlist_name: playlistName, 
+                song_name: songName
+            })
         })
-        return fileNames
+        return await response.json()
+    })
+
+    ipcMain.handle('delete-playlist', async (event: Electron.IpcMainInvokeEvent, playlistName: string) => {
+        const params = { playlistName: playlistName }
+        const response = await fetch('localhost:11738/playlists' + new URLSearchParams(params),{
+            method: 'DELETE',
+        })
+        return await response.json()
+    })
+
+    ipcMain.handle('delete-song-from-playlist', async (event: Electron.IpcMainInvokeEvent, playlistName: string, songName: string) => {
+        const params = { playlistName: playlistName, songName: songName}
+        const response = await fetch('localhost:11738/playlists' + new URLSearchParams(params),{
+            method: 'DELETE',
+        })
+        return await response.json()
+    })
+
+    ipcMain.handle('update-playlist-name', async (event: Electron.IpcMainInvokeEvent, playlistName: string, previousPlaylistName: string) => {
+        const params = { previousPlaylistName: previousPlaylistName }
+        const response = await fetch('localhost:11738/playlists' + new URLSearchParams(params),{
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                playlist_name: playlistName, 
+            })
+        })
+        return await response.json()
     })
 }

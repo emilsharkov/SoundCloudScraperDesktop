@@ -96,7 +96,7 @@ export const sendSongImage = (req: Request, res: Response, next: NextFunction) =
       const matchingFile = files.find(file => {
         const tokens = file.split(fileName)
         return tokens[0] === '' && tokens[1][0] === '.'
-      });
+      })
       
       return matchingFile ? res.sendFile(`${imagePath}/${matchingFile}`): res.status(404).send('File not found')
     })
@@ -105,6 +105,7 @@ export const sendSongImage = (req: Request, res: Response, next: NextFunction) =
 export const editMp3Metadata = async(metadata: Mp3Metadata) => {
     const path = `${workingDir}/songs/${metadata.title}.mp3`
     const mp3Metadata = await mm.parseFile(path, { native: true });
+    const oldTitle = metadata.title
     
     if(metadata.title != mp3Metadata.common.title) {
         mp3Metadata.common.title = metadata.title;
@@ -119,5 +120,28 @@ export const editMp3Metadata = async(metadata: Mp3Metadata) => {
     }
 
     nid3.update(mp3Metadata.common, path)
-    return await mm.parseFile(path, { native: true })
+    await mm.parseFile(path, { native: true })
+
+    let response = await fetch('localhost:11738/songs')
+    const songData: SQLRowResultSong[] = await response.json()
+    const songs = songData.map(song => song.song_name)
+    
+    let url = 'localhost:11738/songs'
+    let method = ''
+    if (songs.includes(mp3Metadata.common.title)) {
+        method = 'PUT'
+        url += new URLSearchParams({ previousName: oldTitle })
+    } else {
+        method = 'POST'
+    }
+    
+    response = await fetch(url,{
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            song_name: mp3Metadata.common.title,
+        }),
+    })
 }
