@@ -76,8 +76,7 @@ async function createWindow() {
   })
 
   update(win)
-  const db: sqlite3.Database = setupDatabase()
-  setupServer(db)
+  setupServer()
   applyElectronHandlers()
 }
 
