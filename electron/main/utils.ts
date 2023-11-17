@@ -1,4 +1,4 @@
-import { Mp3Metadata } from 'electron/interfaces/Mp3Metadata';
+import { Mp3Metadata } from 'electron/interfaces/electron/Mp3Metadata';
 import { Request, Response, NextFunction } from 'express';
 
 const fs = require('fs')

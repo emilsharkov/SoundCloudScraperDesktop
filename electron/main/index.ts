@@ -4,7 +4,7 @@ import { join } from 'node:path'
 import { update } from './update'
 import { applyElectronHandlers } from './electronHandlers'
 import { setupDatabase } from './database'
-import { setupServer } from './server'
+import { runServer } from './server/server'
 import sqlite3 from 'sqlite3'
 // The built directory structure
 //
@@ -76,7 +76,7 @@ async function createWindow() {
   })
 
   update(win)
-  setupServer()
+  runServer()
   applyElectronHandlers()
 }
 

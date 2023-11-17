@@ -1,7 +1,7 @@
 import { ipcMain, dialog } from 'electron'
-import { SongSuggestion } from '../interfaces/SongSuggestion'
-import { Song } from '../interfaces/Song'
-import { Mp3Metadata } from '../interfaces/Mp3Metadata'
+import { SongSuggestion } from '../interfaces/electron/SongSuggestion'
+import { Song } from '../interfaces/electron/Song'
+import { Mp3Metadata } from '../interfaces/electron/Mp3Metadata'
 import { downloadThumbnail, editMp3Metadata, getImgPathFromURL, initDirs, workingDir} from './utils'
 import sqlite3 from 'sqlite3'
 

@@ -1,51 +1,95 @@
-import express, { Request, Response } from 'express';
-import sqlite3 from 'sqlite3';
-import { bodyValidator } from '../server';
-import { queryAsync } from '../../database';
+import express, { Request, Response, NextFunction } from 'express'
+import sqlite3 from 'sqlite3'
+import { bodyValidator } from '../server'
+import { queryAsync } from '../../database'
+import { SongTitle } from '../../../interfaces/express/ResponseBody'
+import { PostSongBody,PutSongBody } from '../../../interfaces/express/RequestBody'
 
-const router = express.Router();
+const router = express.Router()
 
 const songsRoute = (db: sqlite3.Database) => {
   
-  router.get("/:login", async (req: Request, res: Response) => {
+  router.get("/", async (req: Request, res: Response, next: NextFunction) => {  
     try {
-      let loginReq = JSON.parse(decodeURIComponent(req.params.login));
-      const user = await queryAsync(
+      const songs = await queryAsync<SongTitle>(
         db,
-        "SELECT user_id, first_name, last_name, email FROM user WHERE email = ? AND password = ?",
-        [loginReq.email, loginReq.password]
-      );
-
-      if (user.length) {
-        res.json(user[0]);
+        "SELECT title FROM songs",
+        []
+      )
+  
+      if (songs.length) {
+        res.json(songs)
       } else {
-        throw new Error('User Not Found');
+        res.status(404).json({ message: 'Song Not Found' })
       }
     } catch (err) {
-      res.status(404).json((err as Error).message);
+      next(err)
     }
-  });
+  })
 
-  router.post("/", async (req: Request, res: Response) => {
+  router.post("/", bodyValidator(new PostSongBody), async (req: Request, res: Response, next: NextFunction) => {
     try {
-      let newUserReq = req.body.newUser;
-      const newUser = await queryAsync(
+      const body: PostSongBody = req.body
+      const newSong = await queryAsync<SongTitle>(
         db,
-        "INSERT INTO user (first_name, last_name, email, username, password) VALUES (?, ?, ?, ?, ?) returning user_id, first_name, last_name, email",
-        [newUserReq.firstName, newUserReq.lastName, newUserReq.email, newUserReq.username, newUserReq.password]
-      );
-
-      if (newUser.length) {
-        res.json(newUser[0]);
+        "INSERT INTO songs (title) VALUES (?) returning title",
+        [body.title]
+      )
+  
+      if (newSong.length) {
+        res.json(newSong[0])
       } else {
-        throw new Error('User Not Found');
+        res.status(500).json({ message: 'Error creating a new song' })
       }
     } catch (err) {
-      res.status(404).json((err as Error).message);
+      next(err)
     }
-  });
+  })
+  
 
-  return router;
+  router.put("/:title", bodyValidator(new PutSongBody), async (req: Request, res: Response, next: NextFunction) => {
+    const oldTitle = req.params.title
+  
+    try {
+      const body: PutSongBody = req.body
+      const updatedSong = await queryAsync<SongTitle>(
+        db,
+        "UPDATE songs SET title = ? WHERE title = ? returning title",
+        [body.newTitle, oldTitle]
+      )
+  
+      if (updatedSong.length) {
+        res.json(updatedSong[0])
+      } else {
+        res.status(404).json({ message: 'Song Not Found' })
+      }
+    } catch (err) {
+      next(err)
+    }
+  })
+  
+  router.delete("/:title", async (req: Request, res: Response, next: NextFunction) => {
+    const title = req.params.title
+  
+    try {
+      const deletedSong = await queryAsync<SongTitle>(
+        db,
+        "DELETE FROM songs WHERE title = ? returning title",
+        [title]
+      )
+  
+      if (deletedSong.length) {
+        res.json(deletedSong[0])
+      } else {
+        res.status(404).json({ message: 'Song Not Found' })
+      }
+    } catch (err) {
+      next(err)
+    }
+  })
+  
+
+  return router
 }
 
-export default songsRoute;
+export default songsRoute

@@ -1,6 +1,6 @@
 import sqlite3 from 'sqlite3';
 import { workingDir } from './utils';
-import { SqlRow } from './server/interfaces';
+import { SqlRow } from '../interfaces/express/ResponseBody';
 
 const setupDatabase = (): sqlite3.Database => {
     const db = new sqlite3.Database(`${workingDir}/soundCloudScraperDesktop.db`, (err) => {
