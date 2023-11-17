@@ -35,10 +35,25 @@ class PutPlaylistBody implements ReqBody {
 class PostPlaylistSongsBody implements ReqBody {
     public songTitle: string;
     public playlistName: string;
+    public songOrder: string;
 
     constructor(){
         this.songTitle = '';
         this.playlistName = '';
+        this.songOrder = '';
+    }
+}
+
+interface PutPlaylistSongBodyItem {
+    songTitle: string;
+    songOrder: number
+}
+
+class PutPlaylistSongsBody implements ReqBody {
+    public putPlaylistSongBodyItems: PutPlaylistSongBodyItem[]
+
+    constructor(){
+        this.putPlaylistSongBodyItems = [];
     }
 }
 
@@ -47,5 +62,10 @@ export {
     PutSongBody,
     PostPlaylistBody,
     PutPlaylistBody,
-    PostPlaylistSongsBody
+    PostPlaylistSongsBody,
+    PutPlaylistSongsBody
+}
+
+export type { 
+    PutPlaylistSongBodyItem 
 }

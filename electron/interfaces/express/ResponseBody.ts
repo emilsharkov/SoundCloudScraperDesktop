@@ -1,14 +1,21 @@
-export interface SqlRow {}
+interface SqlRow {}
 
-export interface SongTitle extends SqlRow {
+interface SongTitle extends SqlRow {
     title: string;
 }
 
-export interface PlaylistName extends SqlRow {
+interface PlaylistName extends SqlRow {
     name: string;
 }
 
-export interface PlaylistSongsNames extends SqlRow {
-    name: string;
-    title: string;
+interface PlaylistSongsNames extends SqlRow {
+    playlist_name: string;
+    song_title: string;
+}
+
+export type {
+    SqlRow,
+    SongTitle,
+    PlaylistName,
+    PlaylistSongsNames
 }
