@@ -4,6 +4,7 @@ import { bodyValidator } from '../server'
 import { queryAsync } from '../../database'
 import { SongTitle } from '../../../interfaces/express/ResponseBody'
 import { PostSongBody,PutSongBody } from '../../../interfaces/express/RequestBody'
+import { ErrorWithCode } from '../../../interfaces/express/Error'
 
 const router = express.Router()
 
@@ -20,7 +21,7 @@ const songsRoute = (db: sqlite3.Database) => {
       if (songs.length) {
         res.json(songs)
       } else {
-        res.status(404).json({ message: 'Song Not Found' })
+        throw new ErrorWithCode(404,'Song Not Found')
       }
     } catch (err) {
       next(err)
@@ -39,7 +40,7 @@ const songsRoute = (db: sqlite3.Database) => {
       if (newSong.length) {
         res.json(newSong[0])
       } else {
-        res.status(500).json({ message: 'Error creating a new song' })
+        throw new ErrorWithCode(500,'Error Creating a New Song')
       }
     } catch (err) {
       next(err)
@@ -61,7 +62,7 @@ const songsRoute = (db: sqlite3.Database) => {
       if (updatedSong.length) {
         res.json(updatedSong[0])
       } else {
-        res.status(404).json({ message: 'Song Not Found' })
+        throw new ErrorWithCode(500,'Error Updating Song')
       }
     } catch (err) {
       next(err)
@@ -81,7 +82,7 @@ const songsRoute = (db: sqlite3.Database) => {
       if (deletedSong.length) {
         res.json(deletedSong[0])
       } else {
-        res.status(404).json({ message: 'Song Not Found' })
+        throw new ErrorWithCode(500,'Error Deleting Song')
       }
     } catch (err) {
       next(err)

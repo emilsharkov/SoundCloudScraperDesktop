@@ -30,9 +30,9 @@ const setupDatabase = (): sqlite3.Database => {
         // Table to store the relationship between songs and playlists
         db.run(`
             CREATE TABLE IF NOT EXISTS playlist_songs (
-                playlist_id INTEGER,
-                song_id INTEGER,
-                song_order INTEGER,
+                playlist_id INTEGER NOT NULL,
+                song_id INTEGER NOT NULL,
+                song_order INTEGER NOT NULL,
                 PRIMARY KEY (playlist_id, song_id),
                 FOREIGN KEY (playlist_id) REFERENCES playlists(playlist_id) ON DELETE CASCADE,
                 FOREIGN KEY (song_id) REFERENCES songs(song_id) ON DELETE CASCADE

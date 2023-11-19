@@ -1,9 +1,9 @@
 import express, { Request, Response, NextFunction } from 'express'
-import sqlite3 from 'sqlite3'
 import songsRoute from './routes/songs'
 import playlistsRoute from './routes/playlists'
 import playlistSongsRoute from './routes/playlistSongs'
 import { setupDatabase } from '../database'
+import { ErrorWithCode } from '../../interfaces/express/Error'
 
 const app = express()
 const cors = require('cors')
@@ -55,7 +55,11 @@ const bodyValidator = <T extends object>(type: T) => {
 }
 
 const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunction) => {
-  res.status(404).send({ errors: [{ message: (err as Error).message }] })
+  if (err instanceof ErrorWithCode) {
+    res.status(err.code).send({ error: err.message });
+  } else {
+    res.status(500).send({ error: (err as Error).message });
+  }
 }
 
 export {runServer,bodyValidator}

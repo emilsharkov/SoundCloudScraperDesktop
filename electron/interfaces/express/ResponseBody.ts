@@ -13,9 +13,22 @@ interface PlaylistSongsNames extends SqlRow {
     song_title: string;
 }
 
+interface SQLAction extends SqlRow {}
+
+interface SongOrder extends SqlRow {
+    song_title: string;
+    song_order: string;
+}
+
+interface ErrorResponse {
+    
+}
+
 export type {
     SqlRow,
     SongTitle,
     PlaylistName,
-    PlaylistSongsNames
+    PlaylistSongsNames,
+    SQLAction,
+    SongOrder
 }

@@ -50,10 +50,10 @@ interface PutPlaylistSongBodyItem {
 }
 
 class PutPlaylistSongsBody implements ReqBody {
-    public putPlaylistSongBodyItems: PutPlaylistSongBodyItem[]
+    public songOrderings: PutPlaylistSongBodyItem[]
 
     constructor(){
-        this.putPlaylistSongBodyItems = [];
+        this.songOrderings = [];
     }
 }
 

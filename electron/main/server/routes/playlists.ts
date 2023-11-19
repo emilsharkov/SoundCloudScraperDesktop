@@ -4,6 +4,7 @@ import { bodyValidator } from '../server'
 import { queryAsync } from '../../database'
 import { PlaylistName } from '../../../interfaces/express/ResponseBody'
 import { PostPlaylistBody,PutPlaylistBody } from '../../../interfaces/express/RequestBody'
+import { ErrorWithCode } from '../../../interfaces/express/Error'
 
 const router = express.Router()
 
@@ -20,7 +21,7 @@ const playlistsRoute = (db: sqlite3.Database) => {
       if (playlists.length) {
         res.json(playlists)
       } else {
-        res.status(404).json({ message: 'Playlist Not Found' })
+        throw new ErrorWithCode(404,'Playlist Not Found')
       }
     } catch (err) {
       next(err)
@@ -39,7 +40,7 @@ const playlistsRoute = (db: sqlite3.Database) => {
       if (newPlaylist.length) {
         res.json(newPlaylist[0])
       } else {
-        res.status(500).json({ message: 'Error creating a new Playlist' })
+        throw new ErrorWithCode(500,'Error Creating Playlist')
       }
     } catch (err) {
       next(err)
@@ -61,7 +62,7 @@ const playlistsRoute = (db: sqlite3.Database) => {
       if (updatedPlaylist.length) {
         res.json(updatedPlaylist[0])
       } else {
-        res.status(404).json({ message: 'Playlist Not Found' })
+        throw new ErrorWithCode(500,'Error Updating Playlist')
       }
     } catch (err) {
       next(err)
@@ -81,7 +82,7 @@ const playlistsRoute = (db: sqlite3.Database) => {
       if (deletedPlaylist.length) {
         res.json(deletedPlaylist[0])
       } else {
-        res.status(404).json({ message: 'Playlist Not Found' })
+        throw new ErrorWithCode(500,'Error Deleting Playlist')
       }
     } catch (err) {
       next(err)

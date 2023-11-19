@@ -2,8 +2,9 @@
   import sqlite3 from 'sqlite3'
   import { bodyValidator } from '../server'
   import { queryAsync } from '../../database'
-  import { PlaylistSongsNames } from '../../../interfaces/express/ResponseBody'
+  import { PlaylistSongsNames, SQLAction, SongOrder } from '../../../interfaces/express/ResponseBody'
   import { PostPlaylistSongsBody, PutPlaylistSongsBody, PutPlaylistSongBodyItem } from '../../../interfaces/express/RequestBody'
+  import { ErrorWithCode } from '../../../interfaces/express/Error'
 
   const router = express.Router()
 
@@ -15,7 +16,7 @@
       try {
         const playlist = await queryAsync<PlaylistSongsNames>(
           db,
-          `SELECT name as playlist_name, title as song_title
+          `SELECT song_order, title as song_title
           FROM playlist_songs ps
           JOIN playlists p ON ps.playlist_id = p.playlist_id
           JOIN songs s ON ps.song_id = s.song_id
@@ -27,7 +28,7 @@
         if (playlist.length) {
           res.json(playlist)
         } else {
-          res.status(404).json({ message: 'Playlist Not Found' })
+          throw new ErrorWithCode(404,'Playlist Songs Not Found')
         }
       } catch (err) {
         next(err)
@@ -47,13 +48,13 @@
           )
           INSERT INTO playlist_songs (playlist_id, song_id, song_order)
           VALUES (
-              (SELECT song_id FROM song),
               (SELECT playlist_id FROM playlist),
+              (SELECT song_id FROM song),
               ?
           )
           RETURNING
+          (SELECT name FROM playlist) as playlist_name,
           (SELECT title FROM song) as song_title,
-          (SELECT name FROM playlist) as playlist_name
           song_order;`,
           [body.songTitle,body.playlistName,body.songOrder]
         )
@@ -61,7 +62,7 @@
         if (newPlaylist.length) {
           res.json(newPlaylist[0])
         } else {
-          res.status(500).json({ message: 'Error creating a new Playlist' })
+          throw new ErrorWithCode(500,'Error Adding Songs')
         }
       } catch (err) {
         next(err)
@@ -93,7 +94,7 @@
         if (deletedPlaylist.length) {
           res.json(deletedPlaylist[0])
         } else {
-          res.status(404).json({ message: 'Playlist Not Found' })
+          throw new ErrorWithCode(500,'Error Deleting Song')
         }
       } catch (err) {
         next(err)
@@ -105,30 +106,36 @@
         const playlistName = req.params.playlistName
         const body: PutPlaylistSongsBody = req.body
 
-        await db.run('BEGIN TRANSACTION');
-        await db.run(`
-          WITH songsInPlaylist as (
-            SELECT song_id, playlist_id, name as playlist_name, title as song_title
+        const beginTransaction = await queryAsync<SQLAction>(db,`BEGIN TRANSACTION`,[])
+        const createTempTable = await queryAsync<SQLAction>(
+          db,
+          `CREATE TEMPORARY TABLE IF NOT EXISTS songsInPlaylist AS
+            SELECT ps.song_id, ps.playlist_id, p.name, s.title
             FROM playlist_songs ps
             JOIN playlists p ON ps.playlist_id = p.playlist_id
             JOIN songs s ON ps.song_id = s.song_id
-            WHERE p.name = ?
-          )
-        `,[playlistName])
+            WHERE p.name = ?`,
+          [playlistName]
+        )
         
-        for (const songData of body.putPlaylistSongBodyItems) {
+        let updatedSongs: SongOrder[] = []
+        for (const songData of body.songOrderings) {
           const { songTitle, songOrder }: PutPlaylistSongBodyItem = songData
-
-          await db.run(`
-            UPDATE playlist_songs
+          const updatedSong = await queryAsync<SongOrder>(
+            db,
+            `UPDATE playlist_songs
             SET song_order = ?
             WHERE song_id = (SELECT song_id from songsInPlaylist where title = ?)
-          `, [songOrder, songTitle])
+            RETURNING song_order, ? as song_title`, 
+            [songOrder, songTitle, songTitle]
+          )
+          updatedSongs.push(...updatedSong)
         }
 
-        await db.run('COMMIT')
+        const commit = await queryAsync<SQLAction>(db,`COMMIT`,[])
+        res.json(updatedSongs)
       } catch (err) {
-        await db.run('ROLLBACK')
+        const rollback = await queryAsync<SQLAction>(db,`ROLLBACK`,[])
         next(err)
       }
     })
