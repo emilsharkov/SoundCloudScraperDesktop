@@ -1,21 +1,18 @@
-import { ipcMain, dialog } from 'electron'
-import { SongSuggestion } from '../interfaces/electron/SongSuggestion'
-import { Song } from '../interfaces/electron/Song'
-import { Mp3Metadata } from '../interfaces/electron/Mp3Metadata'
-import { downloadThumbnail, editMp3Metadata, getImgPathFromURL, initDirs, workingDir} from './utils'
+import { ipcMain, dialog, OpenDialogReturnValue } from 'electron'
+import { AddSongToPlaylistArgs, ChangePlaylistNameArgs, DeletePlaylistSongArgs, Mp3Metadata, PlaylistNameArgs, ReorderSongsArgs, SongNameArgs, SongURLArgs } from '../interfaces/electron/electronHandlerInputs'
+import { downloadThumbnail, editMp3Metadata, getImgPathFromURL, initDirs, workingDir, fetchData} from './utils'
 import { PlaylistName, PlaylistSongsNames, SongOrder, SongTitle } from '../interfaces/express/ResponseBody'
-import { ErrorResponse } from '../interfaces/express/Error'
-import { PutPlaylistSongBodyItem } from '../interfaces/express/RequestBody'
 
-const fs = require('fs')
-const mm = require("music-metadata")
-const SoundCloud = require("soundcloud-scraper")
+import * as fs from "fs"
+import * as mm from "music-metadata"
+import * as SoundCloud from "soundcloud-scraper"
+
 initDirs()
 
 export const applyElectronHandlers = () => {
-    ipcMain.handle('open-file-dialog', async (event: Electron.IpcMainInvokeEvent) => {
+    ipcMain.handle('open-file-dialog', async (event: Electron.IpcMainInvokeEvent): Promise<OpenDialogReturnValue> => {
         try{
-            const result = await dialog.showOpenDialog({
+            const result: OpenDialogReturnValue = await dialog.showOpenDialog({
                 properties: ['openFile'],
                 filters: [
                     { name: 'Images', extensions: ['jpg', 'jpeg', 'png'] },
@@ -29,17 +26,14 @@ export const applyElectronHandlers = () => {
         }
     })
 
-    ipcMain.handle('search-song', async (event: Electron.IpcMainInvokeEvent, songName: string) => {
+    ipcMain.handle('search-song', async (event: Electron.IpcMainInvokeEvent, args: SongNameArgs): Promise<SoundCloud.Song[]> => {
         try {
-            const client = new SoundCloud.Client()
-            const songs: Song[] = await client.search(songName)
-            const songSuggestions: SongSuggestion[] = await Promise.all(
-                songs.map(async(song: Song) => {
-                    return song.type == 'track' ? await client.getSongInfo(song.url): null
-                }
-            ))
-    
-            return songSuggestions.filter(song => song !== null)
+            const client: SoundCloud.Client = new SoundCloud.Client()
+            const searchResults: SoundCloud.SearchResult[] = await client.search(args.songName,'track')
+            const songs: SoundCloud.Song[] = await Promise.all(
+                searchResults.map(async(song: SoundCloud.SearchResult) => await client.getSongInfo(song.url))
+            )
+            return songs
         } catch (err) {
             console.error('Error in search-song handler:', err)
             throw new Error('Failed to Get Search Results')
@@ -47,11 +41,11 @@ export const applyElectronHandlers = () => {
         
     })
 
-    ipcMain.handle('download-song', async (event: Electron.IpcMainInvokeEvent, songURL: string) => {
+    ipcMain.handle('download-song', async (event: Electron.IpcMainInvokeEvent, args: SongURLArgs): Promise<void> => {
         try {
             return new Promise<void> (async resolve => {
-                const client = new SoundCloud.Client()
-                const song = await client.getSongInfo(songURL)
+                const client: SoundCloud.Client = new SoundCloud.Client()
+                const song: SoundCloud.Song = await client.getSongInfo(args.songURL)
     
                 const stream = await song.downloadProgressive()
                 const writer = stream.pipe(fs.createWriteStream(`${workingDir}/songs/${song.title}.mp3`))
@@ -74,177 +68,155 @@ export const applyElectronHandlers = () => {
         }
     })
 
-    ipcMain.handle('get-mp3-metadata', async (event: Electron.IpcMainInvokeEvent, songName: string) => {
+    ipcMain.handle('get-mp3-metadata', async (event: Electron.IpcMainInvokeEvent, args: SongNameArgs): Promise<Mp3Metadata> => {
         try {
-            const path = `${workingDir}/songs/${songName}.mp3`
-            return await mm.parseFile(path, { native: true })
+            const path = `${workingDir}/songs/${args.songName}.mp3`
+            const response: mm.IAudioMetadata = await mm.parseFile(path)
+            const common = response.common
+            let metadata: Mp3Metadata = { 
+                title: args.songName, 
+                artist: null, 
+                imgPath: `${workingDir}/images/${args.songName}.png` 
+            }
+            if(common.artist) { 
+                metadata.artist = common.artist 
+            }
+            return metadata
         } catch (err) {
             console.error('Error in get-mp3-metadata:', err)
             throw new Error('Failed to Get Mp3 Metadata')
         }
     })
 
-    ipcMain.handle('edit-mp3-metadata', async (event: Electron.IpcMainInvokeEvent, metadata: Mp3Metadata) => {
+    ipcMain.handle('edit-mp3-metadata', async (event: Electron.IpcMainInvokeEvent, args: Mp3Metadata): Promise<void> => {
         try {
-            return await editMp3Metadata(metadata)
+            return await editMp3Metadata(args)
         } catch (err) {
             console.error('Error in edit-mp3-metadata:', err)
             throw new Error('Failed to Edit Mp3 Metadata')
         }
     })
 
-    ipcMain.handle('delete-song-from-computer', async (event: Electron.IpcMainInvokeEvent, songTitle: string) => {
+    ipcMain.handle('delete-song-from-computer', async (event: Electron.IpcMainInvokeEvent, args: SongNameArgs): Promise<SongTitle[]> => {
         try {
-            fs.unlinkSync(`${workingDir}/songs/${songTitle}.mp3`)
-            fs.unlinkSync(`${workingDir}/images/${songTitle}.png`)
-            const response = await fetch(`http://localhost:11738/songs/${songTitle}`,{
+            fs.unlinkSync(`${workingDir}/songs/${args.songName}.mp3`)
+            fs.unlinkSync(`${workingDir}/images/${args.songName}.png`)
+            const data = await fetchData<SongTitle[]>(`http://localhost:11738/songs/${args.songName}`,{
                 method: 'DELETE'
             })
-
-            const data: SongTitle[] | ErrorResponse = await response.json()
-            if('error' in data) {
-                throw new Error(data.error)
-            }
+            return data
         } catch (err) {
             console.error('Error in delete-song-from-computer:', err)
             throw new Error('Failed to Delete Song From Computer')
         }
     })
 
-    ipcMain.on('get-playlists', async (event: Electron.IpcMainInvokeEvent) => {
+    ipcMain.on('get-playlists', async (event: Electron.IpcMainInvokeEvent, args = {}): Promise<PlaylistName[]> => {
         try {
-            const response = await fetch(`http://localhost:11738/playlists`)
-
-            const data: PlaylistName[] | ErrorResponse = await response.json()
-            if('error' in data) {
-                throw new Error(data.error)
-            }
+            const data = await fetchData<PlaylistName[]>('http://localhost:11738/playlists')
+            return data
         } catch (err) {
             console.error('Error in get-playlists:', err)
             throw new Error('Failed to Get All Playlists')
         }
     })
 
-    ipcMain.on('create-playlist', async (event: Electron.IpcMainInvokeEvent, playlistName: string) => {
+    ipcMain.on('create-playlist', async (event: Electron.IpcMainInvokeEvent, args: PlaylistNameArgs): Promise<PlaylistName[]> => {
         try {
-            const response = await fetch(`http://localhost:11738/playlists`, {
+            const data = await fetchData<PlaylistName[]>(`http://localhost:11738/playlists`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ name: playlistName }),
+                body: JSON.stringify({ name: args.playlistName }),
             })
-
-            const data: PlaylistName[] | ErrorResponse = await response.json()
-            if('error' in data) {
-                throw new Error(data.error)
-            }
+            return data
         } catch (err) {
             console.error('Error in create-playlist:', err)
             throw new Error('Failed to Create Playlist')
         }
     })
 
-    ipcMain.on('edit-playlist-name', async (event: Electron.IpcMainInvokeEvent, oldPlaylistName: string, newPlaylistName: string) => {
+    ipcMain.on('edit-playlist-name', async (event: Electron.IpcMainInvokeEvent, args: ChangePlaylistNameArgs): Promise<PlaylistName[]> => {
         try {
-            const response = await fetch(`http://localhost:11738/playlists/${oldPlaylistName}`, {
+            const data = await fetchData<PlaylistName[]>(`http://localhost:11738/playlists/${args.oldPlaylistName}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ newName: newPlaylistName }),
+                body: JSON.stringify({ newName: args.newPlaylistName }),
             })
-
-            const data: PlaylistName[] | ErrorResponse = await response.json()
-            if('error' in data) {
-                throw new Error(data.error)
-            }
+            return data
         } catch (err) {
             console.error('Error in edit-playlist-name:', err)
             throw new Error('Failed to Edit Playlist Name')
         }
     })
 
-    ipcMain.on('delete-playlist', async (event: Electron.IpcMainInvokeEvent, playlistName: string) => {
+    ipcMain.on('delete-playlist', async (event: Electron.IpcMainInvokeEvent, args: PlaylistNameArgs): Promise<PlaylistName[]> => {
         try {
-            const response = await fetch(`http://localhost:11738/playlists/${playlistName}`, {
+            const data = await fetchData<PlaylistName[]>(`http://localhost:11738/playlists/${args.playlistName}`, {
                 method: 'DELETE',
             })
-
-            const data: PlaylistName[] | ErrorResponse = await response.json()
-            if('error' in data) {
-                throw new Error(data.error)
-            }
+            return data
         } catch (err) {
             console.error('Error in delete-playlist:', err)
             throw new Error('Failed to Delete Playlist')
         }
     })
 
-    ipcMain.on('get-songs-in-playlist', async (event: Electron.IpcMainInvokeEvent, playlistName: string) => {
+    ipcMain.on('get-songs-in-playlist', async (event: Electron.IpcMainInvokeEvent, args: PlaylistNameArgs): Promise<SongOrder[]> => {
         try {
-            const response = await fetch(`http://localhost:11738/playlistSongs/${playlistName}`)
-
-            const data: SongOrder[] | ErrorResponse = await response.json()
-            if('error' in data) {
-                throw new Error(data.error)
-            }
+            const data = await fetchData<SongOrder[]>(`http://localhost:11738/playlistSongs/${args.playlistName}`)
+            return data
         } catch (err) {
             console.error('Error in get-songs-in-playlist:', err)
             throw new Error('Failed to Get Songs In Playlist')
         }
     })
 
-    ipcMain.on('add-song-to-playlist', async (event: Electron.IpcMainInvokeEvent, playlistName: string, songTitle: string, songOrder: number) => {
+    ipcMain.on('add-song-to-playlist', async (event: Electron.IpcMainInvokeEvent, args: AddSongToPlaylistArgs): Promise<PlaylistSongsNames[]> => {
         try {
-            const response = await fetch(`http://localhost:11738/playlists`, {
+            const data = await fetchData<PlaylistSongsNames[]>(`http://localhost:11738/playlists`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ songTitle, playlistName, songOrder }),
+                body: JSON.stringify({ 
+                    songTitle: args.songTitle, 
+                    playlistName: args.playlistName, 
+                    songOrder: args.songOrder 
+                }),
             })
-
-            const data: PlaylistSongsNames[] | ErrorResponse = await response.json()
-            if('error' in data) {
-                throw new Error(data.error)
-            }
+            return data
         } catch (err) {
             console.error('add-song-to-playlist:', err)
             throw new Error('Failed to Add Songs to Playlist')
         }
     })
 
-    ipcMain.on('edit-song-order', async (event: Electron.IpcMainInvokeEvent, playlistName: string, songOrderings: PutPlaylistSongBodyItem[]) => {
+    ipcMain.on('edit-song-order', async (event: Electron.IpcMainInvokeEvent, args: ReorderSongsArgs): Promise<SongOrder[]> => {
         try {
-            const response = await fetch(`http://localhost:11738/playlists/${playlistName}`, {
+            const data = await fetchData<SongOrder[]>(`http://localhost:11738/playlists/${args.playlistName}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ songOrderings }),
+                body: JSON.stringify({ songOrderings: args.songOrderings }),
             })
-
-            const data: SongOrder[] | ErrorResponse = await response.json()
-            if('error' in data) {
-                throw new Error(data.error)
-            }
+            return data
         } catch (err) {
             console.error('Error in edit-song-order:', err)
             throw new Error('Failed to Edit Song Order')
         }
     })
 
-    ipcMain.on('delete-song-in-playlist', async (event: Electron.IpcMainInvokeEvent, playlistName: string, songTitle: string) => {
+    ipcMain.on('delete-song-in-playlist', async (event: Electron.IpcMainInvokeEvent, args: DeletePlaylistSongArgs): Promise<PlaylistSongsNames[]> => {
         try {
-            const response = await fetch(`http://localhost:11738/playlists/${playlistName}/${songTitle}`, {
+            const data = await fetchData<PlaylistSongsNames[]>(`http://localhost:11738/playlists/${args.playlistName}/${args.songTitle}`, {
                 method: 'DELETE',
             })
-
-            const data: PlaylistSongsNames[] | ErrorResponse = await response.json()
-            if('error' in data) {
-                throw new Error(data.error)
-            }
+            return data
         } catch (err) {
             console.error('Error in delete-song-in-playlist:', err)
             throw new Error('Failed to Delete Song In Playlist')

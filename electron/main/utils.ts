@@ -1,11 +1,10 @@
-import { Mp3Metadata } from 'electron/interfaces/electron/Mp3Metadata';
+import { Mp3Metadata } from '../interfaces/electron/electronHandlerInputs';
 import { ErrorResponse } from '../interfaces/express/Error';
 import { SongTitle } from '../interfaces/express/ResponseBody';
-import { PostSongBody, PutSongBody } from '../interfaces/express/RequestBody';
 
 const fs = require('fs')
 const sharp = require('sharp');
-const mm = require("music-metadata")
+import * as mm from "music-metadata"
 const nid3 = require('node-id3')
 const { Readable } = require('stream');
 const { finished } = require('stream/promises');
@@ -98,12 +97,26 @@ const copyLocalImageToImages = (path: string) => {
 
 export const editMp3Metadata = async(metadata: Mp3Metadata) => {
     const path = `${workingDir}/songs/${metadata.title}.mp3`
-    const mp3Metadata = await mm.parseFile(path, { native: true });
+    const mp3Metadata: mm.IAudioMetadata = await mm.parseFile(path);
     
-    if(metadata.title != mp3Metadata.common.title) {
-        await changeTitle(mp3Metadata.common.title,metadata.title)
-        mp3Metadata.common.title = metadata.title;
+    if(!mp3Metadata.common.title) {
+        const data = await fetchData<SongTitle[]>(`http://localhost:11738/songs`,{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ title: metadata.title }),
+        })
+    } else {
+        const data = await fetchData<SongTitle[]>(`http://localhost:11738/songs/${mp3Metadata.common.title}`,{
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ newTitle: metadata.title }),
+        })
     }
+    mp3Metadata.common.title = metadata.title
 
     if(metadata.artist != null) {
         mp3Metadata.common.artist = metadata.artist;
@@ -114,42 +127,14 @@ export const editMp3Metadata = async(metadata: Mp3Metadata) => {
     }
 
     nid3.update(mp3Metadata.common, path)
-    await mm.parseFile(path, { native: true })
-
-    
+    await mm.parseFile(path)
 }
 
-const changeTitle = async (oldTitle: string, newTitle: string) => {
-    const songResponse = await fetch('http://localhost:11738/songs')
-    const songData: SongTitle[] | ErrorResponse = await songResponse.json()
-    
-    if('error' in songData) {
-        throw new Error(songData.error)
+export const fetchData = async <T extends object>(url: string, options: RequestInit = {}) => {
+    const response = await fetch(url,options)
+    const data: T | ErrorResponse = await response.json()
+    if('error' in data) {
+        throw new Error(data.error)
     }
-    const songs = songData.map(song => song.title)
-    
-    let url: string = 'http://localhost:11738/songs'
-    let method: string = ''
-    let body: PutSongBody | PostSongBody | null = null
-    if (songs.includes(oldTitle)) {
-        method = 'PUT'
-        url += `/${oldTitle}`
-        body = { newTitle: newTitle }
-    } else {
-        method = 'POST'
-        body = { title: newTitle }
-    }
-    
-    const newMetaDataResponse = await fetch(url,{
-        method: method,
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-    })
-
-    const newMetaData: SongTitle | ErrorResponse = await newMetaDataResponse.json()
-    if('error' in newMetaData) {
-        throw new Error(newMetaData.error)
-    }
+    return data as T
 }
