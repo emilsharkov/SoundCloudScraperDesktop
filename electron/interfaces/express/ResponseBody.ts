@@ -11,6 +11,7 @@ interface PlaylistName extends SqlRow {
 interface PlaylistSongsNames extends SqlRow {
     playlist_name: string;
     song_title: string;
+    song_order: number;
 }
 
 interface SQLAction extends SqlRow {}
@@ -18,10 +19,6 @@ interface SQLAction extends SqlRow {}
 interface SongOrder extends SqlRow {
     song_title: string;
     song_order: string;
-}
-
-interface ErrorResponse {
-    
 }
 
 export type {

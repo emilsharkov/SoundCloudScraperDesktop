@@ -1,7 +1,10 @@
 import { Mp3Metadata } from 'electron/interfaces/electron/Mp3Metadata';
-import { Request, Response, NextFunction } from 'express';
+import { ErrorResponse } from '../interfaces/express/Error';
+import { SongTitle } from '../interfaces/express/ResponseBody';
+import { PostSongBody, PutSongBody } from '../interfaces/express/RequestBody';
 
 const fs = require('fs')
+const sharp = require('sharp');
 const mm = require("music-metadata")
 const nid3 = require('node-id3')
 const { Readable } = require('stream');
@@ -22,11 +25,6 @@ export const initDirs = () => {
     if (!fs.existsSync()) {
         fs.mkdirSync(imagesDir,{ recursive: true })
     }
-
-    const playlistDir = `${workingDir}/playlists`
-    if (!fs.existsSync()) {
-        fs.mkdirSync(playlistDir,{ recursive: true })
-    }
 }
 
 export const getImgPathFromURL = (songName: string, imgURL: string) => {
@@ -36,11 +34,23 @@ export const getImgPathFromURL = (songName: string, imgURL: string) => {
     return imagePath
 }
 
+async function convertToPng(inputPath: string) {
+    try {
+        const outputPath = inputPath.split('.')[0] + '.png'
+        await sharp(inputPath).toFormat('png').toFile(outputPath);
+        console.log('Image converted successfully to PNG:', outputPath);
+    } catch (error) {
+        console.error('Error converting image to PNG:', error)
+        throw error
+    }
+  }
+
 export const downloadThumbnail = async(songName: string, imgURL: string) => {
     const imagePath = getImgPathFromURL(songName,imgURL)    
     const stream = fs.createWriteStream(imagePath);
     const response = await fetch(imgURL);
-    await finished(Readable.fromWeb(response.body).pipe(stream));
+    await finished(Readable.fromWeb(response.body).pipe(stream))
+    await convertToPng(imagePath)
 }
 
 export const editMp3CoverArt = async (songName: string, imagePath: string) => {
@@ -86,28 +96,12 @@ const copyLocalImageToImages = (path: string) => {
     });
 }
 
-export const sendSongImage = (req: Request, res: Response, next: NextFunction) => {
-    const fileName = req.params.fileName
-    const imagePath = `${workingDir}/images`
-  
-    fs.readdir(imagePath, (err: Error, files: string[]) => {
-      if (err) { return res.status(500).send('Internal Server Error') }
-
-      const matchingFile = files.find(file => {
-        const tokens = file.split(fileName)
-        return tokens[0] === '' && tokens[1][0] === '.'
-      })
-      
-      return matchingFile ? res.sendFile(`${imagePath}/${matchingFile}`): res.status(404).send('File not found')
-    })
-}
-
 export const editMp3Metadata = async(metadata: Mp3Metadata) => {
     const path = `${workingDir}/songs/${metadata.title}.mp3`
     const mp3Metadata = await mm.parseFile(path, { native: true });
-    const oldTitle = metadata.title
     
     if(metadata.title != mp3Metadata.common.title) {
+        await changeTitle(mp3Metadata.common.title,metadata.title)
         mp3Metadata.common.title = metadata.title;
     }
 
@@ -122,26 +116,40 @@ export const editMp3Metadata = async(metadata: Mp3Metadata) => {
     nid3.update(mp3Metadata.common, path)
     await mm.parseFile(path, { native: true })
 
-    let response = await fetch('localhost:11738/songs')
-    const songData: SQLRowResultSong[] = await response.json()
-    const songs = songData.map(song => song.song_name)
     
-    let url = 'localhost:11738/songs'
-    let method = ''
-    if (songs.includes(mp3Metadata.common.title)) {
+}
+
+const changeTitle = async (oldTitle: string, newTitle: string) => {
+    const songResponse = await fetch('http://localhost:11738/songs')
+    const songData: SongTitle[] | ErrorResponse = await songResponse.json()
+    
+    if('error' in songData) {
+        throw new Error(songData.error)
+    }
+    const songs = songData.map(song => song.title)
+    
+    let url: string = 'http://localhost:11738/songs'
+    let method: string = ''
+    let body: PutSongBody | PostSongBody | null = null
+    if (songs.includes(oldTitle)) {
         method = 'PUT'
-        url += new URLSearchParams({ previousName: oldTitle })
+        url += `/${oldTitle}`
+        body = { newTitle: newTitle }
     } else {
         method = 'POST'
+        body = { title: newTitle }
     }
     
-    response = await fetch(url,{
+    const newMetaDataResponse = await fetch(url,{
         method: method,
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-            song_name: mp3Metadata.common.title,
-        }),
+        body: JSON.stringify(body),
     })
+
+    const newMetaData: SongTitle | ErrorResponse = await newMetaDataResponse.json()
+    if('error' in newMetaData) {
+        throw new Error(newMetaData.error)
+    }
 }

@@ -4,7 +4,6 @@
   import SongSlider from "./SongSlider"
   import useMusicPlayer from "@/Hooks/useMusicPlaying"
   import Play from "./Play"
-  import { useEffect, useState } from "react"
   import useMusicQueue from "@/Hooks/useMusicQueue"
   import { useAppSelector, useAppDispatch } from '@/Redux/hooks'
 

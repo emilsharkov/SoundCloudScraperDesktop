@@ -17,7 +17,7 @@ const useMusicQueue = (
     useEffect(() => {
         if(audioRef.current && musicQueue.length && currentQueueIndex >= 0 && currentQueueIndex <= musicQueue.length - 1 && musicQueue[currentQueueIndex] !== '') {
             const currentSong = musicQueue[currentQueueIndex]
-            audioRef.current.src = `http://localhost:11738/song/${currentSong}.mp3`
+            audioRef.current.src = `http://localhost:11738/songFiles/${currentSong}.mp3`
             dispatch(setCurrentSong(currentSong))
         } else {
             if(audioRef.current){

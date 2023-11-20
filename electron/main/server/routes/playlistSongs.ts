@@ -14,7 +14,7 @@
       const playlistName = req.params.playlistName
       
       try {
-        const playlist = await queryAsync<PlaylistSongsNames>(
+        const playlist = await queryAsync<SongOrder>(
           db,
           `SELECT song_order, title as song_title
           FROM playlist_songs ps
@@ -69,38 +69,6 @@
       }
     })
     
-    router.delete("/:playlistName/:songTitle", async (req: Request, res: Response, next: NextFunction) => {
-      const playlistName = req.params.playlistName
-      const songTitle = req.params.songTitle
-    
-      try {
-        const deletedPlaylist = await queryAsync<PlaylistSongsNames>(
-          db,
-          `WITH song AS (
-            SELECT * FROM songs WHERE title = ?
-          ),
-          playlist AS (
-            SELECT * FROM playlists WHERE name = ?
-          )
-          DELETE FROM playlist_songs 
-          WHERE playlist_id = (SELECT song_id FROM song)
-          AND song_id = (SELECT playlist_id FROM playlist)
-          RETURNING
-          (SELECT title FROM song) as song_title,
-          (SELECT name FROM playlist) as playlist_name;`,
-          [songTitle,playlistName]
-        )
-    
-        if (deletedPlaylist.length) {
-          res.json(deletedPlaylist[0])
-        } else {
-          throw new ErrorWithCode(500,'Error Deleting Song')
-        }
-      } catch (err) {
-        next(err)
-      }
-    })
-
     router.put("/:playlistName", bodyValidator(new PutPlaylistSongsBody), async (req: Request, res: Response, next: NextFunction) => {
       try {
         const playlistName = req.params.playlistName
@@ -136,6 +104,39 @@
         res.json(updatedSongs)
       } catch (err) {
         const rollback = await queryAsync<SQLAction>(db,`ROLLBACK`,[])
+        next(err)
+      }
+    })
+
+    router.delete("/:playlistName/:songTitle", async (req: Request, res: Response, next: NextFunction) => {
+      const playlistName = req.params.playlistName
+      const songTitle = req.params.songTitle
+    
+      try {
+        const deletedPlaylist = await queryAsync<PlaylistSongsNames>(
+          db,
+          `WITH song AS (
+            SELECT * FROM songs WHERE title = ?
+          ),
+          playlist AS (
+            SELECT * FROM playlists WHERE name = ?
+          )
+          DELETE FROM playlist_songs 
+          WHERE playlist_id = (SELECT song_id FROM song)
+          AND song_id = (SELECT playlist_id FROM playlist)
+          RETURNING
+          (SELECT title FROM song) as song_title,
+          (SELECT name FROM playlist) as playlist_name
+          song_order;`,
+          [songTitle,playlistName]
+        )
+    
+        if (deletedPlaylist.length) {
+          res.json(deletedPlaylist[0])
+        } else {
+          throw new ErrorWithCode(500,'Error Deleting Song')
+        }
+      } catch (err) {
         next(err)
       }
     })

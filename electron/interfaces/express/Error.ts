@@ -8,6 +8,14 @@ class ErrorWithCode extends Error {
     }
 }
 
+interface ErrorResponse {
+  error: string;
+}
+
 export {
   ErrorWithCode
+}
+
+export type {
+  ErrorResponse
 }

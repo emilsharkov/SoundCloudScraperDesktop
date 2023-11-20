@@ -4,6 +4,7 @@ import playlistsRoute from './routes/playlists'
 import playlistSongsRoute from './routes/playlistSongs'
 import { setupDatabase } from '../database'
 import { ErrorWithCode } from '../../interfaces/express/Error'
+import { workingDir } from '../utils'
 
 const app = express()
 const cors = require('cors')
@@ -16,10 +17,14 @@ const runServer = () => {
   app.use(cors())
   app.use(express.json())
   
-  // routes
+  // routes to sqlite db
   app.use('/songs', songsRoute(db))
   app.use('/playlists', playlistsRoute(db))
   app.use('/playlistSongs', playlistSongsRoute(db))
+
+  // routes to song .mp3 and album art .png
+  app.use('/songFiles',express.static(`${workingDir}/songs`));
+  app.use('/songImages', express.static(`${workingDir}/images`))
 
   // needs to be last middleware
   app.use(errorHandler)
