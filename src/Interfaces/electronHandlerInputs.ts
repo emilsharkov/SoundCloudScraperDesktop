@@ -1,5 +1,3 @@
-import { PutPlaylistSongBodyItem } from "../express/RequestBody";
-
 export interface Mp3Metadata {
     title: string;
     artist: string | null;
@@ -34,17 +32,12 @@ export interface ReorderSongsArgs {
     songOrderings: PutPlaylistSongBodyItem[];
 }
 
+export interface PutPlaylistSongBodyItem {
+    songTitle: string;
+    songOrder: number
+}
+
 export interface DeletePlaylistSongArgs {
     playlistName: string;
     songTitle: string;
-}
-
-export interface Song {
-	artist: string;
-	duration: number;
-	id: string;
-	likes: number;
-	thumbnail: string;
-	title: string;
-	url: string;
 }

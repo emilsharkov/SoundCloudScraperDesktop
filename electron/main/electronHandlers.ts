@@ -1,5 +1,5 @@
 import { ipcMain, dialog, OpenDialogReturnValue } from 'electron'
-import { AddSongToPlaylistArgs, ChangePlaylistNameArgs, DeletePlaylistSongArgs, Mp3Metadata, PlaylistNameArgs, ReorderSongsArgs, SongNameArgs, SongURLArgs } from '../interfaces/electron/electronHandlerInputs'
+import { AddSongToPlaylistArgs, ChangePlaylistNameArgs, DeletePlaylistSongArgs, Mp3Metadata, PlaylistNameArgs, ReorderSongsArgs, Song, SongNameArgs, SongURLArgs } from '../interfaces/electron/electronHandlerInputs'
 import { downloadThumbnail, editMp3Metadata, getImgPathFromURL, initDirs, workingDir, fetchData} from './utils'
 import { PlaylistName, PlaylistSongsNames, SongOrder, SongTitle } from '../interfaces/express/ResponseBody'
 
@@ -26,14 +26,25 @@ export const applyElectronHandlers = () => {
         }
     })
 
-    ipcMain.handle('search-song', async (event: Electron.IpcMainInvokeEvent, args: SongNameArgs): Promise<SoundCloud.Song[]> => {
+    ipcMain.handle('search-song', async (event: Electron.IpcMainInvokeEvent, args: SongNameArgs): Promise<Song[]> => {
         try {
             const client: SoundCloud.Client = new SoundCloud.Client()
             const searchResults: SoundCloud.SearchResult[] = await client.search(args.songName,'track')
             const songs: SoundCloud.Song[] = await Promise.all(
                 searchResults.map(async(song: SoundCloud.SearchResult) => await client.getSongInfo(song.url))
             )
-            return songs
+            const songData = songs.map((song: SoundCloud.Song) => {
+                return {
+                    artist: song.author.name,
+                    duration: song.duration,
+                    id: song.id,
+                    likes: song.likes,
+                    thumbnail: song.thumbnail,
+                    title: song.title,
+                    url: song.url
+                } as Song
+            })
+            return songData
         } catch (err) {
             console.error('Error in search-song handler:', err)
             throw new Error('Failed to Get Search Results')
@@ -85,6 +96,16 @@ export const applyElectronHandlers = () => {
         } catch (err) {
             console.error('Error in get-mp3-metadata:', err)
             throw new Error('Failed to Get Mp3 Metadata')
+        }
+    })
+
+    ipcMain.handle('get-all-songs', async (event: Electron.IpcMainInvokeEvent, args = {}): Promise<SongTitle[]> => {
+        try {
+            const data = await fetchData<SongTitle[]>(`http://localhost:11738/songs`)
+            return data
+        } catch (err) {
+            console.error('Error in get-all-songs:', err)
+            throw new Error('Failed to Get All Songs')
         }
     })
 

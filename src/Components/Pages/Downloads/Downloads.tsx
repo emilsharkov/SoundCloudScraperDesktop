@@ -1,34 +1,54 @@
 import { useState, useEffect, useMemo } from "react"
-import { useSongLibrary } from "@/Hooks/Electron/useGetDownloads"
-import { useSearchSong } from "@/Hooks/Electron/useSearchSong"
+import useElectronHandler from "@/Hooks/useElectronHandler"
 import { useDebounce } from "@/Hooks/useDebounce"
-import { SongSuggestion } from '../../../Interfaces/SongSuggestion'
 import { Table,TableBody,TableCell,TableHead,TableHeader,TableRow } from "@/Components/ui/table"
 import ReactDragListView from 'react-drag-listview';
+import { DragListViewProps } from 'react-drag-listview'
+import { SongTitle } from "@/Interfaces/nodeTypes";
 
 const Downloads = () => {
-    const {downloads,setReceivedDownloads} = useSongLibrary()
+    const {result,error,receivedData,setArgs} = useElectronHandler<object,SongTitle[]>('get-all-songs')
+    const [songTitles,setSongTitles] = useState<SongTitle[]>([])
 
-    useEffect(() => { 
-        setReceivedDownloads(false)
+    useEffect(() => {
+        setArgs({})
     },[])
 
-    // const onDragEnd = (fromIndex: number, toIndex: number) => {
-    //     const newData = [...downloads];
-    //     const [draggedItem] = newData.splice(fromIndex, 1);
-    //     newData.splice(toIndex, 0, draggedItem);
-    //     setData(newData);
-    // }
+    useEffect(() => {
+        if(receivedData && !error && result) {
+            setSongTitles(result)
+        }
+    },[receivedData,error,result])
+
+    const onDragEnd = (fromIndex: number, toIndex: number) => {
+        const updatedSongTitles = [...songTitles as SongTitle[]];
+        const draggedItem = updatedSongTitles.splice(fromIndex, 1)[0]
+        updatedSongTitles.splice(toIndex, 0, draggedItem)
+        setSongTitles(updatedSongTitles)
+    }
+    
+    const dragProps: DragListViewProps = {
+        onDragEnd,
+        nodeSelector: 'tr',
+        handleSelector: 'div',
+    }
 
     return(
         <div>
-            {downloads.map(song => {
-                return (
-                    <div>{song}</div>
-                )
-            })}
+            <ReactDragListView {...dragProps}>
+                <Table>
+                    <TableBody>
+                        {songTitles.map((item, index) => (
+                            <TableRow key={index}>
+                                <div>
+                                    <TableCell>{item.title}</TableCell>
+                                </div>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </ReactDragListView>
         </div>
-        
     )
 }
 

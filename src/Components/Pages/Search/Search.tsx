@@ -1,20 +1,22 @@
 import { useState, useEffect, useMemo } from "react"
-import { useSearchSong } from "@/Hooks/Electron/useSearchSong"
+import useElectronHandler from "@/Hooks/useElectronHandler"
 import { useDebounce } from "@/Hooks/useDebounce"
-import SongSuggestionTile from "./SongSuggestionTile"
-import { SongSuggestion } from '../../../Interfaces/SongSuggestion'
+import SongTile from "./SongTile"
 import { Table,TableBody,TableCell,TableHead,TableHeader,TableRow } from "@/Components/ui/table"
 import clock from '../../../Assets/clock.svg'
 import heart from '../../../Assets/heart.svg'
+import { Song } from "@/Interfaces/nodeTypes"
+import { SongNameArgs } from "@/Interfaces/electronHandlerInputs"
 
 const Search = (): JSX.Element => {
     const [searchBarInput,setSearchBarInput] = useState<string>('')
     const debouncedValue = useDebounce(searchBarInput)
-    const {songSuggestions,receivedSuggestions,setSongName} = useSearchSong()
+    const {result,error,receivedData,setArgs} = useElectronHandler<SongNameArgs,Song[]>('search-song')
 
     useEffect(() => {
-        if(debouncedValue != null) {
-            setSongName(debouncedValue)
+        if(debouncedValue && debouncedValue !== null && debouncedValue !== '') {
+            console.log(debouncedValue)
+            setArgs({ songName: debouncedValue })
         }
     },[debouncedValue])
 
@@ -37,16 +39,17 @@ const Search = (): JSX.Element => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {songSuggestions.map((songSuggestion: SongSuggestion) => (                    
-                        <SongSuggestionTile 
-                            key={songSuggestion.id}
-                            title={songSuggestion.title}
-                            thumbnail={songSuggestion.thumbnail}
-                            duration={songSuggestion.duration}
-                            likes={songSuggestion.likes}
-                            artist={songSuggestion.author.name}
-                            url={songSuggestion.url}                            
-                        />
+                    {receivedData && !error 
+                        && result?.map((song: Song) => (                    
+                            <SongTile 
+                                key={song.id}
+                                title={song.title}
+                                thumbnail={song.thumbnail}
+                                duration={song.duration}
+                                likes={song.likes}
+                                artist={song.artist}
+                                url={song.url}                            
+                            />
                     ))}
                 </TableBody>
             </Table>
