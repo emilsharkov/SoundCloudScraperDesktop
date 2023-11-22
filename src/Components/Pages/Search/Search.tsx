@@ -5,7 +5,7 @@ import SongTile from "./SongTile"
 import { Table,TableBody,TableCell,TableHead,TableHeader,TableRow } from "@/Components/ui/table"
 import clock from '../../../Assets/clock.svg'
 import heart from '../../../Assets/heart.svg'
-import { Song } from "@/Interfaces/nodeTypes"
+import { Song } from "@/Interfaces/electronHandlerReturns"
 import { SongNameArgs } from "@/Interfaces/electronHandlerInputs"
 
 const Search = (): JSX.Element => {

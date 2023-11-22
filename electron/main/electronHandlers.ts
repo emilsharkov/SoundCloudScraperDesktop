@@ -87,7 +87,7 @@ export const applyElectronHandlers = () => {
             let metadata: Mp3Metadata = { 
                 title: args.songName, 
                 artist: null, 
-                imgPath: `${workingDir}/images/${args.songName}.png` 
+                imgPath: `localhost:11738/songImages/${args.songName}` 
             }
             if(common.artist) { 
                 metadata.artist = common.artist 
