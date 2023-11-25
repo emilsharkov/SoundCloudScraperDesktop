@@ -65,7 +65,7 @@ export const applyElectronHandlers = () => {
                     
                     const metadata: Mp3Metadata = {
                         title: song.title,
-                        imgPath: getImgPathFromURL(song.title,song.thumbnail),
+                        imgPath: `${workingDir}/images/${song.title}.png`,
                         artist: null
                     }
                     await editMp3Metadata(metadata)
@@ -87,7 +87,7 @@ export const applyElectronHandlers = () => {
             let metadata: Mp3Metadata = { 
                 title: args.songName, 
                 artist: null, 
-                imgPath: `localhost:11738/songImages/${args.songName}` 
+                imgPath: `http://localhost:11738/songImages/${encodeURIComponent(args.songName)}.png` 
             }
             if(common.artist) { 
                 metadata.artist = common.artist 

@@ -37,6 +37,7 @@ const Navbar = (props: NavbarProps) => {
                             {navbarItemList.map((navbarItem: NavbarItemData) => {
                                 return (
                                     <NavbarButtonComponent 
+                                        key={navbarItem.title} 
                                         title={navbarItem.title} 
                                         icon={navbarItem.icon}
                                         onClick={() => dispatch(setCurrentRoute(navbarItem.title))}

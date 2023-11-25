@@ -55,21 +55,9 @@ const Playlists = () => {
     }
 
     return(
-        <div>
-            <ReactDragListView {...dragProps}>
-                <Table>
-                    <TableBody>
-                        {songTitles.map((item, index) => (
-                            <TableRow key={index}>
-                                <div>
-                                    <TableCell>{item.title}</TableCell>
-                                </div>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </ReactDragListView>
-        </div>
+        <ReactDragListView {...dragProps}>
+            {/* <SongTable songMetadata={}/> */}
+        </ReactDragListView>
     )
 }
 

@@ -1,4 +1,4 @@
-interface NavbarButtonProps {
+    interface NavbarButtonProps {
     title: string;
     icon: string;
     onClick: () => void

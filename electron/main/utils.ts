@@ -46,10 +46,13 @@ async function convertToPng(inputPath: string) {
 
 export const downloadThumbnail = async(songName: string, imgURL: string) => {
     const imagePath = getImgPathFromURL(songName,imgURL)    
-    const stream = fs.createWriteStream(imagePath);
-    const response = await fetch(imgURL);
+    const stream = fs.createWriteStream(imagePath)
+    const response = await fetch(imgURL)
     await finished(Readable.fromWeb(response.body).pipe(stream))
-    await convertToPng(imagePath)
+    if(imagePath.indexOf('.png') === -1) {
+        await convertToPng(imagePath)
+        fs.unlinkSync(imagePath)
+    }
 }
 
 export const editMp3CoverArt = async (songName: string, imagePath: string) => {
@@ -72,7 +75,7 @@ export const editMp3CoverArt = async (songName: string, imagePath: string) => {
         })
         .run()
 
-    copyLocalImageToImages(imagePath)
+    // copyLocalImageToImages(imagePath)
 }
 
 const copyLocalImageToImages = (path: string) => {

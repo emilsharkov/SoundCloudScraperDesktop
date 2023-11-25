@@ -1,37 +1,32 @@
-import { SongOrder } from "@/Interfaces/electronHandlerReturns"
 import { Table,TableBody,TableCell,TableHead,TableHeader,TableRow } from "@/Components/ui/table"
-import { useEffect, useState } from "react"
+import { Mp3Metadata } from "@/Interfaces/electronHandlerInputs"
 
 export interface SongTableProps {
-    songOrderings: SongOrder[]
+    songMetadata: Mp3Metadata[],
+    isDraggable: boolean
 }
 
 const SongTable = (props: SongTableProps) => {
-    const [songs, setSongs] = useState<SongOrder[]>([])
-
-    useEffect(() => {
-        const sortedSongs = props.songOrderings.slice().sort((a, b) => {
-            const orderA = parseInt(a.song_order);
-            const orderB = parseInt(b.song_order);
-            return orderA - orderB
-        })
-        setSongs(sortedSongs)
-    },[props.songOrderings])
-
     return (
         <Table>
             <TableHeader>
                 <TableRow>
                     <TableHead className="w-[100px]">#</TableHead>
+                    <TableHead></TableHead>
                     <TableHead>Title</TableHead>
                     <TableHead>Artist</TableHead>
                 </TableRow>
             </TableHeader>
 
             <TableBody>
-                {songs.map((item: SongOrder) => (
-                    <TableRow key={item.song_title}>
-                        <TableCell>{item.song_title}</TableCell>
+                {props.songMetadata.map((item: Mp3Metadata, index: number) => (
+                    <TableRow key={item.title}>
+                            <TableCell>{index}</TableCell>
+                            <TableCell><img src={item.imgPath ?? undefined}/></TableCell>
+                            <TableCell>{item.title}</TableCell>
+                            <TableCell>{item.artist}</TableCell>
+                            <TableCell>Settings Button</TableCell>
+                            {props.isDraggable ? <li>Draggable Dots</li>: null}
                     </TableRow>
                 ))}
             </TableBody>
