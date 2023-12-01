@@ -8,7 +8,7 @@ import { setReplayingType } from "@/Redux/Slices/replayingTypeSlice";
 const Replay = () => {
     const replayingType = useAppSelector((state) => state.replayingType.value)
     const dispatch = useAppDispatch()
-    const replayColor = replayingType === 'NO_REPLAY' ? '' : replayingType === 'REPLAY_PLAYLIST' ? 'fill-orange-300	' : 'fill-red-300	'
+    const replayColor = replayingType === 'NO_REPLAY' ? 'border-green-500' : replayingType === 'REPLAY_PLAYLIST' ? 'border-yellow-500' : 'border-red-500'
 
     const changeReplayingType = () => {
         let newReplayingType: ReplayingType | null = null
@@ -24,7 +24,7 @@ const Replay = () => {
 
     return (
         <Button size="icon" variant="ghost" onClick={() => changeReplayingType()}>
-            <img className={replayColor} src={replay}/>
+            <img className={`border-solid border-2 ${replayColor}`} src={replay}/>
         </Button>
     )
 }

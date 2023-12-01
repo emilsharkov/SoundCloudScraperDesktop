@@ -1,5 +1,6 @@
 import { ReplayingType } from "@/Components/MusicPlaying/MusicPlayer"
 import { setCurrentSong } from "@/Redux/Slices/currentSongSlice"
+import { setIsPlaying } from "@/Redux/Slices/isPlayingSlice"
 import { useAppSelector, useAppDispatch } from '@/Redux/hooks'
 import { useContext, useEffect } from "react"
 
@@ -42,6 +43,7 @@ const useMusicQueue = (
                     }
                 } else {
                     audioRef.current.currentTime = 0
+                    audioRef.current.play()
                 }
             }
         }

@@ -1,7 +1,6 @@
 import SongTable from "@/Components/Shared/SongTable"
 import useElectronHandler from "@/Hooks/useElectronHandler"
 import useSongsWithMetadata from "@/Hooks/useSongsWithMetadata"
-import { Mp3Metadata } from "@/Interfaces/electronHandlerInputs"
 import { SongOrder, SongTitle } from "@/Interfaces/electronHandlerReturns"
 import { useEffect, useState } from "react"
 

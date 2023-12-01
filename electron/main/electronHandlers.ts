@@ -30,6 +30,7 @@ export const applyElectronHandlers = () => {
         try {
             const client: SoundCloud.Client = new SoundCloud.Client()
             const searchResults: SoundCloud.SearchResult[] = await client.search(args.songName,'track')
+
             const songs: SoundCloud.Song[] = await Promise.all(
                 searchResults.map(async(song: SoundCloud.SearchResult) => await client.getSongInfo(song.url))
             )
