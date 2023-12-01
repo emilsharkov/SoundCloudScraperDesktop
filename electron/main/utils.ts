@@ -8,9 +8,6 @@ import * as mm from "music-metadata"
 const nid3 = require('node-id3')
 const { Readable } = require('stream');
 const { finished } = require('stream/promises');
-const ffmpegStatic = require('ffmpeg-static');
-const ffmpeg = require('fluent-ffmpeg');
-ffmpeg.setFfmpegPath(ffmpegStatic);
 
 export const workingDir = process.env.USERPROFILE + '\\SoundCloudScraper'
 
@@ -57,25 +54,17 @@ export const downloadThumbnail = async(songName: string, imgURL: string) => {
 
 export const editMp3CoverArt = async (songName: string, imagePath: string) => {
     const songPath = `${workingDir}/songs/${songName}.mp3`
-    const tempSongPath = `${workingDir}/songs/${songName}_temp.mp3`
-
-    ffmpeg()
-        .input(songPath)
-        .input(imagePath)
-        .outputOptions('-c', 'copy')
-        .outputOptions('-map', '0')
-        .outputOptions('-map', '1')
-        .outputOptions('-id3v2_version', '3')
-        .outputOptions('-metadata:s:v', 'title="Album cover"')
-        .outputOptions('-metadata:s:v', 'comment="Cover (front)"')
-        .output(tempSongPath)
-        .on('end', () => {
-            fs.unlinkSync(songPath)
-            fs.renameSync(tempSongPath,songPath)
-        })
-        .run()
-
-    // copyLocalImageToImages(imagePath)
+    const tags = nid3.read(songPath)
+    tags.image = {
+        mime: 'image/png',
+        type: {
+            id: 3, // Cover (front) image
+            name: 'front'
+        },
+        description: 'Cover',
+        imageBuffer: fs.readFileSync(imagePath)
+    }
+    nid3.write(tags, songPath)
 }
 
 const copyLocalImageToImages = (path: string) => {
