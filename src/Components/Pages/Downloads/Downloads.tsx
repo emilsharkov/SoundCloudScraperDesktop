@@ -1,5 +1,6 @@
 import SongTable from "@/Components/Shared/SongTable"
 import useElectronHandler from "@/Hooks/useElectronHandler"
+import useFuzzySearch from "@/Hooks/useFuzzySearch"
 import useSongsWithMetadata from "@/Hooks/useSongsWithMetadata"
 import { SongOrder, SongTitle } from "@/Interfaces/electronHandlerReturns"
 import { useEffect, useState } from "react"
@@ -14,10 +15,9 @@ const Downloads = () => {
 
     const [songOrder,setSongOrder] = useState<SongOrder[]>([])
     const {songsMetadata,receivedAllData} = useSongsWithMetadata(songOrder)
+    const {searchQuery, setSearchQuery, filteredData} = useFuzzySearch(songsMetadata)
 
-    useEffect(() => {
-        setSongsArgs({})
-    },[])
+    useEffect(() => setSongsArgs({}),[])
 
     useEffect(() => {
         if(receivedSongsData && !songsError && songs) {
@@ -29,13 +29,24 @@ const Downloads = () => {
     },[receivedSongsData,songsError,songs])
 
     return(
-        <>
-            {receivedAllData && 
-                <SongTable 
-                    songMetadata={songsMetadata}
-                    isDraggable={false}
-                />}
-        </>
+        <div>
+            <div>
+                <input
+                    type="text"
+                    placeholder="Search Song"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
+            </div>
+            <div>
+                {receivedAllData && 
+                    <SongTable 
+                        songMetadata={filteredData}
+                        isDraggable={false}
+                    />
+                }
+            </div>
+        </div>
     )
 }
 

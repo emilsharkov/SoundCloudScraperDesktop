@@ -16,6 +16,8 @@ import sqlite3 from 'sqlite3'
 // ├─┬ dist
 // │ └── index.html    > Electron-Renderer
 //
+applyElectronHandlers()
+
 process.env.DIST_ELECTRON = join(__dirname, '../')
 process.env.DIST = join(process.env.DIST_ELECTRON, '../dist')
 process.env.PUBLIC = process.env.VITE_DEV_SERVER_URL
@@ -77,7 +79,6 @@ async function createWindow() {
 
   update(win)
   runServer()
-  applyElectronHandlers()
 }
 
 app.whenReady().then(createWindow)
@@ -97,6 +98,7 @@ app.on('second-instance', () => {
 
 app.on('activate', () => {
   const allWindows = BrowserWindow.getAllWindows()
+
   if (allWindows.length) {
     allWindows[0].focus()
   } else {

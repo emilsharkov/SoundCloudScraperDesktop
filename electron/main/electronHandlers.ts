@@ -133,8 +133,9 @@ export const applyElectronHandlers = () => {
         }
     })
 
-    ipcMain.on('get-playlists', async (event: Electron.IpcMainInvokeEvent, args = {}): Promise<PlaylistName[]> => {
+    ipcMain.handle('get-playlists', async (event: Electron.IpcMainInvokeEvent, args = {}): Promise<PlaylistName[]> => {
         try {
+            console.log('Handler for get-playlists is called');
             const data = await fetchData<PlaylistName[]>('http://localhost:11738/playlists')
             return data
         } catch (err) {
@@ -143,7 +144,7 @@ export const applyElectronHandlers = () => {
         }
     })
 
-    ipcMain.on('create-playlist', async (event: Electron.IpcMainInvokeEvent, args: PlaylistNameArgs): Promise<PlaylistName[]> => {
+    ipcMain.handle('create-playlist', async (event: Electron.IpcMainInvokeEvent, args: PlaylistNameArgs): Promise<PlaylistName[]> => {
         try {
             const data = await fetchData<PlaylistName[]>(`http://localhost:11738/playlists`, {
                 method: 'POST',
@@ -159,7 +160,7 @@ export const applyElectronHandlers = () => {
         }
     })
 
-    ipcMain.on('edit-playlist-name', async (event: Electron.IpcMainInvokeEvent, args: ChangePlaylistNameArgs): Promise<PlaylistName[]> => {
+    ipcMain.handle('edit-playlist-name', async (event: Electron.IpcMainInvokeEvent, args: ChangePlaylistNameArgs): Promise<PlaylistName[]> => {
         try {
             const data = await fetchData<PlaylistName[]>(`http://localhost:11738/playlists/${args.oldPlaylistName}`, {
                 method: 'PUT',
@@ -175,7 +176,7 @@ export const applyElectronHandlers = () => {
         }
     })
 
-    ipcMain.on('delete-playlist', async (event: Electron.IpcMainInvokeEvent, args: PlaylistNameArgs): Promise<PlaylistName[]> => {
+    ipcMain.handle('delete-playlist', async (event: Electron.IpcMainInvokeEvent, args: PlaylistNameArgs): Promise<PlaylistName[]> => {
         try {
             const data = await fetchData<PlaylistName[]>(`http://localhost:11738/playlists/${args.playlistName}`, {
                 method: 'DELETE',
@@ -187,7 +188,7 @@ export const applyElectronHandlers = () => {
         }
     })
 
-    ipcMain.on('get-songs-in-playlist', async (event: Electron.IpcMainInvokeEvent, args: PlaylistNameArgs): Promise<SongOrder[]> => {
+    ipcMain.handle('get-songs-in-playlist', async (event: Electron.IpcMainInvokeEvent, args: PlaylistNameArgs): Promise<SongOrder[]> => {
         try {
             const data = await fetchData<SongOrder[]>(`http://localhost:11738/playlistSongs/${args.playlistName}`)
             return data
@@ -197,7 +198,7 @@ export const applyElectronHandlers = () => {
         }
     })
 
-    ipcMain.on('add-song-to-playlist', async (event: Electron.IpcMainInvokeEvent, args: AddSongToPlaylistArgs): Promise<PlaylistSongsNames[]> => {
+    ipcMain.handle('add-song-to-playlist', async (event: Electron.IpcMainInvokeEvent, args: AddSongToPlaylistArgs): Promise<PlaylistSongsNames[]> => {
         try {
             const data = await fetchData<PlaylistSongsNames[]>(`http://localhost:11738/playlists`, {
                 method: 'POST',
@@ -217,7 +218,7 @@ export const applyElectronHandlers = () => {
         }
     })
 
-    ipcMain.on('edit-song-order', async (event: Electron.IpcMainInvokeEvent, args: ReorderSongsArgs): Promise<SongOrder[]> => {
+    ipcMain.handle('edit-song-order', async (event: Electron.IpcMainInvokeEvent, args: ReorderSongsArgs): Promise<SongOrder[]> => {
         try {
             const data = await fetchData<SongOrder[]>(`http://localhost:11738/playlists/${args.playlistName}`, {
                 method: 'PUT',
@@ -233,7 +234,7 @@ export const applyElectronHandlers = () => {
         }
     })
 
-    ipcMain.on('delete-song-in-playlist', async (event: Electron.IpcMainInvokeEvent, args: DeletePlaylistSongArgs): Promise<PlaylistSongsNames[]> => {
+    ipcMain.handle('delete-song-in-playlist', async (event: Electron.IpcMainInvokeEvent, args: DeletePlaylistSongArgs): Promise<PlaylistSongsNames[]> => {
         try {
             const data = await fetchData<PlaylistSongsNames[]>(`http://localhost:11738/playlists/${args.playlistName}/${args.songTitle}`, {
                 method: 'DELETE',
