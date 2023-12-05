@@ -8,8 +8,12 @@ import Playlists from './Components/Pages/Playlists/Playlists'
 import Search from './Components/Pages/Search/Search'
 import MusicPlayer from './Components/MusicPlaying/MusicPlayer'
 import Navbar from './Components/Navbar/Navbar'
+import { Toaster } from "@/Components/ui/toaster"
+import useToastError from './Hooks/useToastError'
 
 const App = () => {
+  useToastError()
+
   return (
     <div className='app-container'>
         <Routes className='page-component overflow-auto'>
@@ -18,7 +22,8 @@ const App = () => {
           <Route path='Downloads' component={<Downloads/>}/>
         </Routes>
         <Navbar className='navbar-component'/>
-        <MusicPlayer className='music-player-component'/>  
+        <MusicPlayer className='music-player-component'/>
+        <Toaster />  
     </div>
   )
 }

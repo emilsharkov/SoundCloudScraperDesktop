@@ -4,6 +4,7 @@ import isPlayingReducer from './Slices/isPlayingSlice'
 import replayingTypeReducer from './Slices/replayingTypeSlice'
 import songsReducer from './Slices/songsSlice'
 import currentRouteReducer from './Slices/currentRouteSlice'
+import toastErrorSlice from './Slices/toastErrorSlice'
 
 const store = configureStore({
   reducer: {
@@ -11,7 +12,8 @@ const store = configureStore({
     isPlaying: isPlayingReducer,
     replayingType: replayingTypeReducer,
     songs: songsReducer,
-    currentRoute: currentRouteReducer
+    currentRoute: currentRouteReducer,
+    toastError: toastErrorSlice,
   },
 })
 

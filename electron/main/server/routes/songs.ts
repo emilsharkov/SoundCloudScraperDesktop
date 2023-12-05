@@ -17,12 +17,7 @@ const songsRoute = (db: sqlite3.Database) => {
         "SELECT title FROM songs",
         []
       )
-  
-      if (songs.length) {
-        res.json(songs)
-      } else {
-        throw new ErrorWithCode(404,'Song Not Found')
-      }
+      res.json(songs)
     } catch (err) {
       next(err)
     }

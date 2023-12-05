@@ -37,13 +37,17 @@ const SongTile = (props: SongSuggestionProps) => {
         return `${minutes}:${seconds}`
     },[props.duration])
 
+    const likeFormatted = useMemo(() => {
+        return props.likes.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    },[props.likes])
+
     return (
         <TableRow ref={rowRef} key={url} onClick={() => setIsClicked(true)}>
             <TableCell className="font-medium">{songIcon}</TableCell>
             <TableCell>{title}</TableCell>
             <TableCell>{artist}</TableCell>
             <TableCell>{durationFormatted}</TableCell>
-            <TableCell className="text-right">{likes}</TableCell>
+            <TableCell className="text-right">{likeFormatted}</TableCell>
         </TableRow>
     )
 }

@@ -24,12 +24,7 @@
           ORDER BY song_order`,
           [playlistName]
         )
-
-        if (playlist.length) {
-          res.json(playlist)
-        } else {
-          throw new ErrorWithCode(404,'Playlist Songs Not Found')
-        }
+        res.json(playlist)
       } catch (err) {
         next(err)
       }

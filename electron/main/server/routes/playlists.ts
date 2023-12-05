@@ -17,12 +17,7 @@ const playlistsRoute = (db: sqlite3.Database) => {
         "SELECT name FROM playlists",
         []
       )
-  
-      if (playlists.length) {
-        res.json(playlists)
-      } else {
-        throw new ErrorWithCode(404,'Playlist Not Found')
-      }
+      res.json(playlists)
     } catch (err) {
       next(err)
     }

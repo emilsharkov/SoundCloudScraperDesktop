@@ -10,7 +10,7 @@ import * as SoundCloud from "soundcloud-scraper"
 initDirs()
 
 export const applyElectronHandlers = () => {
-    ipcMain.handle('open-file-dialog', async (event: Electron.IpcMainInvokeEvent): Promise<OpenDialogReturnValue> => {
+    ipcMain.handle('open-file-dialog', async (event: Electron.IpcMainInvokeEvent, args = {}): Promise<OpenDialogReturnValue> => {
         try{
             const result: OpenDialogReturnValue = await dialog.showOpenDialog({
                 properties: ['openFile'],
@@ -135,7 +135,6 @@ export const applyElectronHandlers = () => {
 
     ipcMain.handle('get-playlists', async (event: Electron.IpcMainInvokeEvent, args = {}): Promise<PlaylistName[]> => {
         try {
-            console.log('Handler for get-playlists is called');
             const data = await fetchData<PlaylistName[]>('http://localhost:11738/playlists')
             return data
         } catch (err) {

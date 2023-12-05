@@ -2,6 +2,7 @@ import SongTable from "@/Components/Shared/SongTable"
 import useElectronHandler from "@/Hooks/useElectronHandler"
 import useFuzzySearch from "@/Hooks/useFuzzySearch"
 import useSongsWithMetadata from "@/Hooks/useSongsWithMetadata"
+import { Mp3Metadata } from "@/Interfaces/electronHandlerInputs"
 import { SongOrder, SongTitle } from "@/Interfaces/electronHandlerReturns"
 import { useEffect, useState } from "react"
 
@@ -15,7 +16,7 @@ const Downloads = () => {
 
     const [songOrder,setSongOrder] = useState<SongOrder[]>([])
     const {songsMetadata,receivedAllData} = useSongsWithMetadata(songOrder)
-    const {searchQuery, setSearchQuery, filteredData} = useFuzzySearch(songsMetadata)
+    const {searchQuery, setSearchQuery, filteredData} = useFuzzySearch<Mp3Metadata>(songsMetadata,'title')
 
     useEffect(() => setSongsArgs({}),[])
 

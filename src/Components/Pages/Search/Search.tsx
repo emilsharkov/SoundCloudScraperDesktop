@@ -24,7 +24,7 @@ const Search = (): JSX.Element => {
         <div className='flex flex-col w-full h-full bg-gray-25'>
             <input 
                 className='border-0 px-3 py-3 placeholder-gray-300 text-gray-600 bg-white rounded text-sm shadow outline-none focus:outline-none focus:ring w-full pl-6 self-center my-3 table-fixed'
-                placeholder="Enter Song Name"
+                placeholder="Find Song"
                 value={searchBarInput}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchBarInput(e.target.value)}
             />
