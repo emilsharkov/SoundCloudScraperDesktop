@@ -21,24 +21,31 @@ const SongTile = (props: SongSuggestionProps) => {
     const rowRef = useRef<HTMLTableRowElement>(null)
     const [isClicked,setIsClicked] = useState<boolean>(false)
     const {result,error,receivedData,setArgs} = useElectronHandler<SongURLArgs,void>('download-song')
-    const songIcon = isClicked && receivedData && !error ? <Spinner/>: <img className='h-8' src={thumbnail}/>
+    const songIcon = isClicked && !receivedData && result !== undefined ? <Spinner/>: <img className='h-8' src={thumbnail}/>
 
     useEffect(() => {
-        if(!isClicked) { return }
-        const row = rowRef.current
-        row!.className = 'bg-gray-300'
-        setArgs({ songURL: url })
+        if(isClicked && receivedData && result === undefined) {
+            setIsClicked(false)
+        }
+    },[receivedData,isClicked,result])
+
+    useEffect(() => {
+        if(isClicked) {
+            const row = rowRef.current
+            row!.className = 'bg-gray-300'
+            setArgs({ songURL: url })
+        }        
     },[isClicked])
 
     const durationFormatted = useMemo(() => {
-        const durationInSeconds = Math.trunc(props.duration / MILLISECONDS_PER_SECOND)
+        const durationInSeconds = Math.trunc(duration / MILLISECONDS_PER_SECOND)
         const minutes = Math.trunc(durationInSeconds / SECONDS_PER_MINUTE)
-        const seconds = durationInSeconds % SECONDS_PER_MINUTE
+        const seconds = String(durationInSeconds % SECONDS_PER_MINUTE).padStart(2,'0')
         return `${minutes}:${seconds}`
     },[props.duration])
 
     const likeFormatted = useMemo(() => {
-        return props.likes.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        return likes.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     },[props.likes])
 
     return (
