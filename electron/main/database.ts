@@ -40,6 +40,10 @@ const setupDatabase = (): sqlite3.Database => {
         `)
     })
 
+    /*
+    is there some sqlite magic that when a song gets deleted from songs the playlist_songs fixes its ordering to be sequential once again. For example in songs ordering 1,2,3,4,5 song 2 gets removed and song 3 becomes song 2 and song 4 becomes song 3 and song 5 becomes song 4 with new ordering of 1,2,3,4
+    */
+
     return db
 }
 
