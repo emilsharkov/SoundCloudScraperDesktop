@@ -1,14 +1,31 @@
 import { Button } from "@/Components/ui/button"
-import replay from '../../Assets/replay.svg'
+import { Repeat } from 'lucide-react';
+import { Repeat1 } from 'lucide-react';
 import { useState } from "react"
 import { ReplayingType } from "./MusicPlayer";
 import { useAppDispatch, useAppSelector } from "@/Redux/hooks";
 import { setReplayingType } from "@/Redux/Slices/replayingTypeSlice";
 
+const ReplayIconData = {
+    'NO_REPLAY': {
+        icon: Repeat,
+        color: 'black',
+    },
+    'REPLAY_PLAYLIST': {
+        icon: Repeat,
+        color: '#1ed760',
+    },
+    'REPLAY_SONG': {
+        icon: Repeat1,
+        color: '#1ed760',
+    }
+}
+
 const Replay = () => {
     const replayingType = useAppSelector((state) => state.replayingType.value)
     const dispatch = useAppDispatch()
-    const replayColor = replayingType === 'NO_REPLAY' ? 'border-green-500' : replayingType === 'REPLAY_PLAYLIST' ? 'border-yellow-500' : 'border-red-500'
+    // const replayIcon = replayingType === 'NO_REPLAY' ? <Repeat/> : replayingType === 'REPLAY_PLAYLIST' ? <Repeat color='#1ed760'/>: <Repeat1 color='#1ed760'/>
+    const Icon = ReplayIconData[replayingType]
 
     const changeReplayingType = () => {
         let newReplayingType: ReplayingType | null = null
@@ -24,7 +41,7 @@ const Replay = () => {
 
     return (
         <Button size="icon" variant="ghost" onClick={() => changeReplayingType()}>
-            <img className={`border-solid border-2 ${replayColor}`} src={replay}/>
+            <Icon.icon color={Icon.color} strokeWidth={1.5}/>
         </Button>
     )
 }

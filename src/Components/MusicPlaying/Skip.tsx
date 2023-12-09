@@ -1,8 +1,5 @@
-import { useContext, useMemo, useCallback } from 'react'
 import { Button } from "@/Components/ui/button"
-import SkipBack from '../../Assets/skip-back.svg'
-import SkipForward from '../../Assets/skip-forward.svg'
-import useMusicPlaying from '@/Hooks/useMusicPlaying';
+import { FastForward, Rewind } from 'lucide-react';
 
 interface skipProps {
     skipForward: boolean;
@@ -13,7 +10,7 @@ interface skipProps {
 
 const Skip = (props: skipProps) => {
     const { skipForward,musicQueue,currentQueueIndex,setCurrentQueueIndex } = props
-    const buttonSVG = skipForward ? SkipForward: SkipBack
+    const Icon = skipForward ? FastForward: Rewind
     const disabled = skipForward ? currentQueueIndex === musicQueue.length - 1 || currentQueueIndex === 0: currentQueueIndex === 0
 
     const skip = () => {
@@ -23,7 +20,7 @@ const Skip = (props: skipProps) => {
 
     return (
         <Button size="icon" variant="ghost" disabled={disabled} onClick={() => skip()}>
-            <img src={buttonSVG}/>
+            <Icon strokeWidth={1.5}/>
         </Button>
     )
 }

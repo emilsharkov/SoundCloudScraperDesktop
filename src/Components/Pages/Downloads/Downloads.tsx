@@ -43,7 +43,7 @@ const Downloads = () => {
                 {receivedAllData && 
                     <SongTable 
                         songMetadata={filteredData}
-                        isDraggable={false}
+                        isPlaylist={false}
                     />
                 }
             </div>

@@ -1,5 +1,5 @@
 import { Button } from "@/Components/ui/button"
-import shuffle from '../../Assets/shuffle.svg'
+import { Shuffle as ShuffleIcon } from 'lucide-react';
 import { useEffect, useState } from "react"
 
 interface ShuffleProps {
@@ -39,7 +39,8 @@ const Shuffle = (props: ShuffleProps) => {
 
     return (
         <Button size="icon" variant="ghost" onClick={() => setIsShuffled(!isShuffled)}>
-            <img className={isShuffled ? 'fill-orange-300': ''} src={shuffle}/>
+            <ShuffleIcon strokeWidth={1.5}/>
+            {/* <img className={isShuffled ? 'fill-orange-300': ''} src={shuffle}/> */}
         </Button>
     )
 }

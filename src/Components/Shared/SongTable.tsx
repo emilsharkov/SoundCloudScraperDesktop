@@ -1,9 +1,12 @@
 import { Table,TableBody,TableCell,TableHead,TableHeader,TableRow } from "@/Components/ui/table"
 import { Mp3Metadata } from "@/Interfaces/electronHandlerInputs"
+import { MoreVertical } from 'lucide-react'
+import { GripVertical } from 'lucide-react'
+import SongSettings from "./SongSettings"
 
 export interface SongTableProps {
     songMetadata: Mp3Metadata[],
-    isDraggable: boolean
+    isPlaylist: boolean
 }
 
 const SongTable = (props: SongTableProps) => {
@@ -25,8 +28,8 @@ const SongTable = (props: SongTableProps) => {
                             <TableCell><img src={item.imgPath ?? undefined}/></TableCell>
                             <TableCell>{item.title}</TableCell>
                             <TableCell>{item.artist}</TableCell>
-                            <TableCell>Settings Button</TableCell>
-                            {props.isDraggable ? <li>Draggable Dots</li>: null}
+                            <TableCell><SongSettings isPlaylist={props.isPlaylist} songName={item.title}/></TableCell>
+                            <TableCell>{props.isPlaylist ? <GripVertical/>: null}</TableCell>
                     </TableRow>
                 ))}
             </TableBody>

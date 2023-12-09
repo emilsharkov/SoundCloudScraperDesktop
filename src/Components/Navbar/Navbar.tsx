@@ -1,6 +1,8 @@
 import React, { useContext } from 'react';
 import NavbarButtonComponent from './NavbarButton'
-import Search from '../../Assets/search.svg'
+import { LucideIcon, Search } from 'lucide-react';
+import { Download } from 'lucide-react';
+import { Folders } from 'lucide-react';
 import Downloads from '../../Assets/downloads.svg'
 import Playlists from '../../Assets/playlists.svg'
 import CurrentSongThumbnail from './CurrentSongThumbnail';
@@ -13,13 +15,13 @@ interface NavbarProps {
 
 export interface NavbarItemData {
     title: string;
-    icon: string;
+    icon: LucideIcon;
 }
 
 const navbarItemList: NavbarItemData[] = [
     {title: 'Search', icon: Search},
-    {title: 'Downloads', icon: Downloads},
-    {title: 'Playlists', icon: Playlists}
+    {title: 'Downloads', icon: Download},
+    {title: 'Playlists', icon: Folders}
 ]
 
 const Navbar = (props: NavbarProps) => {

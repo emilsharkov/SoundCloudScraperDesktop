@@ -3,10 +3,11 @@ import useElectronHandler from "@/Hooks/useElectronHandler"
 import { useDebounce } from "@/Hooks/useDebounce"
 import SongTile from "./SongTile"
 import { Table,TableBody,TableCell,TableHead,TableHeader,TableRow } from "@/Components/ui/table"
-import clock from '../../../Assets/clock.svg'
-import heart from '../../../Assets/heart.svg'
 import { Song } from "@/Interfaces/electronHandlerReturns"
 import { SongNameArgs } from "@/Interfaces/electronHandlerInputs"
+import { ListOrdered } from 'lucide-react';
+import { Clock } from 'lucide-react';
+import { Heart } from 'lucide-react';
 
 const Search = (): JSX.Element => {
     const [searchBarInput,setSearchBarInput] = useState<string>('')
@@ -31,11 +32,11 @@ const Search = (): JSX.Element => {
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead className="w-[100px]"></TableHead>
+                        <TableHead className="w-[100px]"><ListOrdered/></TableHead>
                         <TableHead>Title</TableHead>
                         <TableHead>Artist</TableHead>
-                        <TableHead><img className='h-8' src={clock}/></TableHead>
-                        <TableHead><img className='h-8' src={heart}/></TableHead>
+                        <TableHead><Clock/></TableHead>
+                        <TableHead><Heart/></TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Button } from "../ui/button"
-import play from '../../Assets/play.svg'
-import pause from '../../Assets/pause.svg'
+import { Pause as PauseIcon } from 'lucide-react';
+import { Play as PlayIcon } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '@/Redux/hooks'
 import { setIsPlaying } from "@/Redux/Slices/isPlayingSlice"
 
@@ -13,7 +13,7 @@ const Play = (props: PlayProps) => {
     const { audioRef } = props
     const isPlaying = useAppSelector((state) => state.isPlaying.value)
     const dispatch = useAppDispatch()
-    const buttonSVG = isPlaying ? pause: play
+    const Icon = isPlaying ? PauseIcon: PlayIcon
     const [disabled,setDisabled] = useState<boolean>(audioRef.current?.src === window.location.href)
 
     useEffect(() => {
@@ -38,7 +38,7 @@ const Play = (props: PlayProps) => {
             disabled={disabled} 
             onClick={() => dispatch(setIsPlaying(!isPlaying))}
         >
-            <img src={buttonSVG}/>
+            <Icon strokeWidth={1.25}/>
         </Button>
     )
 }
