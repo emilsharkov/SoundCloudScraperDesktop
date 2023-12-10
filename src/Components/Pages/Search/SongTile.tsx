@@ -3,6 +3,8 @@ import useElectronHandler from '@/Hooks/useElectronHandler';
 import { TableCell,TableRow } from '@/Components/ui/table';
 import Spinner from './Spinner';
 import { SongURLArgs } from '@/Interfaces/electronHandlerInputs';
+import Marquee from "react-fast-marquee";
+import MarqueeText from '@/Components/Shared/MarqueeText';
 
 interface SongSuggestionProps {
     title: string;
@@ -21,7 +23,7 @@ const SongTile = (props: SongSuggestionProps) => {
     const rowRef = useRef<HTMLTableRowElement>(null)
     const [isClicked,setIsClicked] = useState<boolean>(false)
     const {result,error,receivedData,setArgs} = useElectronHandler<SongURLArgs,void>('download-song')
-    const songIcon = isClicked && !receivedData && result !== undefined ? <Spinner/>: <img className='h-8' src={thumbnail}/>
+    const songIcon = isClicked && !receivedData && result !== undefined ? <Spinner/>: <img className='h-12 w-12 max-w-none' src={thumbnail}/>
 
     useEffect(() => {
         if(isClicked && receivedData && result === undefined) {
@@ -51,8 +53,12 @@ const SongTile = (props: SongSuggestionProps) => {
     return (
         <TableRow ref={rowRef} key={url} onClick={() => setIsClicked(true)}>
             <TableCell className="font-medium">{songIcon}</TableCell>
-            <TableCell>{title}</TableCell>
-            <TableCell>{artist}</TableCell>
+            <TableCell className='max-w-[400px]'>
+                <MarqueeText text={title}/>
+            </TableCell>
+            <TableCell className='max-w-[100px]'>
+                <MarqueeText text={title}/>
+            </TableCell>
             <TableCell>{durationFormatted}</TableCell>
             <TableCell className="text-right">{likeFormatted}</TableCell>
         </TableRow>

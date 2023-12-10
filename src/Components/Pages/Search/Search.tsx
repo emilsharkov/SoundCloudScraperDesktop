@@ -8,6 +8,7 @@ import { SongNameArgs } from "@/Interfaces/electronHandlerInputs"
 import { ListOrdered } from 'lucide-react';
 import { Clock } from 'lucide-react';
 import { Heart } from 'lucide-react';
+import { Input } from "@/Components/ui/input"
 
 const Search = (): JSX.Element => {
     const [searchBarInput,setSearchBarInput] = useState<string>('')
@@ -22,12 +23,12 @@ const Search = (): JSX.Element => {
     },[debouncedValue])
 
     return(
-        <div className='flex flex-col w-full h-full bg-gray-25'>
-            <input 
-                className='border-0 px-3 py-3 placeholder-gray-300 text-gray-600 bg-white rounded text-sm shadow outline-none focus:outline-none focus:ring w-full pl-6 self-center my-3 table-fixed'
-                placeholder="Find Song"
+        <div className='flex flex-col w-full h-full items-center'>
+            <Input 
+                className='w-[99%] mt-1'
+                placeholder='Find Song'
                 value={searchBarInput}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchBarInput(e.target.value)}
+                onChange={(e) => setSearchBarInput(e.target.value)}
             />
             <Table>
                 <TableHeader>

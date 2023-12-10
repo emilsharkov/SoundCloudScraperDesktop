@@ -10,6 +10,7 @@ export interface SongTableProps {
 }
 
 const SongTable = (props: SongTableProps) => {
+    const { songMetadata,isPlaylist } = props
     return (
         <Table>
             <TableHeader>
@@ -22,14 +23,15 @@ const SongTable = (props: SongTableProps) => {
             </TableHeader>
 
             <TableBody>
-                {props.songMetadata.map((item: Mp3Metadata, index: number) => (
+                {songMetadata.map((item: Mp3Metadata, index: number) => (
                     <TableRow key={item.title}>
                             <TableCell>{index}</TableCell>
                             <TableCell><img src={item.imgPath ?? undefined}/></TableCell>
                             <TableCell>{item.title}</TableCell>
                             <TableCell>{item.artist}</TableCell>
-                            <TableCell><SongSettings isPlaylist={props.isPlaylist} songName={item.title}/></TableCell>
-                            <TableCell>{props.isPlaylist ? <GripVertical/>: null}</TableCell>
+                            <TableCell>
+                                <SongSettings isPlaylist={isPlaylist} songMetadata={songMetadata[index]}/></TableCell>
+                            <TableCell>{isPlaylist ? <GripVertical/>: null}</TableCell>
                     </TableRow>
                 ))}
             </TableBody>

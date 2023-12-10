@@ -14,14 +14,16 @@ import {
     DropdownMenuTrigger,
 } from "@/Components/ui/dropdown-menu"
 import { useState } from "react"
+import EditMetadataDialog from "./EditMetadataDialog"
+import { Mp3Metadata } from "@/Interfaces/electronHandlerInputs"
 
 export interface SongSettingsProps {
-    songName: string,
+    songMetadata: Mp3Metadata,
     isPlaylist: boolean
 }
 
 const SongSettings = (props: SongSettingsProps) => {
-    const { songName,isPlaylist } = props
+    const { songMetadata,isPlaylist } = props
     const [openEditDialog, setOpenEditDialog] = useState<boolean>(false)
 
     return (
@@ -31,7 +33,7 @@ const SongSettings = (props: SongSettingsProps) => {
                     <Button variant="outline"><MoreVertical/></Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56">
-                    <DropdownMenuLabel>{songName}</DropdownMenuLabel>
+                    <DropdownMenuLabel>{songMetadata.title}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
                         <DropdownMenuItem onClick={() => setOpenEditDialog(true)}>
@@ -70,6 +72,11 @@ const SongSettings = (props: SongSettingsProps) => {
                     </DropdownMenuGroup>
                 </DropdownMenuContent>
             </DropdownMenu>
+            <EditMetadataDialog 
+                open={openEditDialog}
+                setOpen={setOpenEditDialog}
+                songMetadata={songMetadata}
+            />
         </>
     )
 }
