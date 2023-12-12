@@ -36,7 +36,7 @@
     )
 
     return (
-      <div className={props.className}>
+      <div className={`${props.className} self-center mb-2`}>
         <div className="flex flex-col space-y-4 p-4">
           <div className="flex items-center justify-between">
             <Shuffle 

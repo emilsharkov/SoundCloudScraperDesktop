@@ -53,12 +53,8 @@ const SongTile = (props: SongSuggestionProps) => {
     return (
         <TableRow ref={rowRef} key={url} onClick={() => setIsClicked(true)}>
             <TableCell>{songIcon}</TableCell>
-            <TableCell className='max-w-[400px]'>
-                <MarqueeText text={title}/>
-            </TableCell>
-            <TableCell className='max-w-[100px]'>
-                <MarqueeText text={title}/>
-            </TableCell>
+            <TableCell className='max-w-[400px]'><MarqueeText text={title}/></TableCell>
+            <TableCell className='max-w-[100px]'><MarqueeText text={artist}/></TableCell>
             <TableCell>{durationFormatted}</TableCell>
             <TableCell className="text-right">{likeFormatted}</TableCell>
         </TableRow>

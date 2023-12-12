@@ -1,4 +1,4 @@
-import { MoreVertical } from "lucide-react"
+import { MoreVertical,FileEdit, Trash2, ListX, ListPlus, ListEnd } from "lucide-react"
 import { Button } from "@/Components/ui/button"
 import {
     DropdownMenu,
@@ -37,22 +37,25 @@ const SongSettings = (props: SongSettingsProps) => {
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
                         <DropdownMenuItem onClick={() => setOpenEditDialog(true)}>
+                            <FileEdit className="mr-2 h-4 w-4"/>
                             <span>Edit Metadata</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem >
+                            <ListEnd className="mr-2 h-4 w-4"/>
                             <span>Add to Queue</span>
                         </DropdownMenuItem>
                         <DropdownMenuSub>
                             <DropdownMenuSubTrigger>
+                                <ListPlus className="mr-2 h-4 w-4"/>
                                 <span>Add to Playlist</span>
                             </DropdownMenuSubTrigger>
                             <DropdownMenuPortal>
                                 <DropdownMenuSubContent>
                                     <DropdownMenuItem>
-                                        <span>Email</span>
+                                        <span>Playlist1</span>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem>
-                                        <span>Message</span>
+                                        <span>Playlist2</span>
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem>
@@ -63,10 +66,12 @@ const SongSettings = (props: SongSettingsProps) => {
                         </DropdownMenuSub>
                         {isPlaylist && 
                             <DropdownMenuItem >
+                                <ListX className="mr-2 h-4 w-4"/>
                                 <span>Remove from This Playlist</span>
                             </DropdownMenuItem>
                         }
                         <DropdownMenuItem >
+                            <Trash2 className="mr-2 h-4 w-4"/>
                             <span>Delete From Computer</span>
                         </DropdownMenuItem>
                     </DropdownMenuGroup>
