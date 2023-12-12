@@ -1,4 +1,5 @@
 import SongTable from "@/Components/Shared/SongTable"
+import { Input } from "@/Components/ui/input"
 import useElectronHandler from "@/Hooks/useElectronHandler"
 import useFuzzySearch from "@/Hooks/useFuzzySearch"
 import useSongsWithMetadata from "@/Hooks/useSongsWithMetadata"
@@ -30,23 +31,20 @@ const Downloads = () => {
     },[receivedSongsData,songsError,songs])
 
     return(
-        <div>
-            <div>
-                <input
-                    type="text"
-                    placeholder="Search Song"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+        <div className='flex flex-col w-full h-full items-center'>
+            <Input 
+                className='w-[99%] mt-1'
+                type="text"
+                placeholder="Search Song"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            {receivedAllData && 
+                <SongTable 
+                    songMetadata={filteredData}
+                    isPlaylist={false}
                 />
-            </div>
-            <div>
-                {receivedAllData && 
-                    <SongTable 
-                        songMetadata={filteredData}
-                        isPlaylist={false}
-                    />
-                }
-            </div>
+            }
         </div>
     )
 }

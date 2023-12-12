@@ -95,7 +95,6 @@ body {
 
 .page-component {
   grid-area: pages;
-  border: 2px dotted black;
 }
 
 .navbar-component {

@@ -33,7 +33,7 @@ const Search = (): JSX.Element => {
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead className="w-[100px]"><ListOrdered/></TableHead>
+                        <TableHead className="w-[100px]"></TableHead>
                         <TableHead>Title</TableHead>
                         <TableHead>Artist</TableHead>
                         <TableHead><Clock/></TableHead>

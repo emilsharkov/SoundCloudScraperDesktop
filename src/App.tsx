@@ -16,7 +16,7 @@ const App = () => {
 
   return (
     <div className='app-container'>
-        <Routes className='page-component overflow-auto'>
+        <Routes className='page-component'>
           <Route path='Search' component={<Search/>}/>
           <Route path='Playlists' component={<Playlists/>}/>
           <Route path='Downloads' component={<Downloads/>}/>

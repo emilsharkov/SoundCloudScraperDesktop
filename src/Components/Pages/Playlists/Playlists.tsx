@@ -3,6 +3,7 @@ import useFuzzySearch from '@/Hooks/useFuzzySearch';
 import { PlaylistName } from '@/Interfaces/electronHandlerReturns';
 import { useEffect } from 'react'
 import NewPlaylistButton from './NewPlaylistButton';
+import { Input } from '@/Components/ui/input';
 
 const Playlists = () => {
     const {result: playlists,error,receivedData,setArgs} = useElectronHandler<object,PlaylistName[]>('get-playlists')
@@ -11,9 +12,10 @@ const Playlists = () => {
     useEffect(() => setArgs({}),[])
 
     return (
-        <div>
-            <div>
-                <input
+        <div className='flex flex-col w-full h-full items-center'>
+            <div className='flex flex-row mt-1 m w-[97%]'>
+                <Input 
+                    className='mr-1'
                     type="text"
                     placeholder="Find Playlist"
                     value={searchQuery}
@@ -24,13 +26,12 @@ const Playlists = () => {
                     refreshPlaylists={setArgs}
                 />
             </div>
-            <div>
-                {receivedData && !error
-                    && filteredData?.map(playlist => {
-                        return playlist.name
-                    })
-                }
-            </div>
+            
+            {receivedData && !error
+                && filteredData?.map(playlist => {
+                    return playlist.name
+                })
+            }
         </div>
     )
     

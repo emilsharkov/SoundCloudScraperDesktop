@@ -1,6 +1,6 @@
 import { Table,TableBody,TableCell,TableHead,TableHeader,TableRow } from "@/Components/ui/table"
 import { Mp3Metadata } from "@/Interfaces/electronHandlerInputs"
-import { MoreVertical } from 'lucide-react'
+import { ListOrdered, MoreVertical } from 'lucide-react'
 import { GripVertical } from 'lucide-react'
 import SongSettings from "./SongSettings"
 
@@ -15,7 +15,7 @@ const SongTable = (props: SongTableProps) => {
         <Table>
             <TableHeader>
                 <TableRow>
-                    <TableHead className="w-[100px]">#</TableHead>
+                    <TableHead className="w-[50px]"><ListOrdered/></TableHead>
                     <TableHead></TableHead>
                     <TableHead>Title</TableHead>
                     <TableHead>Artist</TableHead>
@@ -26,7 +26,7 @@ const SongTable = (props: SongTableProps) => {
                 {songMetadata.map((item: Mp3Metadata, index: number) => (
                     <TableRow key={item.title}>
                             <TableCell>{index}</TableCell>
-                            <TableCell><img src={item.imgPath ?? undefined}/></TableCell>
+                            <TableCell><img className='h-12 w-12 max-w-none' src={item.imgPath ?? undefined}/></TableCell>
                             <TableCell>{item.title}</TableCell>
                             <TableCell>{item.artist}</TableCell>
                             <TableCell>
