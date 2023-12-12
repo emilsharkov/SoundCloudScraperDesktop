@@ -39,8 +39,7 @@ const Shuffle = (props: ShuffleProps) => {
 
     return (
         <Button size="icon" variant="ghost" onClick={() => setIsShuffled(!isShuffled)}>
-            <ShuffleIcon strokeWidth={1.5}/>
-            {/* <img className={isShuffled ? 'fill-orange-300': ''} src={shuffle}/> */}
+            <ShuffleIcon color={isShuffled ? '#1ed760': 'black'} strokeWidth={1.5}/>
         </Button>
     )
 }

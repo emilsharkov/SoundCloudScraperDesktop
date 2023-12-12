@@ -5,6 +5,7 @@ import replayingTypeReducer from './Slices/replayingTypeSlice'
 import songsReducer from './Slices/songsSlice'
 import currentRouteReducer from './Slices/currentRouteSlice'
 import toastErrorSlice from './Slices/toastErrorSlice'
+import audioRefSlice from './Slices/audioRefSlice'
 
 const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ const store = configureStore({
     songs: songsReducer,
     currentRoute: currentRouteReducer,
     toastError: toastErrorSlice,
+    audioRef: audioRefSlice,
   },
 })
 

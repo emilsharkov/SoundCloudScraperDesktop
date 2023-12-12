@@ -24,7 +24,6 @@ const ReplayIconData = {
 const Replay = () => {
     const replayingType = useAppSelector((state) => state.replayingType.value)
     const dispatch = useAppDispatch()
-    // const replayIcon = replayingType === 'NO_REPLAY' ? <Repeat/> : replayingType === 'REPLAY_PLAYLIST' ? <Repeat color='#1ed760'/>: <Repeat1 color='#1ed760'/>
     const Icon = ReplayIconData[replayingType]
 
     const changeReplayingType = () => {

@@ -54,6 +54,7 @@
             />
             <Play
               audioRef={audioRef}
+              inSongTableRow={false}
             />
             <Skip 
               skipForward={true}

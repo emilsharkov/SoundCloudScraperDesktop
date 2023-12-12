@@ -7,7 +7,7 @@ import { Input } from '@/Components/ui/input';
 
 const Playlists = () => {
     const {result: playlists,error,receivedData,setArgs} = useElectronHandler<object,PlaylistName[]>('get-playlists')
-    const {searchQuery, setSearchQuery, filteredData} = useFuzzySearch<PlaylistName>(playlists,'title')
+    const {searchQuery, setSearchQuery, filteredData} = useFuzzySearch<PlaylistName>(playlists,'name')
     
     useEffect(() => setArgs({}),[])
 

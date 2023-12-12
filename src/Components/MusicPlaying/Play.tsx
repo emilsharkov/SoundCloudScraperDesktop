@@ -7,13 +7,16 @@ import { setIsPlaying } from "@/Redux/Slices/isPlayingSlice"
 
 interface PlayProps {
     audioRef: React.MutableRefObject<HTMLAudioElement | null>;
+    inSongTableRow: boolean;
+    rowSong?: string
 }
 
 const Play = (props: PlayProps) => {
-    const { audioRef } = props
+    const { audioRef,inSongTableRow,rowSong } = props
     const isPlaying = useAppSelector((state) => state.isPlaying.value)
+    const currentSong = useAppSelector((state) => state.currentSong.value)
     const dispatch = useAppDispatch()
-    const Icon = isPlaying ? PauseIcon: PlayIcon
+    const Icon = inSongTableRow ? (isPlaying && rowSong && rowSong === currentSong ? PauseIcon: PlayIcon) :(isPlaying ? PauseIcon: PlayIcon)
     const [disabled,setDisabled] = useState<boolean>(audioRef.current?.src === window.location.href)
 
     useEffect(() => {

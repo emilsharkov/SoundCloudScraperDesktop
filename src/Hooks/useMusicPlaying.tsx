@@ -2,7 +2,7 @@ import { useState, useEffect, useContext, useRef } from 'react'
 import { useAppSelector, useAppDispatch } from '@/Redux/hooks'
 
 const useMusicPlayer = () => {
-    const audioRef = useRef<HTMLAudioElement | null>(null)
+    const audioRef = useAppSelector((state) => state.audioRef.value)
     if(audioRef.current === null) {
         audioRef.current = new Audio()
     }

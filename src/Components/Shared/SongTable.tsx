@@ -32,6 +32,7 @@ const SongTable = (props: SongTableProps) => {
             <TableBody>
                 {songMetadata.map((item: Mp3Metadata, index: number) => (
                     <SongTableRow 
+                        key={item.title}
                         currentSong={currentSong} 
                         isPlaying={isPlaying} 
                         item={item} 
