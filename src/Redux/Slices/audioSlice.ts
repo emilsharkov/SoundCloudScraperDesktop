@@ -13,8 +13,23 @@ const initialState: AudioState = {
 export const audioSlice = createSlice({
   name: 'audio',
   initialState,
-  reducers: {},
+  reducers: {
+    play: (state, action: PayloadAction<void>) => {
+      state.value.play()
+    },
+    pause: (state, action: PayloadAction<void>) => {
+      state.value.pause()
+    },
+    setCurrentSong: (state, action: PayloadAction<string>) => {
+      state.value.src = `http://localhost:11738/songFiles/${action.payload}.mp3`
+    },
+    clearSource: (state, action: PayloadAction<void>) => {
+      state.value.src = ''
+    },
+  },
 })
+
+export const { play,pause,setCurrentSong,clearSource } = audioSlice.actions
 
 export const selectAudio = (state: RootState) => state.audio.value
 

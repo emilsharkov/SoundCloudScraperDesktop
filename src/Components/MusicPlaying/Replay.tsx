@@ -1,10 +1,8 @@
 import { Button } from "@/Components/ui/button"
 import { Repeat } from 'lucide-react';
 import { Repeat1 } from 'lucide-react';
-import { useState } from "react"
-import { ReplayingType } from "./MusicPlayer";
 import { useAppDispatch, useAppSelector } from "@/Redux/hooks";
-import { setReplayingType } from "@/Redux/Slices/replayingTypeSlice";
+import { toggleReplayingType } from "@/Redux/Slices/replayingTypeSlice";
 
 const ReplayIconData = {
     'NO_REPLAY': {
@@ -26,20 +24,8 @@ const Replay = () => {
     const dispatch = useAppDispatch()
     const Icon = ReplayIconData[replayingType]
 
-    const changeReplayingType = () => {
-        let newReplayingType: ReplayingType | null = null
-        if(replayingType === 'NO_REPLAY'){
-            newReplayingType = 'REPLAY_PLAYLIST'
-        } else if(replayingType === 'REPLAY_PLAYLIST'){
-            newReplayingType = 'REPLAY_SONG'
-        } else{
-            newReplayingType = 'NO_REPLAY'
-        }
-        dispatch(setReplayingType(newReplayingType))
-    }
-
     return (
-        <Button size="icon" variant="ghost" onClick={() => changeReplayingType()}>
+        <Button size="icon" variant="ghost" onClick={() => dispatch(toggleReplayingType())}>
             <Icon.icon color={Icon.color} strokeWidth={1.5}/>
         </Button>
     )

@@ -1,22 +1,27 @@
 import { configureStore } from '@reduxjs/toolkit'
-import currentSongReducer from './Slices/currentSongSlice'
 import isPlayingReducer from './Slices/isPlayingSlice'
 import replayingTypeReducer from './Slices/replayingTypeSlice'
-import songsReducer from './Slices/songsSlice'
 import currentRouteReducer from './Slices/currentRouteSlice'
 import toastErrorSlice from './Slices/toastErrorSlice'
 import audioSlice from './Slices/audioSlice'
+import queueSlice from './Slices/queueSlice'
+import queuedSongsSlice from './Slices/queuedSongsSlice'
+import currentQueueIndexSlice from './Slices/currentQueueIndexSlice'
+import isShuffledSlice from './Slices/isShuffledSlice'
 
 const store = configureStore({
   reducer: {
-    currentSong: currentSongReducer,
     isPlaying: isPlayingReducer,
+    isShuffled: isShuffledSlice,
     replayingType: replayingTypeReducer,
-    songs: songsReducer,
     currentRoute: currentRouteReducer,
     toastError: toastErrorSlice,
     audio: audioSlice,
+    queue: queueSlice,
+    queuedSongs: queuedSongsSlice,
+    currentQueueIndex: currentQueueIndexSlice,
   },
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({serializableCheck: false}),
 })
 
 export default store

@@ -17,7 +17,6 @@ export interface SongTableRowProps {
 
 const SongTableRow = (props: SongTableRowProps) => {
     const {currentSong,item,index,isPlaying,isPlaylist} = props
-    const audioRef = useAppSelector((state) => state.audioRef.value)
     const [isHovered,setIsHovered] = useState<boolean>(false)
 
     const onMouseEnter = () => setIsHovered(true)
@@ -31,12 +30,7 @@ const SongTableRow = (props: SongTableRowProps) => {
             key={item.title}
         >
             <TableCell>
-                {(isPlaying && currentSong === item.title) || isHovered ? 
-                    <Play 
-                        audioRef={audioRef} 
-                        inSongTableRow={true} 
-                        rowSong={item.title}
-                    />: index}
+                {(isPlaying && currentSong === item.title) || isHovered ? index: index}
             </TableCell>
             <TableCell><img className='h-12 w-12 max-w-none' src={item.imgPath ?? undefined}/></TableCell>
             <TableCell className='max-w-[400px]'><MarqueeText text={item.title}/></TableCell>

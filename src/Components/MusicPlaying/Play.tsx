@@ -4,34 +4,24 @@ import { Pause as PauseIcon } from 'lucide-react';
 import { Play as PlayIcon } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '@/Redux/hooks'
 import { setIsPlaying } from "@/Redux/Slices/isPlayingSlice"
+import { pause, play } from "@/Redux/Slices/audioSlice";
 
-interface PlayProps {
-    audioRef: React.MutableRefObject<HTMLAudioElement | null>;
-    inSongTableRow: boolean;
-    rowSong?: string
-}
-
-const Play = (props: PlayProps) => {
-    const { audioRef,inSongTableRow,rowSong } = props
+const Play = () => {
+    const audio = useAppSelector((state) => state.audio.value)
     const isPlaying = useAppSelector((state) => state.isPlaying.value)
-    const currentSong = useAppSelector((state) => state.currentSong.value)
     const dispatch = useAppDispatch()
-    const Icon = inSongTableRow ? (isPlaying && rowSong && rowSong === currentSong ? PauseIcon: PlayIcon) :(isPlaying ? PauseIcon: PlayIcon)
-    const [disabled,setDisabled] = useState<boolean>(audioRef.current?.src === window.location.href)
+    const Icon = isPlaying ? PauseIcon: PlayIcon
+    const [disabled,setDisabled] = useState<boolean>(audio.src === window.location.href)
 
     useEffect(() => {
-        setDisabled(audioRef.current?.src === window.location.href)
-    }, [audioRef.current])
+        setDisabled(audio.src === window.location.href)
+    },[audio])
 
     useEffect(() => {
-        if(audioRef.current?.src) {
-            if(isPlaying) {
-                audioRef.current?.play()
-            } else{
-                audioRef.current?.pause()
-            }
+        if(audio.src) {
+            isPlaying ? dispatch(play()): dispatch(pause())
         }
-    },[audioRef,isPlaying])
+    },[isPlaying])
 
     return (
         <Button 

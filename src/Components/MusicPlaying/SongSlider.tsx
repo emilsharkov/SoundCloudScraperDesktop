@@ -1,24 +1,21 @@
 import { Slider } from "@/Components/ui/slider"
+import { useAppSelector } from "@/Redux/hooks";
 import { useEffect, useState } from "react";
 
-interface SongSliderProps {
-    audioRef: React.MutableRefObject<HTMLAudioElement | null>;
-}
-
-const SongSlider = (props: SongSliderProps) => {
-    const { audioRef } = props
-    const duration = audioRef.current?.duration ?? 0
-    const [seconds,setSeconds] = useState<number>(0)
+const SongSlider = () => {
+    const audio = useAppSelector((state) => state.audio.value)
+    const duration = audio.duration ?? 0
+    const [seconds,setSeconds] = useState<number>(audio.currentTime)
 
     useEffect(() => {
-        const handleTimeUpdate = () => setSeconds(audioRef.current?.currentTime ?? 0)
-        audioRef.current?.addEventListener('timeupdate', handleTimeUpdate)
-        return () => audioRef.current?.removeEventListener('timeupdate', handleTimeUpdate)
-    }, [audioRef])
+        const handleTimeUpdate = () => setSeconds(audio.currentTime ?? 0)
+        audio.addEventListener('timeupdate', handleTimeUpdate)
+        return () => audio.removeEventListener('timeupdate', handleTimeUpdate)
+    }, [audio])
 
     const seek = (seekedTo: number[]) => {
-        if(audioRef.current && seekedTo.length && seekedTo[0] >= 0 && seekedTo[0] <= duration) {
-            audioRef.current.currentTime = seekedTo[0]
+        if(seekedTo.length && seekedTo[0] >= 0 && seekedTo[0] <= duration) {
+            audio.currentTime = seekedTo[0]
         }
     }
 

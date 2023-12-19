@@ -1,10 +1,7 @@
-import React, { useContext } from 'react';
 import NavbarButtonComponent from './NavbarButton'
 import { LucideIcon, Search } from 'lucide-react';
 import { Download } from 'lucide-react';
 import { Folders } from 'lucide-react';
-import Downloads from '../../Assets/downloads.svg'
-import Playlists from '../../Assets/playlists.svg'
 import CurrentSongThumbnail from './CurrentSongThumbnail';
 import { setCurrentRoute } from '@/Redux/Slices/currentRouteSlice';
 import { useAppDispatch } from '@/Redux/hooks';

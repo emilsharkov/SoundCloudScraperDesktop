@@ -15,7 +15,9 @@ export interface SongTableProps {
 
 const SongTable = (props: SongTableProps) => {
     const { songMetadata,isPlaylist } = props
-    const currentSong = useAppSelector((state) => state.currentSong.value)
+    const currentQueueIndex = useAppSelector((state) => state.currentQueueIndex.value)
+    const musicQueue = useAppSelector((state) => state.queue.musicQueue)
+    const currentSong = musicQueue.length && currentQueueIndex < musicQueue.length && currentQueueIndex >= 0 ? musicQueue[currentQueueIndex] : ''
     const isPlaying = useAppSelector((state) => state.isPlaying.value)
 
     return (

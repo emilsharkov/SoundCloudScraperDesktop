@@ -15,13 +15,21 @@ export const replayingTypeSlice = createSlice({
   name: 'replayingType',
   initialState,
   reducers: {
-    setReplayingType: (state, action: PayloadAction<ReplayingType>) => {
-      state.value = action.payload
+    toggleReplayingType: (state, action: PayloadAction<void>) => {
+      let newReplayingType: ReplayingType | null = null
+      if(state.value === 'NO_REPLAY'){
+        newReplayingType = 'REPLAY_PLAYLIST'
+      } else if(state.value === 'REPLAY_PLAYLIST'){
+        newReplayingType = 'REPLAY_SONG'
+      } else{
+        newReplayingType = 'NO_REPLAY'
+      }
+      state.value = newReplayingType
     },
   },
 })
 
-export const { setReplayingType } = replayingTypeSlice.actions
+export const { toggleReplayingType } = replayingTypeSlice.actions
 
 export const selectReplayingType = (state: RootState) => state.replayingType.value
 

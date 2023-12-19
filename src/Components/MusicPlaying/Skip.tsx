@@ -1,21 +1,28 @@
 import { Button } from "@/Components/ui/button"
+import { play } from "@/Redux/Slices/audioSlice";
+import { setCurrentQueueIndex } from "@/Redux/Slices/currentQueueIndexSlice";
+import { useAppDispatch, useAppSelector } from "@/Redux/hooks";
 import { FastForward, Rewind } from 'lucide-react';
 
 interface skipProps {
     skipForward: boolean;
-    musicQueue: string[],
-    currentQueueIndex: number,
-    setCurrentQueueIndex: React.Dispatch<React.SetStateAction<number>>,
 }
 
 const Skip = (props: skipProps) => {
-    const { skipForward,musicQueue,currentQueueIndex,setCurrentQueueIndex } = props
+    const { skipForward } = props
+    const audio = useAppSelector((state) => state.audio.value)
+    const musicQueue = useAppSelector((state) => state.queue.musicQueue)
+    const currentQueueIndex = useAppSelector((state) => state.currentQueueIndex.value)
+    const dispatch = useAppDispatch()
+    
     const Icon = skipForward ? FastForward: Rewind
-    const disabled = skipForward ? currentQueueIndex === musicQueue.length - 1 || currentQueueIndex === 0: currentQueueIndex === 0
+    const move = skipForward ? 1: -1
+    const disabled = skipForward ? (currentQueueIndex === musicQueue.length - 1 || musicQueue.length === 1) : (currentQueueIndex === 0)
 
     const skip = () => {
-        const move: number = skipForward ? 1: -1
-        setCurrentQueueIndex(currentQueueIndex + move)
+        dispatch(setCurrentQueueIndex(currentQueueIndex + move))
+        audio.currentTime = 0
+        // dispatch(play())
     }
 
     return (

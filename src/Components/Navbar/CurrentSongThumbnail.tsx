@@ -7,8 +7,10 @@ interface CurrentSongThumbnailProps {
 }
 
 const CurrentSongThumbnail = (props: CurrentSongThumbnailProps) => {
-    const currentSong = useAppSelector((state) => state.currentSong.value)
-    const songImageSource: string = currentSong !== '' ? `http://localhost:11738/songImages/${currentSong}.png`: DefaultThumbnail
+    const currentQueueIndex = useAppSelector((state) => state.currentQueueIndex.value)
+    const musicQueue = useAppSelector((state) => state.queue.musicQueue)
+    const currentSong = musicQueue.length && currentQueueIndex < musicQueue.length && currentQueueIndex >= 0 ? musicQueue[currentQueueIndex] : ''
+    const songImageSource = currentSong !== '' ? `http://localhost:11738/songImages/${currentSong}.png`: DefaultThumbnail
 
     return (
         <div className='flex justify-center w-full'>
