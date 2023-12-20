@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import type { RootState } from '../store'
-import { useRef } from 'react'
 
 interface AudioState {
   value: HTMLAudioElement
@@ -21,7 +20,10 @@ export const audioSlice = createSlice({
       state.value.pause()
     },
     setCurrentSong: (state, action: PayloadAction<string>) => {
-      state.value.src = `http://localhost:11738/songFiles/${action.payload}.mp3`
+      const newSource = `http://localhost:11738/songFiles/${action.payload}.mp3`
+      if(decodeURIComponent(state.value.src) !== newSource) {
+        state.value.src = newSource
+      }
     },
     clearSource: (state, action: PayloadAction<void>) => {
       state.value.src = ''

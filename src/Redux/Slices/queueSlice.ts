@@ -6,8 +6,8 @@ interface QueueState {
 }
 
 const initialState: QueueState = {
-  defaultQueue: [],
-  musicQueue: ['Clovis Reyes - Fluxxwave (Ultra Slowed)',`I'LL KILL THEM ALL - EREN YEAGER - AOT × FLARE -HENSONN (SLOWED)`]
+  defaultQueue: ['Clovis Reyes - Fluxxwave (Ultra Slowed)',`I'LL KILL THEM ALL - EREN YEAGER - AOT × FLARE -HENSONN (SLOWED)`,`Jump out the house guitar remix slowed “I know what you are” Kobeni x anime villain mashup`],
+  musicQueue: ['Clovis Reyes - Fluxxwave (Ultra Slowed)',`I'LL KILL THEM ALL - EREN YEAGER - AOT × FLARE -HENSONN (SLOWED)`,`Jump out the house guitar remix slowed “I know what you are” Kobeni x anime villain mashup`]
 }
 
 export const queueSlice = createSlice({

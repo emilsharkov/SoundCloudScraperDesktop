@@ -10,7 +10,7 @@ const initialState: QueuedSongsState = {
 }
 
 export const queuedSongsSlice = createSlice({
-  name: 'musicQueue',
+  name: 'queuedSongs',
   initialState,
   reducers: {
     setQueuedSongs: (state, action: PayloadAction<string[]>) => {

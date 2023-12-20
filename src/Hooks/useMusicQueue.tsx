@@ -1,5 +1,6 @@
 import { clearSource, play, setCurrentSong } from '@/Redux/Slices/audioSlice'
 import { setCurrentQueueIndex } from '@/Redux/Slices/currentQueueIndexSlice'
+import { setIsPlaying } from '@/Redux/Slices/isPlayingSlice'
 import { setMusicQueue } from '@/Redux/Slices/queueSlice'
 import { setQueuedSongs } from '@/Redux/Slices/queuedSongsSlice'
 import { useAppSelector, useAppDispatch } from '@/Redux/hooks'
@@ -16,7 +17,52 @@ const useMusicQueue = () => {
     const isShuffled = useAppSelector((state) => state.isShuffled.value)
     
     const dispatch = useAppDispatch()
-    const latestSongRef = useRef<string>('')
+
+    const prevIsShuffled = useRef<boolean | null>(null)
+
+    useEffect(() => {
+      if (isShuffled !== prevIsShuffled.current) {
+        if (audio.src && defaultQueue.length) {
+          if (isShuffled) {
+            const songsWithoutCurrent = musicQueue.filter((song) => song !== musicQueue[currentQueueIndex])
+            const shuffledSongs: string[] = songsWithoutCurrent
+              .map((value: string) => ({ value, sort: Math.random() }))
+              .sort((a, b) => a.sort - b.sort)
+              .map(({ value }) => value)
+            const newMusicQueue = [musicQueue[currentQueueIndex], ...shuffledSongs]
+            dispatch(setMusicQueue(newMusicQueue))
+            dispatch(setCurrentQueueIndex(0))
+          } else {
+            const indexOfCurrentSong = defaultQueue.indexOf(musicQueue[currentQueueIndex])
+            dispatch(setMusicQueue(defaultQueue))
+            dispatch(setCurrentQueueIndex(indexOfCurrentSong))
+          }
+        }
+        prevIsShuffled.current = isShuffled
+      }
+    },[isShuffled,defaultQueue,currentQueueIndex,musicQueue])
+
+    useEffect(() => {
+        if(musicQueue.length && currentQueueIndex >= 0 && currentQueueIndex <= musicQueue.length - 1) {
+            console.log('here')
+            const currentSong = musicQueue[currentQueueIndex]
+            dispatch(setCurrentSong(currentSong))
+        } else {
+            console.log('here2')
+            dispatch(clearSource())
+        }
+    },[musicQueue,currentQueueIndex])
+
+    useEffect(() => {
+        const handleCanPlay = () => {
+            if(isPlaying) {
+                console.log(isPlaying)
+                dispatch(play())
+            }
+        }
+        audio.addEventListener('canplay', handleCanPlay)
+        return () => audio.removeEventListener('canplay', handleCanPlay)
+    },[audio.src,isPlaying])
 
     const listenQueuedSong = () => {
         const firstHalf = musicQueue.length > 1 ? musicQueue.slice(0,currentQueueIndex): []
@@ -27,46 +73,6 @@ const useMusicQueue = () => {
         dispatch(setQueuedSongs(newQueuedSongs))
         dispatch(setCurrentQueueIndex(currentQueueIndex + 1))
     }
-
-    useEffect(() => {
-        if(audio.src && defaultQueue.length) {
-            if(isShuffled){
-                const songsWithoutCurrent = musicQueue.filter(song => song !== musicQueue[currentQueueIndex])
-                const shuffledSongs: string[] = songsWithoutCurrent
-                    .map((value: string) => ({ value, sort: Math.random() }))
-                    .sort((a, b) => a.sort - b.sort)
-                    .map(({ value }) => value)
-                setMusicQueue( [musicQueue[currentQueueIndex],...shuffledSongs] ) 
-                dispatch(setCurrentQueueIndex(0))
-            } else {
-                const indexOfCurrentSong = defaultQueue.indexOf(musicQueue[currentQueueIndex])
-                dispatch(setMusicQueue(defaultQueue))
-                dispatch(setCurrentQueueIndex(indexOfCurrentSong))
-            }
-        }
-    },[isShuffled,defaultQueue,currentQueueIndex,musicQueue])
-
-    useEffect(() => {
-        if(musicQueue.length && currentQueueIndex >= 0 && currentQueueIndex <= musicQueue.length - 1) {
-            const currentSong = musicQueue[currentQueueIndex]
-            dispatch(setCurrentSong(currentSong))
-            latestSongRef.current = currentSong
-        } else {
-            dispatch(clearSource())
-            latestSongRef.current = ''
-        }
-    },[musicQueue,currentQueueIndex])
-
-    useEffect(() => {
-        if(isPlaying) {
-            if(musicQueue.length && currentQueueIndex >= 0 && currentQueueIndex <= musicQueue.length - 1) {
-                const currentSong = musicQueue[currentQueueIndex]
-                if() {
-                    
-                }
-            }
-        }
-    },[latestSongRef.current,musicQueue,currentQueueIndex])
 
     useEffect(() => {
         const handleSongEnded = () => {

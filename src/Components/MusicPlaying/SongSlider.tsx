@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 const SongSlider = () => {
     const audio = useAppSelector((state) => state.audio.value)
     const duration = audio.duration ?? 0
-    const [seconds,setSeconds] = useState<number>(audio.currentTime)
+    const [seconds,setSeconds] = useState<number>(0)
 
     useEffect(() => {
         const handleTimeUpdate = () => setSeconds(audio.currentTime ?? 0)
@@ -22,6 +22,7 @@ const SongSlider = () => {
     return (
         <Slider 
             className="flex-1" 
+            disabled={!audio.src}
             defaultValue={[0]}
             value={[seconds]}
             max={duration}
