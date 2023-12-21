@@ -13,7 +13,7 @@ const Shuffle = () => {
         <Button 
             size="icon" 
             variant="ghost" 
-            disabled={!audio.src}
+            disabled={audio.src === ''}
             onClick={() => dispatch(setIsShuffled(!isShuffled))}
         >
             <ShuffleIcon color={isShuffled ? '#1ed760': 'black'} strokeWidth={1.5}/>

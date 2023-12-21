@@ -21,6 +21,4 @@ export const queuedSongsSlice = createSlice({
 
 export const { setQueuedSongs } = queuedSongsSlice.actions
 
-export const selectQueuedSongs = (state: RootState) => state.queuedSongs.value
-
 export default queuedSongsSlice.reducer

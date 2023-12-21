@@ -22,7 +22,7 @@ const SongSlider = () => {
     return (
         <Slider 
             className="flex-1" 
-            disabled={!audio.src}
+            disabled={audio.src === ''}
             defaultValue={[0]}
             value={[seconds]}
             max={duration}

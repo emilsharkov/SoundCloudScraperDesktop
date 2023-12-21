@@ -16,6 +16,8 @@ import {
 import { useState } from "react"
 import EditMetadataDialog from "./EditMetadataDialog"
 import { Mp3Metadata } from "@/Interfaces/electronHandlerInputs"
+import { useAppDispatch, useAppSelector } from "@/Redux/hooks"
+import { setQueuedSongs } from "@/Redux/Slices/queuedSongsSlice"
 
 export interface SongSettingsProps {
     songMetadata: Mp3Metadata,
@@ -25,6 +27,9 @@ export interface SongSettingsProps {
 const SongSettings = (props: SongSettingsProps) => {
     const { songMetadata,isPlaylist } = props
     const [openEditDialog, setOpenEditDialog] = useState<boolean>(false)
+
+    const queuedSongs = useAppSelector((state) => state.queuedSongs.value)
+    const dispatch = useAppDispatch()
 
     return (
         <>
@@ -40,7 +45,7 @@ const SongSettings = (props: SongSettingsProps) => {
                             <FileEdit className="mr-2 h-4 w-4"/>
                             <span>Edit Metadata</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem >
+                        <DropdownMenuItem onClick={() => dispatch(setQueuedSongs([...queuedSongs,songMetadata.title]))}>
                             <ListEnd className="mr-2 h-4 w-4"/>
                             <span>Add to Queue</span>
                         </DropdownMenuItem>

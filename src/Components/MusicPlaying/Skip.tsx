@@ -11,6 +11,7 @@ interface skipProps {
 
 const Skip = (props: skipProps) => {
     const { skipForward } = props
+    const audio = useAppSelector((state) => state.audio.value)
     const replayingType = useAppSelector((state) => state.replayingType.value)
     const musicQueue = useAppSelector((state) => state.queue.musicQueue)
     const currentQueueIndex = useAppSelector((state) => state.currentQueueIndex.value)
@@ -18,13 +19,13 @@ const Skip = (props: skipProps) => {
     
     const Icon = skipForward ? FastForward: Rewind
     const move = skipForward ? 1: -1
-    const isReplayingPlaylist = replayingType === 'REPLAY_PLAYLIST'
+    const isReplaying = replayingType === 'REPLAY_PLAYLIST' || replayingType === 'REPLAY_SONG'
     const isLastIndex = currentQueueIndex === musicQueue.length - 1
     const isFirstIndex = currentQueueIndex === 0
-    const disabled = isReplayingPlaylist ? false : (skipForward ? isLastIndex || musicQueue.length === 1 : isFirstIndex)
+    const disabled = isReplaying ? false : (skipForward ? isLastIndex || musicQueue.length === 1 : isFirstIndex)
 
     const skip = () => {
-        if(isReplayingPlaylist) {
+        if(isReplaying) {
             let index = null
             if(isLastIndex && skipForward) {
                 index = 0
@@ -40,7 +41,12 @@ const Skip = (props: skipProps) => {
     }
 
     return (
-        <Button size="icon" variant="ghost" disabled={disabled} onClick={() => skip()}>
+        <Button 
+            size="icon" 
+            variant="ghost" 
+            disabled={disabled || audio.src === '' || musicQueue.length === 1} 
+            onClick={() => skip()}
+        >
             <Icon strokeWidth={1.5}/>
         </Button>
     )

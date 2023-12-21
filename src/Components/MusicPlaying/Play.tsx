@@ -11,11 +11,6 @@ const Play = () => {
     const isPlaying = useAppSelector((state) => state.isPlaying.value)
     const dispatch = useAppDispatch()
     const Icon = isPlaying ? PauseIcon: PlayIcon
-    const [disabled,setDisabled] = useState<boolean>(audio.src === window.location.href)
-
-    useEffect(() => {
-        setDisabled(audio.src === window.location.href)
-    },[audio])
 
     useEffect(() => {
         if(audio.src) {
@@ -28,7 +23,7 @@ const Play = () => {
             className="p-2" 
             size="icon" 
             variant="ghost" 
-            disabled={disabled} 
+            disabled={audio.src === ''} 
             onClick={() => dispatch(setIsPlaying(!isPlaying))}
         >
             <Icon strokeWidth={1.25}/>

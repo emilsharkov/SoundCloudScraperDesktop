@@ -20,7 +20,7 @@ const MarqueeText = (props: MarqueeTextProps) => {
 
     return(
         <div 
-            className={`whitespace-nowrap overflow-hidden`} 
+            className={`whitespace-nowrap overflow-hidden max-w-[200px]`} 
             onMouseEnter={onMouseEnter} 
             onMouseLeave={onMouseLeave}
         >

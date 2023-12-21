@@ -1,13 +1,17 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
+export type Origin = 'Playlist' | 'Downloads'
+
 interface QueueState {
+  origin: Origin | null;
   defaultQueue: string[];
   musicQueue: string[];
 }
 
 const initialState: QueueState = {
-  defaultQueue: ['Clovis Reyes - Fluxxwave (Ultra Slowed)',`I'LL KILL THEM ALL - EREN YEAGER - AOT × FLARE -HENSONN (SLOWED)`,`Jump out the house guitar remix slowed “I know what you are” Kobeni x anime villain mashup`],
-  musicQueue: ['Clovis Reyes - Fluxxwave (Ultra Slowed)',`I'LL KILL THEM ALL - EREN YEAGER - AOT × FLARE -HENSONN (SLOWED)`,`Jump out the house guitar remix slowed “I know what you are” Kobeni x anime villain mashup`]
+  origin: null,
+  defaultQueue: [],
+  musicQueue: []
 }
 
 export const queueSlice = createSlice({
@@ -20,9 +24,12 @@ export const queueSlice = createSlice({
     setMusicQueue: (state, action: PayloadAction<string[]>) => {
       state.musicQueue = action.payload
     },
+    setOrigin: (state, action: PayloadAction<Origin | null>) => {
+      state.origin = action.payload
+    },
   },
 })
 
-export const { setDefaultQueue,setMusicQueue } = queueSlice.actions
+export const { setDefaultQueue,setMusicQueue,setOrigin } = queueSlice.actions
 
 export default queueSlice.reducer
