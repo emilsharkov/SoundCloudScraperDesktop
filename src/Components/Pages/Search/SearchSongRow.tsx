@@ -4,7 +4,7 @@ import { TableCell,TableRow } from '@/Components/ui/table';
 import Spinner from './Spinner';
 import { SongURLArgs } from '@/Interfaces/electronHandlerInputs';
 import Marquee from "react-fast-marquee";
-import MarqueeText from '@/Components/Shared/MarqueeText';
+import MarqueeText from '@/Components/Shared/SongTable/MarqueeText';
 
 interface SongSuggestionProps {
     title: string;
@@ -18,12 +18,11 @@ interface SongSuggestionProps {
 const MILLISECONDS_PER_SECOND = 1000
 const SECONDS_PER_MINUTE = 60
 
-const SongTile = (props: SongSuggestionProps) => {
+const SearchSongRow = (props: SongSuggestionProps) => {
     const {title,thumbnail,duration,likes,artist,url} = props
     const rowRef = useRef<HTMLTableRowElement>(null)
     const [isClicked,setIsClicked] = useState<boolean>(false)
     const {result,error,receivedData,setArgs} = useElectronHandler<SongURLArgs,void>('download-song')
-    const songIcon = isClicked && !receivedData && result !== undefined ? <Spinner/>: <img className='h-12 w-12 max-w-none' src={thumbnail}/>
 
     useEffect(() => {
         if(isClicked && receivedData && result === undefined) {
@@ -52,7 +51,7 @@ const SongTile = (props: SongSuggestionProps) => {
 
     return (
         <TableRow ref={rowRef} key={url} onClick={() => setIsClicked(true)}>
-            <TableCell>{songIcon}</TableCell>
+            <TableCell>{isClicked && !receivedData && result !== undefined ? <Spinner/>: <img className='h-12 w-12 max-w-none' src={thumbnail}/>}</TableCell>
             <TableCell className='max-w-[400px]'><MarqueeText text={title}/></TableCell>
             <TableCell className='max-w-[100px]'><MarqueeText text={artist}/></TableCell>
             <TableCell>{durationFormatted}</TableCell>
@@ -61,4 +60,4 @@ const SongTile = (props: SongSuggestionProps) => {
     )
 }
 
-export default SongTile
+export default SearchSongRow

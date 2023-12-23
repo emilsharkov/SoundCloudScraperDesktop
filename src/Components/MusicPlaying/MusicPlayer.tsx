@@ -4,7 +4,6 @@
   import SongSlider from "./SongSlider"
   import Play from "./Play"
   import useMusicQueue from "@/Hooks/useMusicQueue"
-  import { useAppSelector, useAppDispatch } from '@/Redux/hooks'
 
   export type ReplayingType = 'NO_REPLAY' | 'REPLAY_PLAYLIST' | 'REPLAY_SONG'
 

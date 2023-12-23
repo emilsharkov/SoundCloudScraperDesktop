@@ -83,8 +83,8 @@ body {
   width: 100vw;
   height: 100vh;
   display: grid;
-  grid-template-columns: repeat(7, calc(100vw/7));
-  grid-template-rows: repeat(5, calc(100vh/5));
+  grid-template-columns: repeat(7,1fr);
+  grid-template-rows: repeat(5,1fr);
   grid-template-areas: 
       "navbar navbar pages pages pages pages pages"
       "navbar navbar pages pages pages pages pages"
@@ -95,6 +95,7 @@ body {
 
 .page-component {
   grid-area: pages;
+  overflow: hidden;
 }
 
 .navbar-component {
@@ -102,8 +103,10 @@ body {
   display: flex;
   align-items: center;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .music-player-component {
   grid-area: music;
+  overflow: hidden;
 }

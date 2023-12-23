@@ -1,4 +1,4 @@
-import SongTable from "@/Components/Shared/SongTable"
+import SongTable from "@/Components/Shared/SongTable/SongTable"
 import { Input } from "@/Components/ui/input"
 import useElectronHandler from "@/Hooks/useElectronHandler"
 import useFuzzySearch from "@/Hooks/useFuzzySearch"

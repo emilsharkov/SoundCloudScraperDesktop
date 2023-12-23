@@ -66,12 +66,9 @@ const useMusicQueue = () => {
     },[audio.src,isPlaying])
 
     const listenQueuedSong = () => {
-        const firstHalf = musicQueue.length > 1 ? musicQueue.slice(0,currentQueueIndex): []
-        const secondHalf = musicQueue.length > 1 ? musicQueue.slice(currentQueueIndex): []
-        const newMusicQueue = [...firstHalf,queuedSongs[0],...secondHalf]
-        const newQueuedSongs = queuedSongs.length > 1 ? queuedSongs.slice(1): []
-        console.log(newMusicQueue)
-        console.log(newQueuedSongs)
+        let newMusicQueue = [...musicQueue]
+        newMusicQueue.splice(currentQueueIndex + 1, 0, queuedSongs[0])
+        const newQueuedSongs = queuedSongs.length > 0 ? queuedSongs.slice(1) : [];
         dispatch(setMusicQueue(newMusicQueue))
         dispatch(setQueuedSongs(newQueuedSongs))
         dispatch(setCurrentQueueIndex(currentQueueIndex + 1))

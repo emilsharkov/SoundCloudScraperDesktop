@@ -1,35 +1,50 @@
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, KeyboardEvent } from "react"
 import useElectronHandler from "@/Hooks/useElectronHandler"
-import { useDebounce } from "@/Hooks/useDebounce"
-import SongTile from "./SongTile"
+import SearchSongRow from "./SearchSongRow"
 import { Table,TableBody,TableCell,TableHead,TableHeader,TableRow } from "@/Components/ui/table"
 import { Song } from "@/Interfaces/electronHandlerReturns"
 import { SongNameArgs } from "@/Interfaces/electronHandlerInputs"
-import { ListOrdered } from 'lucide-react';
-import { Clock } from 'lucide-react';
-import { Heart } from 'lucide-react';
+import { Clock } from 'lucide-react'
+import { Search as SearchGlass } from 'lucide-react';
+import { Heart } from 'lucide-react'
 import { Input } from "@/Components/ui/input"
+import { Button } from "@/Components/ui/button"
+import Spinner from "./Spinner"
 
 const Search = (): JSX.Element => {
     const [searchBarInput,setSearchBarInput] = useState<string>('')
-    const debouncedValue = useDebounce(searchBarInput)
     const {result,error,receivedData,setArgs} = useElectronHandler<SongNameArgs,Song[]>('search-song')
 
-    useEffect(() => {
-        if(debouncedValue && debouncedValue !== null && debouncedValue !== '') {
-            console.log(debouncedValue)
-            setArgs({ songName: debouncedValue })
+    const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            handleSubmit()
         }
-    },[debouncedValue])
+    }
+
+    const handleSubmit = () => {
+        if(searchBarInput !== ''){
+            setArgs({ songName: searchBarInput })
+        }
+    }
 
     return(
         <div className='flex flex-col w-full h-full items-center'>
-            <Input 
-                className='w-[99%] mt-1'
-                placeholder='Find Song'
-                value={searchBarInput}
-                onChange={(e) => setSearchBarInput(e.target.value)}
-            />
+            <div className='flex flex-row mt-1 w-[97%]'>
+                <Input 
+                    className='mr-1'
+                    placeholder='Find Song'
+                    value={searchBarInput}
+                    onChange={(e) => setSearchBarInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                />
+                <Button 
+                    onClick={handleSubmit}
+                    variant='outline'
+                >
+                    {receivedData ? <SearchGlass className="h-4"/>: <Spinner size={4} hexColor="#000000"/>}
+                </Button>
+            </div>
+            
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -43,7 +58,7 @@ const Search = (): JSX.Element => {
                 <TableBody>
                     {receivedData && !error 
                         && result?.map((song: Song) => (                    
-                            <SongTile 
+                            <SearchSongRow 
                                 key={song.id}
                                 title={song.title}
                                 thumbnail={song.thumbnail}

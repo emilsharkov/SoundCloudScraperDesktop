@@ -74,7 +74,9 @@ const NewPlaylistButton = (props: NewPlaylistButtonProps) => {
                     <Button 
                         disabled={name === '' || isSubmitted || !props.playlists} 
                         onClick={() => createPlaylist()} 
-                    >Save changes</Button>
+                    >
+                        Save changes
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

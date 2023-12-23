@@ -16,7 +16,6 @@ export const applyElectronHandlers = () => {
                 properties: ['openFile'],
                 filters: [
                     { name: 'Images', extensions: ['jpg', 'jpeg', 'png'] },
-                    { name: 'All Files', extensions: ['*'] }
                 ]
             })
             return result

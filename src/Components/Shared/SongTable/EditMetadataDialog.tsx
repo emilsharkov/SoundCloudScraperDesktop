@@ -12,6 +12,7 @@ import { Label } from "@/Components/ui/label"
 import { Button } from "@/Components/ui/button"
 import { Mp3Metadata } from "@/Interfaces/electronHandlerInputs"
 import { useState } from "react"
+import ImageInput from "./ImageInput"
 
 export interface EditMetadataDialogProps {
     songMetadata: Mp3Metadata,
@@ -56,10 +57,7 @@ const EditMetadataDialog = (props: EditMetadataDialogProps) => {
                 <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label className="text-right">Image</Label>
-                        <Input
-                            className="col-span-3"
-                            onChange={(e) => setNewImgPath(e.target.value)}
-                        />
+                        <ImageInput />
                     </div>
                 </div>
                 <DialogFooter>
