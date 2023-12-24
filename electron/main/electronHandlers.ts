@@ -57,8 +57,9 @@ export const applyElectronHandlers = () => {
             return new Promise<void> (async resolve => {
                 const client: SoundCloud.Client = new SoundCloud.Client()
                 const song: SoundCloud.Song = await client.getSongInfo(args.songURL)
+                console.log(song)
     
-                const stream = await song.downloadProgressive()
+                const stream = song.trackURL.endsWith('/stream/progressive') ? await song.downloadProgressive(): await song.downloadHLS()
                 const writer = stream.pipe(fs.createWriteStream(`${workingDir}/songs/${song.title}.mp3`))
                 writer.on("finish", async() => { 
                     await downloadThumbnail(song.title,song.thumbnail)

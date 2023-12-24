@@ -23,8 +23,8 @@ const SongPlayButton = (props: SongPlayButtonProps) => {
     const dispatch = useAppDispatch()
 
     useEffect(() => {
-        setSongPlaying(playing && origin === songOrigin);
-    }, [playing, origin, songOrigin]);
+        setSongPlaying(playing && origin === songOrigin)
+    }, [playing, origin, songOrigin])
 
     useEffect(() => {
         if(!clicked.current) {
