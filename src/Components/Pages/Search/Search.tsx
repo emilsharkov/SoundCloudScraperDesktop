@@ -10,68 +10,74 @@ import { Heart } from 'lucide-react'
 import { Input } from "@/Components/ui/input"
 import { Button } from "@/Components/ui/button"
 import Spinner from "./Spinner"
+import RowSkeleton from "@/Components/Shared/RowSkeleton"
 
 const Search = (): JSX.Element => {
-    const [searchBarInput,setSearchBarInput] = useState<string>('')
-    const {result,error,receivedData,setArgs} = useElectronHandler<SongNameArgs,Song[]>('search-song')
+    const [searchBarInput, setSearchBarInput] = useState<string>('');
+    const { result, error, receivedData, setArgs } = useElectronHandler<SongNameArgs, Song[]>('search-song');
 
     const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
-            handleSubmit()
+            handleSubmit();
         }
     }
 
     const handleSubmit = () => {
-        if(searchBarInput !== ''){
-            setArgs({ songName: searchBarInput })
+        if (searchBarInput !== '') {
+            setArgs({ songName: searchBarInput });
         }
     }
 
-    return(
+    return (
         <div className='flex flex-col w-full h-full items-center'>
             <div className='flex flex-row mt-1 w-[97%]'>
-                <Input 
+                <Input
                     className='mr-1'
                     placeholder='Find Song'
                     value={searchBarInput}
                     onChange={(e) => setSearchBarInput(e.target.value)}
                     onKeyDown={handleKeyDown}
                 />
-                <Button 
+                <Button
                     onClick={handleSubmit}
                     variant='outline'
                 >
-                    {receivedData ? <SearchGlass className="h-4"/>: <Spinner size={4} hexColor="#000000"/>}
+                    {receivedData ? <SearchGlass className="h-4" /> : <Spinner size={4} hexColor="#000000" />}
                 </Button>
             </div>
-            
+
             <Table>
                 <TableHeader>
                     <TableRow>
                         <TableHead className="w-[100px]"></TableHead>
-                        <TableHead>Title</TableHead>
-                        <TableHead>Artist</TableHead>
-                        <TableHead><Clock/></TableHead>
-                        <TableHead><Heart/></TableHead>
+                        <TableHead className="w-[250px]">Title</TableHead>
+                        <TableHead className="w-[100px]">Artist</TableHead>
+                        <TableHead className="w-[50px]"><Clock /></TableHead>
+                        <TableHead className="w-[100px]"><Heart /></TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {receivedData && !error 
-                        && result?.map((song: Song) => (                    
-                            <SearchSongRow 
+                    {receivedData && !error ? (
+                        result?.map((song: Song) => (
+                            <SearchSongRow
                                 key={song.id}
                                 title={song.title}
                                 thumbnail={song.thumbnail}
                                 duration={song.duration}
                                 likes={song.likes}
                                 artist={song.artist}
-                                url={song.url}                            
+                                url={song.url}
                             />
-                    ))}
+                        ))
+                    ) : (
+                        Array.from({ length: 10 }, (_, index) => (
+                            <RowSkeleton key={index} />
+                        ))
+                    )}
                 </TableBody>
             </Table>
         </div>
     )
 }
 
-export default Search
+export default Search;

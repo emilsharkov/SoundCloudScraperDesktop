@@ -8,46 +8,49 @@ import { Button } from "@/Components/ui/button";
 import { Origin } from "@/Redux/Slices/queueSlice";
 
 export interface SongPlayButtonProps {
-    playing: boolean;
     playSong: () => void;
     songOrigin: Origin;
+    isCurrentSong: boolean;
 }
 
 const SongPlayButton = (props: SongPlayButtonProps) => {
-    const {playing,playSong,songOrigin} = props
+    const {playSong,songOrigin,isCurrentSong} = props
     const audio = useAppSelector((state) => state.audio.value)
     const origin = useAppSelector((state) => state.queue.origin)
-    const [songPlaying,setSongPlaying] = useState<boolean>(playing && origin === songOrigin)
+    const isPlaying = useAppSelector((state) => state.isPlaying.value)
+    const [rowPlaying,setRowPlaying] = useState<boolean>(isPlaying && isCurrentSong && origin === songOrigin)
     const clicked = useRef<boolean>(false)
-    const Icon = songPlaying ? PauseIcon : PlayIcon
+    const Icon = rowPlaying ? PauseIcon : PlayIcon
     const dispatch = useAppDispatch()
 
     useEffect(() => {
-        setSongPlaying(playing && origin === songOrigin)
-    }, [playing, origin, songOrigin])
+        setRowPlaying(isPlaying && isCurrentSong && origin === songOrigin)
+    }, [isCurrentSong, isPlaying, origin, songOrigin])
 
     useEffect(() => {
         if(!clicked.current) {
             return
         }
-        else if(songPlaying) {
+        else if(rowPlaying) {
             dispatch(setIsPlaying(true))
         } else {
             dispatch(setIsPlaying(false))
         }
-    },[songPlaying])
+    },[rowPlaying])
 
     const onClick = () => {
         if(!clicked.current) {
             clicked.current = true
-            if(songPlaying) {
-                setSongPlaying(false)
+            if(!rowPlaying && origin === songOrigin && isCurrentSong) {
+                setRowPlaying(true)
+            } else if(rowPlaying) {
+                setRowPlaying(false)
             } else {
                 playSong()
-                setSongPlaying(true)
+                setRowPlaying(true)
             }
         } else {
-            setSongPlaying(!songPlaying)
+            setRowPlaying(!rowPlaying)
         }
     }
 

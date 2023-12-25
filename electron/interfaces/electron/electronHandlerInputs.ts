@@ -2,8 +2,14 @@ import { PutPlaylistSongBodyItem } from "../express/RequestBody";
 
 export interface Mp3Metadata {
     title: string;
-    artist: string | null;
-    imgPath: string | null;
+    artist: string;
+    imgPath: string;
+    duration: number;
+}
+
+export interface EditMetadataArgs {
+    originalTitle: string;
+    metadata: Mp3Metadata;
 }
 
 export interface SongNameArgs {

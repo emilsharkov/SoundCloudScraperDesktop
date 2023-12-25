@@ -1,6 +1,6 @@
 import { ipcMain, dialog, OpenDialogReturnValue } from 'electron'
-import { AddSongToPlaylistArgs, ChangePlaylistNameArgs, DeletePlaylistSongArgs, Mp3Metadata, PlaylistNameArgs, ReorderSongsArgs, Song, SongNameArgs, SongURLArgs } from '../interfaces/electron/electronHandlerInputs'
-import { downloadThumbnail, editMp3Metadata, getImgPathFromURL, initDirs, workingDir, fetchData} from './utils'
+import { AddSongToPlaylistArgs, ChangePlaylistNameArgs, DeletePlaylistSongArgs, EditMetadataArgs, Mp3Metadata, PlaylistNameArgs, ReorderSongsArgs, Song, SongNameArgs, SongURLArgs } from '../interfaces/electron/electronHandlerInputs'
+import { downloadThumbnail, editMp3Metadata, getImgPathFromURL, initDirs, workingDir, fetchData, getDuration, editMp3CoverArt} from './utils'
 import { PlaylistName, PlaylistSongsNames, SongOrder, SongTitle } from '../interfaces/express/ResponseBody'
 
 import * as fs from "fs"
@@ -54,24 +54,30 @@ export const applyElectronHandlers = () => {
 
     ipcMain.handle('download-song', async (event: Electron.IpcMainInvokeEvent, args: SongURLArgs): Promise<void> => {
         try {
-            return new Promise<void> (async resolve => {
-                const client: SoundCloud.Client = new SoundCloud.Client()
-                const song: SoundCloud.Song = await client.getSongInfo(args.songURL)
-                console.log(song)
+            const client = new SoundCloud.Client()
+            const song = await client.getSongInfo(args.songURL)
     
-                const stream = song.trackURL.endsWith('/stream/progressive') ? await song.downloadProgressive(): await song.downloadHLS()
-                const writer = stream.pipe(fs.createWriteStream(`${workingDir}/songs/${song.title}.mp3`))
-                writer.on("finish", async() => { 
-                    await downloadThumbnail(song.title,song.thumbnail)
-                    
-                    const metadata: Mp3Metadata = {
-                        title: song.title,
-                        imgPath: `${workingDir}/images/${song.title}.png`,
-                        artist: null
+            const stream = song.trackURL.endsWith('/stream/progressive')
+                ? await song.downloadProgressive()
+                : await song.downloadHLS()
+    
+            const writer = stream.pipe(fs.createWriteStream(`${workingDir}/songs/${song.title}.mp3`))
+    
+            await new Promise<void>((resolve, reject) => {
+                writer.on("finish", async () => { 
+                    try {
+                        await downloadThumbnail(song.title, song.thumbnail)
+                        await editMp3Metadata(song.title,{
+                            title: song.title,
+                            imgPath: `${workingDir}/images/${song.title}.png`,
+                            artist: song.author.name,
+                            duration: song.duration
+                        })
+                        editMp3CoverArt(song.title,`${workingDir}/images/${song.title}.png`)
+                        resolve()
+                    } catch(err) {
+                        reject(err)
                     }
-                    await editMp3Metadata(metadata)
-                    
-                    resolve() 
                 })
             })
         } catch (err) {
@@ -79,6 +85,7 @@ export const applyElectronHandlers = () => {
             throw new Error('Failed to Download Song')
         }
     })
+    
 
     ipcMain.handle('get-mp3-metadata', async (event: Electron.IpcMainInvokeEvent, args: SongNameArgs): Promise<Mp3Metadata> => {
         try {
@@ -87,11 +94,9 @@ export const applyElectronHandlers = () => {
             const common = response.common
             let metadata: Mp3Metadata = { 
                 title: args.songName, 
-                artist: null, 
-                imgPath: `http://localhost:11738/songImages/${encodeURIComponent(args.songName)}.png` 
-            }
-            if(common.artist) { 
-                metadata.artist = common.artist 
+                artist: common.artist!, 
+                imgPath: `${workingDir}/images/${args.songName}.png`,
+                duration: getDuration(path) 
             }
             return metadata
         } catch (err) {
@@ -110,9 +115,9 @@ export const applyElectronHandlers = () => {
         }
     })
 
-    ipcMain.handle('edit-mp3-metadata', async (event: Electron.IpcMainInvokeEvent, args: Mp3Metadata): Promise<void> => {
+    ipcMain.handle('edit-mp3-metadata', async (event: Electron.IpcMainInvokeEvent, args: EditMetadataArgs): Promise<void> => {
         try {
-            return await editMp3Metadata(args)
+            return await editMp3Metadata(args.originalTitle,args.metadata)
         } catch (err) {
             console.error('Error in edit-mp3-metadata:', err)
             throw new Error('Failed to Edit Mp3 Metadata')

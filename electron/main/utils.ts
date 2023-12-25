@@ -1,13 +1,15 @@
-import { Mp3Metadata } from '../interfaces/electron/electronHandlerInputs';
-import { ErrorResponse } from '../interfaces/express/Error';
-import { SongTitle } from '../interfaces/express/ResponseBody';
+import { Mp3Metadata } from '../interfaces/electron/electronHandlerInputs'
+import { ErrorResponse } from '../interfaces/express/Error'
+import { SongTitle } from '../interfaces/express/ResponseBody'
 
 const fs = require('fs')
-const sharp = require('sharp');
+const sharp = require('sharp')
 import * as mm from "music-metadata"
+const getMP3Duration = require('get-mp3-duration')
+const Jimp = require("jimp");
 const nid3 = require('node-id3')
-const { Readable } = require('stream');
-const { finished } = require('stream/promises');
+const { Readable } = require('stream')
+const { finished } = require('stream/promises')
 
 export const workingDir = process.env.USERPROFILE + '\\SoundCloudScraper'
 
@@ -32,9 +34,12 @@ export const getImgPathFromURL = (songName: string, imgURL: string) => {
 
 async function convertToPng(inputPath: string) {
     try {
-        const outputPath = inputPath.split('.')[0] + '.png'
-        await sharp(inputPath).toFormat('png').toFile(outputPath);
-        console.log('Image converted successfully to PNG:', outputPath);
+        console.log(inputPath)
+        const outputPath = inputPath.slice(0, inputPath.lastIndexOf('.')) + '.png'
+        console.log(outputPath)
+        const image = await Jimp.read(inputPath)
+        await image.writeAsync(outputPath)  
+        console.log('Image converted successfully to PNG:', outputPath)
     } catch (error) {
         console.error('Error converting image to PNG:', error)
         throw error
@@ -67,59 +72,70 @@ export const editMp3CoverArt = async (songName: string, imagePath: string) => {
     nid3.write(tags, songPath)
 }
 
-const copyLocalImageToImages = (path: string) => {
-    const fileNameArr: string[] = path.split('/')
-    const fileName: string = fileNameArr[fileNameArr.length - 1]
-    const copyPath = `${workingDir}/images/${fileName}`
+export const editMp3Metadata = async(originalTitle: string, metadata: Mp3Metadata) => {
+    const originalSongPath = `${workingDir}/songs/${originalTitle}.mp3`
+    const metadataSongPath = `${workingDir}/songs/${metadata.title}.mp3`
+    const originalImagePath = `${workingDir}/images/${originalTitle}.png`
+    const metadataImagePath = `${workingDir}/images/${metadata.title}.png`
+    const mp3Metadata: mm.IAudioMetadata = await mm.parseFile(originalSongPath)
+    
+    if(metadata.title !== mp3Metadata.common.title) {
+        if(!mp3Metadata.common.title) {
+            const data = await fetchData<SongTitle[]>(`http://localhost:11738/songs`,{
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ title: originalTitle }),
+            })
+        } else {
+            fs.renameSync(originalSongPath, metadataSongPath)
+            fs.renameSync(originalImagePath, metadataImagePath)
 
-    fs.readFile(path, (err: NodeJS.ErrnoException | null, data: Buffer) => {
-        if (err) {
-          console.error('Error reading the source image:', err);
-          return;
+            const data = await fetchData<SongTitle[]>(`http://localhost:11738/songs/${mp3Metadata.common.title}`,{
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ newTitle: metadata.title }),
+            })
         }
-      
-        fs.writeFile(copyPath, data, (err: NodeJS.ErrnoException | null) => {
-          if (err) {
-            console.error('Error writing the destination image:', err);
-            return;
-          }
-        });
-    });
+        mp3Metadata.common.title = metadata.title
+    }
+
+    if(metadata.artist !== mp3Metadata.common.artist) {
+        mp3Metadata.common.artist = metadata.artist
+    }
+
+    if (metadata.imgPath !== originalImagePath) {
+        console.log(metadata)
+        console.log('originalImagePath:', originalImagePath);
+        console.log('metadataImagePath:', metadataImagePath);
+    
+        fs.unlinkSync(originalImagePath === metadataImagePath ? originalImagePath : metadataImagePath);
+    
+        const extension = metadata.imgPath.split('.').pop();
+        const tempMetadataImagePath = `${workingDir}/images/${metadata.title}.${extension}`;
+        console.log('tempMetadataImagePath:', tempMetadataImagePath);
+    
+        const imgData = fs.readFileSync(metadata.imgPath)
+        fs.writeFileSync(tempMetadataImagePath, imgData)
+
+        if (tempMetadataImagePath.indexOf('.png') === -1) {
+            await convertToPng(tempMetadataImagePath);
+            fs.unlinkSync(tempMetadataImagePath);
+        }
+    
+        editMp3CoverArt(metadata.title, metadata.imgPath);
+    }
+    
+
+    nid3.update(mp3Metadata.common, originalSongPath === metadataSongPath ? originalSongPath: metadataSongPath)
 }
 
-export const editMp3Metadata = async(metadata: Mp3Metadata) => {
-    const path = `${workingDir}/songs/${metadata.title}.mp3`
-    const mp3Metadata: mm.IAudioMetadata = await mm.parseFile(path);
-    
-    if(!mp3Metadata.common.title) {
-        const data = await fetchData<SongTitle[]>(`http://localhost:11738/songs`,{
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ title: metadata.title }),
-        })
-    } else {
-        const data = await fetchData<SongTitle[]>(`http://localhost:11738/songs/${mp3Metadata.common.title}`,{
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ newTitle: metadata.title }),
-        })
-    }
-    mp3Metadata.common.title = metadata.title
-
-    if(metadata.artist != null) {
-        mp3Metadata.common.artist = metadata.artist;
-    }
-
-    if(metadata.imgPath != null) {
-        editMp3CoverArt(metadata.title, metadata.imgPath)
-    }
-
-    nid3.update(mp3Metadata.common, path)
-    await mm.parseFile(path)
+export const getDuration = (filePath: string): number => {
+    const buffer = fs.readFileSync(filePath)
+    return getMP3Duration(buffer) 
 }
 
 export const fetchData = async <T extends object>(url: string, options: RequestInit = {}) => {

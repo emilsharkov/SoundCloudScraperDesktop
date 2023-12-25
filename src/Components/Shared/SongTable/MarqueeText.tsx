@@ -20,12 +20,12 @@ const MarqueeText = (props: MarqueeTextProps) => {
 
     return(
         <div 
-            className={`whitespace-nowrap overflow-hidden max-w-[200px]`} 
+            className={`whitespace-nowrap overflow-hidden`} 
             onMouseEnter={onMouseEnter} 
             onMouseLeave={onMouseLeave}
         >
             {isHovered ? 
-                <Marquee speed={speed ?? 30}>{text}</Marquee>: 
+                <Marquee style={{ overflowY: 'hidden' }} speed={speed ?? 30}>{text}</Marquee>: 
                 <span>{text}</span>}
         </div>
     )

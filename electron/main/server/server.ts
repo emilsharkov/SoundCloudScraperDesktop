@@ -23,8 +23,16 @@ const runServer = () => {
   app.use('/playlistSongs', playlistSongsRoute(db))
 
   // routes to song .mp3 and album art .png
-  app.use('/songFiles',express.static(`${workingDir}/songs`));
-  app.use('/songImages', express.static(`${workingDir}/images`))
+  app.use('/songFiles', (req, res, next) => {
+    res.setHeader('Cache-Control', 'no-cache'); // Add cache control header
+    express.static(`${workingDir}/songs`)(req, res, next);
+  });
+
+  // Serve song images
+  app.use('/songImages', (req, res, next) => {
+      res.setHeader('Cache-Control', 'no-cache'); // Add cache control header
+      express.static(`${workingDir}/images`)(req, res, next);
+  });
 
   // needs to be last middleware
   app.use(errorHandler)

@@ -38,12 +38,12 @@ const SearchSongRow = (props: SongSuggestionProps) => {
         }        
     },[isClicked])
 
-    const durationFormatted = useMemo(() => {
+    const durationFormatted = () => {
         const durationInSeconds = Math.trunc(duration / MILLISECONDS_PER_SECOND)
         const minutes = Math.trunc(durationInSeconds / SECONDS_PER_MINUTE)
         const seconds = String(durationInSeconds % SECONDS_PER_MINUTE).padStart(2,'0')
         return `${minutes}:${seconds}`
-    },[props.duration])
+    }
 
     const likeFormatted = useMemo(() => {
         return likes.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -54,7 +54,7 @@ const SearchSongRow = (props: SongSuggestionProps) => {
             <TableCell>{isClicked && !receivedData && result !== undefined ? <Spinner/>: <img className='h-12 w-12 max-w-none' src={thumbnail}/>}</TableCell>
             <TableCell className='max-w-[400px]'><MarqueeText text={title}/></TableCell>
             <TableCell className='max-w-[100px]'><MarqueeText text={artist}/></TableCell>
-            <TableCell>{durationFormatted}</TableCell>
+            <TableCell>{durationFormatted()}</TableCell>
             <TableCell className="text-right">{likeFormatted}</TableCell>
         </TableRow>
     )

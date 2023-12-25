@@ -36,6 +36,7 @@ const SongTable = (props: SongTableProps) => {
                     <TableHead className="w-12"></TableHead>
                     <TableHead className=''>Title</TableHead>
                     <TableHead>Artist</TableHead>
+                    <TableHead>Duration</TableHead>
                 </TableRow>
             </TableHeader>
 

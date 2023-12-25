@@ -10,6 +10,7 @@ import MusicPlayer from './Components/MusicPlaying/MusicPlayer'
 import Navbar from './Components/Navbar/Navbar'
 import { Toaster } from "@/Components/ui/toaster"
 import useToastError from './Hooks/useToastError'
+import CurrentSongThumbnail from '@/Components/Navbar/CurrentSongThumbnail'
 
 const App = () => {
   useToastError()
@@ -21,6 +22,7 @@ const App = () => {
           <Route path='Playlists' component={<Playlists/>}/>
           <Route path='Downloads' component={<Downloads/>}/>
         </Routes>
+        <CurrentSongThumbnail className='thumbnail-component'/>
         <Navbar className='navbar-component'/>
         <MusicPlayer className='music-player-component'/>
         <Toaster />  
