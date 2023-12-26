@@ -64,6 +64,12 @@ const Playlist = (props: PlaylistProps) => {
             songOrderings: songOrderings
         })
     }
+
+    useEffect(() => {
+        if(songOrder && !songOrderError && receivedSongOrderData) {
+            dispatch(refreshPlaylist())
+        }
+    },[songOrder,songOrderError,receivedSongOrderData])
     
     const dragProps: DragListViewProps = {
         onDragEnd: onDragEnd,
