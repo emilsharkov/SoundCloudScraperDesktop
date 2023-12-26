@@ -8,6 +8,7 @@ import queueSlice from './Slices/queueSlice'
 import queuedSongsSlice from './Slices/queuedSongsSlice'
 import currentQueueIndexSlice from './Slices/currentQueueIndexSlice'
 import isShuffledSlice from './Slices/isShuffledSlice'
+import refreshDataSlice from './Slices/refreshDataSlice'
 
 const store = configureStore({
   reducer: {
@@ -20,6 +21,7 @@ const store = configureStore({
     queue: queueSlice,
     queuedSongs: queuedSongsSlice,
     currentQueueIndex: currentQueueIndexSlice,
+    refreshData: refreshDataSlice,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware({serializableCheck: false}),
 })

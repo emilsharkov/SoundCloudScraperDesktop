@@ -19,8 +19,8 @@ const App = () => {
     <div className='app-container'>
         <Routes className='page-component'>
           <Route path='Search' component={<Search/>}/>
-          <Route path='Playlists' component={<Playlists/>}/>
           <Route path='Downloads' component={<Downloads/>}/>
+          <Route path='Playlists' component={<Playlists/>}/>
         </Routes>
         <CurrentSongThumbnail className='thumbnail-component'/>
         <Navbar className='navbar-component'/>

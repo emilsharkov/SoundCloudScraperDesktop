@@ -72,7 +72,7 @@ const SongTableRow = (props: SongTableRowProps) => {
             </TableCell>
 
             <TableCell>
-                {isPlaylist ? <GripVertical/>: null}
+                {isPlaylist ? <a><GripVertical/></a>: null}
             </TableCell>
         </TableRow>
     )

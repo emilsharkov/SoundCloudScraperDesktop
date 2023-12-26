@@ -3,7 +3,6 @@ import { ErrorResponse } from '../interfaces/express/Error'
 import { SongTitle } from '../interfaces/express/ResponseBody'
 
 const fs = require('fs')
-const sharp = require('sharp')
 import * as mm from "music-metadata"
 const getMP3Duration = require('get-mp3-duration')
 const Jimp = require("jimp");
@@ -34,9 +33,7 @@ export const getImgPathFromURL = (songName: string, imgURL: string) => {
 
 async function convertToPng(inputPath: string) {
     try {
-        console.log(inputPath)
         const outputPath = inputPath.slice(0, inputPath.lastIndexOf('.')) + '.png'
-        console.log(outputPath)
         const image = await Jimp.read(inputPath)
         await image.writeAsync(outputPath)  
         console.log('Image converted successfully to PNG:', outputPath)
@@ -129,8 +126,21 @@ export const editMp3Metadata = async(originalTitle: string, metadata: Mp3Metadat
         editMp3CoverArt(metadata.title, metadata.imgPath);
     }
     
-
     nid3.update(mp3Metadata.common, originalSongPath === metadataSongPath ? originalSongPath: metadataSongPath)
+    return true
+}
+
+export const getMetadata = async(songName: string) => {
+    const path = `${workingDir}/songs/${songName}.mp3`
+    const response: mm.IAudioMetadata = await mm.parseFile(path)
+    const common = response.common
+    let metadata: Mp3Metadata = { 
+        title: songName, 
+        artist: common.artist!, 
+        imgPath: `${workingDir}/images/${songName}.png`,
+        duration: getDuration(path) 
+    }
+    return metadata
 }
 
 export const getDuration = (filePath: string): number => {

@@ -1,6 +1,6 @@
 import { ipcMain, dialog, OpenDialogReturnValue } from 'electron'
-import { AddSongToPlaylistArgs, ChangePlaylistNameArgs, DeletePlaylistSongArgs, EditMetadataArgs, Mp3Metadata, PlaylistNameArgs, ReorderSongsArgs, Song, SongNameArgs, SongURLArgs } from '../interfaces/electron/electronHandlerInputs'
-import { downloadThumbnail, editMp3Metadata, getImgPathFromURL, initDirs, workingDir, fetchData, getDuration, editMp3CoverArt} from './utils'
+import { AddSongToPlaylistArgs, ChangePlaylistNameArgs, DeletePlaylistSongArgs, EditMetadataArgs, Mp3Metadata, PlaylistNameArgs, ReorderSongsArgs, Song, SongNameArgs, SongNamesArgs, SongURLArgs } from '../interfaces/electron/electronHandlerInputs'
+import { downloadThumbnail, editMp3Metadata, getImgPathFromURL, initDirs, workingDir, fetchData, getDuration, editMp3CoverArt, getMetadata} from './utils'
 import { PlaylistName, PlaylistSongsNames, SongOrder, SongTitle } from '../interfaces/express/ResponseBody'
 
 import * as fs from "fs"
@@ -89,19 +89,22 @@ export const applyElectronHandlers = () => {
 
     ipcMain.handle('get-mp3-metadata', async (event: Electron.IpcMainInvokeEvent, args: SongNameArgs): Promise<Mp3Metadata> => {
         try {
-            const path = `${workingDir}/songs/${args.songName}.mp3`
-            const response: mm.IAudioMetadata = await mm.parseFile(path)
-            const common = response.common
-            let metadata: Mp3Metadata = { 
-                title: args.songName, 
-                artist: common.artist!, 
-                imgPath: `${workingDir}/images/${args.songName}.png`,
-                duration: getDuration(path) 
-            }
-            return metadata
+            return await getMetadata(args.songName)
         } catch (err) {
             console.error('Error in get-mp3-metadata:', err)
             throw new Error('Failed to Get Mp3 Metadata')
+        }
+    })
+
+    ipcMain.handle('get-all-mp3-metadata', async (event: Electron.IpcMainInvokeEvent, args: SongNamesArgs): Promise<Mp3Metadata[]> => {
+        try {
+            const {songNames} = args
+            const promises = songNames.map((songName: string) => getMetadata(songName))
+            return await Promise.all(promises)
+
+        } catch (err) {
+            console.error('Error in get-all-mp3-metadata:', err)
+            throw new Error('Failed to Get All Mp3 Metadata')
         }
     })
 
@@ -115,7 +118,7 @@ export const applyElectronHandlers = () => {
         }
     })
 
-    ipcMain.handle('edit-mp3-metadata', async (event: Electron.IpcMainInvokeEvent, args: EditMetadataArgs): Promise<void> => {
+    ipcMain.handle('edit-mp3-metadata', async (event: Electron.IpcMainInvokeEvent, args: EditMetadataArgs): Promise<boolean> => {
         try {
             return await editMp3Metadata(args.originalTitle,args.metadata)
         } catch (err) {

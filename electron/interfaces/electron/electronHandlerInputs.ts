@@ -16,6 +16,10 @@ export interface SongNameArgs {
     songName: string;
 }
 
+export interface SongNamesArgs {
+    songNames: string[];
+}
+
 export interface SongURLArgs {
     songURL: string;
 }

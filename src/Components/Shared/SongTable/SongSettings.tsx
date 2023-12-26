@@ -86,6 +86,7 @@ const SongSettings = (props: SongSettingsProps) => {
                 open={openEditDialog}
                 setOpen={setOpenEditDialog}
                 songMetadata={songMetadata}
+                isPlaylist={isPlaylist}
             />
         </>
     )

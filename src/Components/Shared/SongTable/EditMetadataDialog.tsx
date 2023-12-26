@@ -14,28 +14,31 @@ import { EditMetadataArgs, Mp3Metadata } from "@/Interfaces/electronHandlerInput
 import { useEffect, useState } from "react"
 import ImageInput from "./ImageInput"
 import useElectronHandler from "@/Hooks/useElectronHandler"
+import { useAppDispatch } from "@/Redux/hooks"
+import { refreshDownloads, refreshPlaylist } from "@/Redux/Slices/refreshDataSlice"
 
 export interface EditMetadataDialogProps {
-    songMetadata: Mp3Metadata,
-    open: boolean,
-    setOpen: React.Dispatch<React.SetStateAction<boolean>>
+    songMetadata: Mp3Metadata;
+    open: boolean;
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    isPlaylist: boolean;
 }
 
 const EditMetadataDialog = (props: EditMetadataDialogProps) => {
-    const {open,setOpen} = props
-    const { title,artist,imgPath,duration } = props.songMetadata
+    const {open,setOpen,songMetadata,isPlaylist} = props
+    const { title,artist,imgPath,duration } = songMetadata
     const [newTitle,setNewTitle] = useState<string>(title)
     const [newArtist,setNewArtist] = useState<string>(artist)
     const [newImgPath,setNewImgPath] = useState<string>(imgPath)
-    const {result,error,receivedData,setArgs} = useElectronHandler<EditMetadataArgs,void>('edit-mp3-metadata')
-
-    console.log(newImgPath)
+    const {result,error,receivedData,setArgs} = useElectronHandler<EditMetadataArgs,boolean>('edit-mp3-metadata')
+    const dispatch = useAppDispatch()
 
     useEffect(() => {
-        if(receivedData && !error) {
+        if(receivedData && !error && result) {
             setOpen(false)
+            isPlaylist? dispatch(refreshPlaylist()): dispatch(refreshDownloads())
         }
-    },[receivedData,error])
+    },[receivedData,error,result])
 
     const submitDialog = () => {
         setArgs({

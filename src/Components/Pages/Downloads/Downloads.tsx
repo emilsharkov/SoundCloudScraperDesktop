@@ -2,9 +2,10 @@ import SongTable from "@/Components/Shared/SongTable/SongTable"
 import { Input } from "@/Components/ui/input"
 import useElectronHandler from "@/Hooks/useElectronHandler"
 import useFuzzySearch from "@/Hooks/useFuzzySearch"
-import useSongsWithMetadata from "@/Hooks/useSongsWithMetadata"
-import { Mp3Metadata } from "@/Interfaces/electronHandlerInputs"
+import { Mp3Metadata, SongNamesArgs } from "@/Interfaces/electronHandlerInputs"
 import { SongOrder, SongTitle } from "@/Interfaces/electronHandlerReturns"
+import { refreshDownloads } from "@/Redux/Slices/refreshDataSlice"
+import { useAppDispatch, useAppSelector } from "@/Redux/hooks"
 import { useEffect, useState } from "react"
 
 const Downloads = () => {
@@ -15,20 +16,26 @@ const Downloads = () => {
         setArgs: setSongsArgs
     } = useElectronHandler<object,SongTitle[]>('get-all-songs')
 
-    const [songOrder,setSongOrder] = useState<SongOrder[]>([])
-    const {songsMetadata,receivedAllData} = useSongsWithMetadata(songOrder)
+    const {
+        result: songsMetadata,
+        error: songsMetadataError,
+        receivedData: receivedSongsMetadata,
+        setArgs: setSongsMetadataArgs
+    } = useElectronHandler<SongNamesArgs,Mp3Metadata[]>('get-all-mp3-metadata')
+
+    const refreshDownloadsData = useAppSelector((state) => state.refreshData.downloads)
+    const dispatch = useAppDispatch()
     const {searchQuery, setSearchQuery, filteredData} = useFuzzySearch<Mp3Metadata>(songsMetadata,'title')
 
-    useEffect(() => setSongsArgs({}),[])
+    useEffect(() => { dispatch(refreshDownloads()) },[])
+    useEffect(() => setSongsArgs({}),[refreshDownloadsData])
 
     useEffect(() => {
-        if(receivedSongsData && !songsError && songs) {
-            const orderedSongs: SongOrder[] = songs.map((song: SongTitle,index: number) => {
-                return { song_title: song.title, song_order: index.toString()}
-            })
-            setSongOrder(orderedSongs)
+        if(songs && !songsError && receivedSongsData) {
+            const songNames: string[] = songs.map(song => song.title)
+            setSongsMetadataArgs({songNames: songNames})
         }
-    },[receivedSongsData,songsError,songs])
+    },[songs,songsError,receivedSongsData])
 
     return(
         <div className='flex flex-col w-full h-full items-center'>
@@ -39,7 +46,7 @@ const Downloads = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
             />
-            {receivedAllData && 
+            {receivedSongsMetadata && !songsMetadataError && songsMetadata &&
                 <SongTable 
                     songMetadata={filteredData}
                     isPlaylist={false}
