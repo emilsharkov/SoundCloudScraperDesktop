@@ -1,57 +1,45 @@
-  import express, { Request, Response, NextFunction } from 'express'
-  import sqlite3 from 'sqlite3'
-  import { bodyValidator } from '../server'
-  import { queryAsync } from '../../database'
-  import { PlaylistSongsNames, SQLAction, SongOrder } from '../../../interfaces/express/ResponseBody'
-  import { PostPlaylistSongsBody, PutPlaylistSongsBody, PutPlaylistSongBodyItem } from '../../../interfaces/express/RequestBody'
-  import { ErrorWithCode } from '../../../interfaces/express/Error'
+import express, { Request, Response, NextFunction } from 'express'
+import sqlite3 from 'sqlite3'
+import { queryAsync } from '../../database'
+import { PlaylistSong, PlaylistSongData, SQLAction, SongOrder } from '../../../interfaces/express/ResponseBody'
+import { PostPlaylistSongsBody, PutPlaylistSongsBody, PutPlaylistSongBodyItem } from '../../../interfaces/express/RequestBody'
+import { ErrorWithCode } from '../../../interfaces/express/Error'
+import { body } from 'express-validator'
 
-  const router = express.Router()
+const router = express.Router()
 
-  const playlistSongsRoute = (db: sqlite3.Database) => {
-    
-    router.get("/:playlistName", async (req: Request, res: Response, next: NextFunction) => {  
-      const playlistName = req.params.playlistName
-      
+const playlistSongsRoute = (db: sqlite3.Database) => {
+  
+  router.get("/:playlist_id", 
+    async (req: Request, res: Response, next: NextFunction) => {  
       try {
-        const playlist = await queryAsync<SongOrder>(
+        const playlist_id = req.params.playlist_id
+        const playlist = await queryAsync<PlaylistSongData>(
           db,
-          `SELECT song_order, title as song_title
+          `SELECT playlist_id,song_id,title,artist,playlist_order
           FROM playlist_songs ps
-          JOIN playlists p ON ps.playlist_id = p.playlist_id
           JOIN songs s ON ps.song_id = s.song_id
-          WHERE p.name = ?
-          ORDER BY song_order`,
-          [playlistName]
+          WHERE ps.playlist_id = ?
+          ORDER BY playlist_order`,
+          [playlist_id]
         )
         res.json(playlist)
       } catch (err) {
         next(err)
       }
-    })
+  })
 
-    router.post("/", bodyValidator(new PostPlaylistSongsBody), async (req: Request, res: Response, next: NextFunction) => {
+  router.post("/", 
+    body('playlist_id').isNumeric(), 
+    body('song_id').isNumeric(), 
+    async (req: Request, res: Response, next: NextFunction) => {
       try {
-        const body: PostPlaylistSongsBody = req.body
-        const newPlaylist = await queryAsync<PlaylistSongsNames>(
+        const body = req.body
+        const newPlaylist = await queryAsync<PlaylistSong>(
           db,
-          `WITH song AS (
-            SELECT * FROM songs WHERE title = ?
-          ),
-          playlist AS (
-            SELECT * FROM playlists WHERE name = ?
-          )
-          INSERT INTO playlist_songs (playlist_id, song_id, song_order)
-          VALUES (
-              (SELECT playlist_id FROM playlist),
-              (SELECT song_id FROM song),
-              ?
-          )
-          RETURNING
-          (SELECT name FROM playlist) as playlist_name,
-          (SELECT title FROM song) as song_title,
-          song_order;`,
-          [body.songTitle,body.playlistName,body.songOrder]
+          `INSERT INTO playlist_songs (playlist_id,song_id) VALUES (?,?) 
+          RETURNING playlist_id,song_id;`,
+          [body.playlist_id,body.song_id]
         )
     
         if (newPlaylist.length) {
@@ -62,68 +50,48 @@
       } catch (err) {
         next(err)
       }
-    })
-    
-    router.put("/:playlistName", bodyValidator(new PutPlaylistSongsBody), async (req: Request, res: Response, next: NextFunction) => {
+  })
+  
+  router.put("/", 
+    body('from').isNumeric(), 
+    body('to').isNumeric(), 
+    async (req: Request, res: Response, next: NextFunction) => {
       try {
-        const playlistName = req.params.playlistName
-        const body: PutPlaylistSongsBody = req.body
+        const body = req.body
+        const {from,to} = body
+        db.serialize(() => {
+          db.run(`BEGIN TRANSACTION;`);
 
-        const beginTransaction = await queryAsync<SQLAction>(db,`BEGIN TRANSACTION`,[])
-        const createTempTable = await queryAsync<SQLAction>(
-          db,
-          `CREATE TEMPORARY TABLE IF NOT EXISTS songsInPlaylist AS
-            SELECT ps.song_id, ps.playlist_id, p.name, s.title
-            FROM playlist_songs ps
-            JOIN playlists p ON ps.playlist_id = p.playlist_id
-            JOIN songs s ON ps.song_id = s.song_id
-            WHERE p.name = ?`,
-          [playlistName]
-        )
-        
-        let updatedSongs: SongOrder[] = []
-        for (const songData of body.songOrderings) {
-          const { songTitle, songOrder }: PutPlaylistSongBodyItem = songData
-          const updatedSong = await queryAsync<SongOrder>(
-            db,
-            `UPDATE playlist_songs
-            SET song_order = ?
-            WHERE song_id = (SELECT song_id from songsInPlaylist where title = ?)
-            RETURNING song_order, ? as song_title`, 
-            [songOrder, songTitle, songTitle]
-          )
-          updatedSongs.push(...updatedSong)
-        }
+          if (to < from) {
+              // Moving a song upward
+              db.run(`UPDATE playlist_songs SET playlist_order = playlist_order + 1 WHERE playlist_order >= ? AND playlist_order < ?;`, [to, from])
+              db.run(`UPDATE playlist_songs SET playlist_order = ? WHERE playlist_order = ?;`, [to, from])
+          } else if (to > from) {
+              // Moving a song downward
+              db.run(`UPDATE playlist_songs SET playlist_order = playlist_order - 1 WHERE playlist_order > ? AND playlist_order <= ?;`, [from, to])
+              db.run(`UPDATE playlist_songs SET playlist_order = ? WHERE playlist_order = ?;`, [to, from + 1]); // Adjust for shifted orders
+          }
 
-        const commit = await queryAsync<SQLAction>(db,`COMMIT`,[])
-        res.json(updatedSongs)
+          db.run(`COMMIT;`)
+        })
+
+        res.json({status: "Success"})
       } catch (err) {
-        const rollback = await queryAsync<SQLAction>(db,`ROLLBACK`,[])
         next(err)
       }
-    })
+  })
 
-    router.delete("/:playlistName/:songTitle", async (req: Request, res: Response, next: NextFunction) => {
-      const playlistName = req.params.playlistName
-      const songTitle = req.params.songTitle
-    
+  router.delete("/:playlist_id/:song_id", 
+    async (req: Request, res: Response, next: NextFunction) => {
       try {
-        const deletedPlaylist = await queryAsync<PlaylistSongsNames>(
+        const playlist_id = req.params.playlist_id
+        const song_id = req.params.song_id
+        const deletedPlaylist = await queryAsync<PlaylistSong>(
           db,
-          `WITH song AS (
-            SELECT * FROM songs WHERE title = ?
-          ),
-          playlist AS (
-            SELECT * FROM playlists WHERE name = ?
-          )
-          DELETE FROM playlist_songs 
-          WHERE playlist_id = (SELECT song_id FROM song)
-          AND song_id = (SELECT playlist_id FROM playlist)
-          RETURNING
-          (SELECT title FROM song) as song_title,
-          (SELECT name FROM playlist) as playlist_name
-          song_order;`,
-          [songTitle,playlistName]
+          `DELETE FROM playlist_songs 
+          WHERE playlist_id = ? AND song_id = ? 
+          RETURNING playlist_id,song_id,playlist_order;`,
+          [playlist_id,song_id]
         )
     
         if (deletedPlaylist.length) {
@@ -136,7 +104,7 @@
       }
     })
 
-    return router
-  }
+  return router
+}
 
-  export default playlistSongsRoute
+export default playlistSongsRoute

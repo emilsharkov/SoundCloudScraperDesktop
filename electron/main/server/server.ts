@@ -47,26 +47,6 @@ const runServer = () => {
   })
 }
 
-const bodyValidator = <T extends object>(type: T) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const haveSameKeys = (obj1: object, obj2: object): boolean => {
-      const keys1 = Object.keys(obj1);
-      const keys2 = Object.keys(obj2);
-    
-      if (keys1.length !== keys2.length) {
-        return false;
-      }
-      return keys1.every(key => keys2.includes(key));
-    }
-    
-    if (haveSameKeys(type,req.body)) {
-      next()
-    } else {
-      throw new Error('Invalid request body type')
-    }
-  }
-}
-
 const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof ErrorWithCode) {
     res.status(err.code).send({ error: err.message });
@@ -75,4 +55,4 @@ const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunct
   }
 }
 
-export {runServer,bodyValidator}
+export {runServer}

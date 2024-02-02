@@ -39,11 +39,14 @@ const Playlist = (props: PlaylistProps) => {
         setArgs: setSongOrderArgs
     } = useElectronHandler<ReorderSongsArgs,SongOrder[]>('edit-song-order')
 
+    console.log(songsMetadata)
+
     useEffect(() => { dispatch(refreshPlaylist()) },[])
     useEffect(() => setSongsArgs({ playlistName: playlistName }),[refreshPlaylistData])
 
     useEffect(() => {
         if(songs && !songsError && receivedSongsData) {
+            console.log(songs)
             const songNames: string[] = songs
                 .sort((a, b) => (a.song_order > b.song_order) ? 1 : -1)
                 .map(song => song.song_title)
@@ -78,13 +81,16 @@ const Playlist = (props: PlaylistProps) => {
     }
 
     return(
-        !receivedSongsMetadata && !songsMetadataError && songsMetadata &&
-            <ReactDragListView {...dragProps}>
-                <SongTable 
-                    songMetadata={songsMetadata} 
-                    isPlaylist={true}
-                />
-            </ReactDragListView>
+        <>
+            {!receivedSongsMetadata && !songsMetadataError && songsMetadata &&
+                <ReactDragListView {...dragProps}>
+                    <SongTable 
+                        songMetadata={songsMetadata} 
+                        isPlaylist={true}
+                    />
+                </ReactDragListView>
+            }
+        </>
     )
 }
 

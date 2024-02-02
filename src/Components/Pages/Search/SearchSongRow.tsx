@@ -52,10 +52,10 @@ const SearchSongRow = (props: SongSuggestionProps) => {
     return (
         <TableRow ref={rowRef} key={url} onClick={() => setIsClicked(true)}>
             <TableCell>{isClicked && !receivedData && result !== undefined ? <Spinner/>: <img className='h-12 w-12 max-w-none' src={thumbnail}/>}</TableCell>
-            <TableCell className='max-w-[400px]'><MarqueeText text={title}/></TableCell>
+            <TableCell className='max-w-[200px]'><MarqueeText text={title}/></TableCell>
             <TableCell className='max-w-[100px]'><MarqueeText text={artist}/></TableCell>
             <TableCell>{durationFormatted()}</TableCell>
-            <TableCell className="text-right">{likeFormatted}</TableCell>
+            <TableCell className="text-center">{likeFormatted}</TableCell>
         </TableRow>
     )
 }

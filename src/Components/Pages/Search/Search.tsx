@@ -49,15 +49,15 @@ const Search = (): JSX.Element => {
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead className="w-[100px]"></TableHead>
-                        <TableHead className="w-[250px]">Title</TableHead>
-                        <TableHead className="w-[100px]">Artist</TableHead>
+                        <TableHead className="w-[50px]"></TableHead>
+                        <TableHead className="w-[100px]">Title</TableHead>
+                        <TableHead className="w-[50px]">Artist</TableHead>
                         <TableHead className="w-[50px]"><Clock /></TableHead>
-                        <TableHead className="w-[100px]"><Heart /></TableHead>
+                        <TableHead className="w-[100px] flex items-center justify-center"><Heart /></TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {receivedData && !error ? (
+                    {!!(receivedData && !error) ? (
                         result?.map((song: Song) => (
                             <SearchSongRow
                                 key={song.id}

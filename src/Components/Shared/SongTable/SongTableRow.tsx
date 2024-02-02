@@ -68,6 +68,7 @@ const SongTableRow = (props: SongTableRowProps) => {
                 <SongSettings 
                     isPlaylist={isPlaylist} 
                     songMetadata={item}
+                    index={index}
                 />
             </TableCell>
 

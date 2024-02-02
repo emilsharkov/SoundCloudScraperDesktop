@@ -35,12 +35,12 @@ class PutPlaylistBody implements ReqBody {
 class PostPlaylistSongsBody implements ReqBody {
     public songTitle: string;
     public playlistName: string;
-    public songOrder: string;
+    public songOrder: number;
 
     constructor(){
         this.songTitle = '';
         this.playlistName = '';
-        this.songOrder = '';
+        this.songOrder = 0;
     }
 }
 

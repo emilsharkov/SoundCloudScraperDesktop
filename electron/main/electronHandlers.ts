@@ -4,7 +4,6 @@ import { downloadThumbnail, editMp3Metadata, getImgPathFromURL, initDirs, workin
 import { PlaylistName, PlaylistSongsNames, SongOrder, SongTitle } from '../interfaces/express/ResponseBody'
 
 import * as fs from "fs"
-import * as mm from "music-metadata"
 import * as SoundCloud from "soundcloud-scraper"
 
 initDirs()
@@ -207,7 +206,7 @@ export const applyElectronHandlers = () => {
 
     ipcMain.handle('add-song-to-playlist', async (event: Electron.IpcMainInvokeEvent, args: AddSongToPlaylistArgs): Promise<PlaylistSongsNames[]> => {
         try {
-            const data = await fetchData<PlaylistSongsNames[]>(`http://localhost:11738/playlists`, {
+            const data = await fetchData<PlaylistSongsNames[]>(`http://localhost:11738/playlistSongs`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

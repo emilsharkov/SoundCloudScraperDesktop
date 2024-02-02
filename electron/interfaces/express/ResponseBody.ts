@@ -1,17 +1,29 @@
 interface SqlRow {}
 
-interface SongTitle extends SqlRow {
+interface Song extends SqlRow {
+    song_id: number;
     title: string;
+    artist: string;
+    song_order: number;
 }
 
-interface PlaylistName extends SqlRow {
+interface Playlist extends SqlRow {
+    playlist_id: string;
     name: string;
 }
 
-interface PlaylistSongsNames extends SqlRow {
-    playlist_name: string;
-    song_title: string;
-    song_order: number;
+interface PlaylistSong extends SqlRow {
+    playlist_id: number;
+    song_id: number;
+    playlist_order: number;
+}
+
+interface PlaylistSongData extends SqlRow {
+    playlist_id: number;
+    song_id: number;
+    title: string;
+    artist: string;
+    playlist_order: number;
 }
 
 interface SQLAction extends SqlRow {}
@@ -23,9 +35,10 @@ interface SongOrder extends SqlRow {
 
 export type {
     SqlRow,
-    SongTitle,
-    PlaylistName,
-    PlaylistSongsNames,
+    Song,
+    Playlist,
+    PlaylistSong,
+    PlaylistSongData,
     SQLAction,
     SongOrder
 }
