@@ -1,10 +1,11 @@
 import express, { Request, Response, NextFunction } from 'express'
 import sqlite3 from 'sqlite3'
-import { body } from 'express-validator';
+import { body, validationResult } from 'express-validator';
 import { queryAsync } from '../../database'
 import { Song } from '../../../interfaces/express/ResponseBody'
 import { PostSongBody,PutSongBody } from '../../../interfaces/express/RequestBody'
-import { ErrorWithCode } from '../../../interfaces/express/Error'
+import { BodyError, ErrorWithCode } from '../../../interfaces/express/Error'
+import { validateBody } from '../server';
 
 const router = express.Router()
 
@@ -24,11 +25,14 @@ const songsRoute = (db: sqlite3.Database) => {
       }
   })
 
-  router.post("/", 
-    body('title').notEmpty(), 
-    body('artist').notEmpty(), 
+  router.post("/",
+    [ 
+      body('title').notEmpty(), 
+      body('artist').notEmpty(), 
+    ],
     async (req: Request, res: Response, next: NextFunction) => {
       try {
+        validateBody(req)
         const body = req.body
         const newSong = await queryAsync<Song>(
           db,
@@ -48,16 +52,19 @@ const songsRoute = (db: sqlite3.Database) => {
   
 
   router.put("/:song_id", 
-    body('title').notEmpty(), 
-    body('artist').notEmpty(), 
+    [
+      body('title').notEmpty(), 
+      body('artist').notEmpty(), 
+    ],
     async (req: Request, res: Response, next: NextFunction) => {
       try {
+        validateBody(req)
         const song_id = req.params.song_id
         const body = req.body
         const updatedSong = await queryAsync<Song>(
           db,
           "UPDATE songs SET title = ?, artist = ? WHERE song_id = ? RETURNING song_id,title,artist,song_order",
-          [body.title, body.artist]
+          [body.title, body.artist, song_id]
         )
     
         if (updatedSong.length) {
@@ -70,24 +77,30 @@ const songsRoute = (db: sqlite3.Database) => {
       }
   })
 
-  router.put("/", 
-    body('from').isNumeric(), 
-    body('to').isNumeric(), 
+  router.put("/",
+    [
+      body('from').isNumeric(), 
+      body('to').isNumeric(), 
+    ],
     async (req: Request, res: Response, next: NextFunction) => {
       try {
+        validateBody(req)
         const body = req.body
         const {from,to} = body
+        
         db.serialize(() => {
           db.run(`BEGIN TRANSACTION;`);
 
           if (to < from) {
               // Moving a song upward
+              db.run(`UPDATE songs SET song_order = -1 WHERE song_order = ?;`, [from])
               db.run(`UPDATE songs SET song_order = song_order + 1 WHERE song_order >= ? AND song_order < ?;`, [to, from])
-              db.run(`UPDATE songs SET song_order = ? WHERE song_order = ?;`, [to, from])
+              db.run(`UPDATE songs SET song_order = ? WHERE song_order = -1;`, [to])
           } else if (to > from) {
               // Moving a song downward
+              db.run(`UPDATE songs SET song_order = -1 WHERE song_order = ?;`, [from])
               db.run(`UPDATE songs SET song_order = song_order - 1 WHERE song_order > ? AND song_order <= ?;`, [from, to])
-              db.run(`UPDATE songs SET song_order = ? WHERE song_order = ?;`, [to, from + 1]); // Adjust for shifted orders
+              db.run(`UPDATE songs SET song_order = ? WHERE song_order = -1;`, [to])
           }
 
           db.run(`COMMIT;`)
@@ -110,6 +123,12 @@ const songsRoute = (db: sqlite3.Database) => {
         )
     
         if (deletedSong.length) {
+          const deletedSongOrder = deletedSong[0].song_order
+          const updatedSong = await queryAsync<Song>(
+            db,
+            "UPDATE songs SET song_order = song_order - 1 WHERE song_order > ?",
+            [deletedSongOrder]
+          )
           res.json(deletedSong[0])
         } else {
           throw new ErrorWithCode(500,'Error Deleting Song')

@@ -3,8 +3,8 @@ import sqlite3 from 'sqlite3'
 import { body } from 'express-validator';
 import { queryAsync } from '../../database'
 import { Playlist } from '../../../interfaces/express/ResponseBody'
-import { PostPlaylistBody,PutPlaylistBody } from '../../../interfaces/express/RequestBody'
 import { ErrorWithCode } from '../../../interfaces/express/Error'
+import { validateBody } from '../server';
 
 const router = express.Router()
 
@@ -25,10 +25,13 @@ const playlistsRoute = (db: sqlite3.Database) => {
   })
 
   router.post("/", 
-    body('name').notEmpty(), 
+    [
+      body('name').notEmpty(), 
+    ],
     async (req: Request, res: Response, next: NextFunction) => {
       try {
-        const body: PostPlaylistBody = req.body
+        validateBody(req)
+        const body = req.body
         const newPlaylist = await queryAsync<Playlist>(
           db,
           "INSERT INTO playlists (name) VALUES (?) RETURNING playlist_id,name",
@@ -47,9 +50,12 @@ const playlistsRoute = (db: sqlite3.Database) => {
   
 
   router.put("/:playlist_id", 
-    body('name').notEmpty(), 
+    [
+      body('name').notEmpty(), 
+    ],
     async (req: Request, res: Response, next: NextFunction) => {
       try {
+        validateBody(req)
         const playlist_id = req.params.playlist_id
         const body = req.body
         const updatedPlaylist = await queryAsync<Playlist>(

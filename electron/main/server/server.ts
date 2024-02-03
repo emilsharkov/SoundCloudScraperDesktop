@@ -3,8 +3,9 @@ import songsRoute from './routes/songs'
 import playlistsRoute from './routes/playlists'
 import playlistSongsRoute from './routes/playlistSongs'
 import { setupDatabase } from '../database'
-import { ErrorWithCode } from '../../interfaces/express/Error'
+import { BodyError, ErrorWithCode } from '../../interfaces/express/Error'
 import { workingDir } from '../utils'
+import { ValidationError, validationResult } from 'express-validator'
 
 const app = express()
 const cors = require('cors')
@@ -24,15 +25,15 @@ const runServer = () => {
 
   // routes to song .mp3 and album art .png
   app.use('/songFiles', (req, res, next) => {
-    res.setHeader('Cache-Control', 'no-cache'); // Add cache control header
-    express.static(`${workingDir}/songs`)(req, res, next);
-  });
+    res.setHeader('Cache-Control', 'no-cache') // Add cache control header
+    express.static(`${workingDir}/songs`)(req, res, next)
+  })
 
   // Serve song images
   app.use('/songImages', (req, res, next) => {
-      res.setHeader('Cache-Control', 'no-cache'); // Add cache control header
-      express.static(`${workingDir}/images`)(req, res, next);
-  });
+      res.setHeader('Cache-Control', 'no-cache') // Add cache control header
+      express.static(`${workingDir}/images`)(req, res, next)
+  })
 
   // needs to be last middleware
   app.use(errorHandler)
@@ -47,12 +48,27 @@ const runServer = () => {
   })
 }
 
-const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunction) => {
-  if (err instanceof ErrorWithCode) {
-    res.status(err.code).send({ error: err.message });
-  } else {
-    res.status(500).send({ error: (err as Error).message });
+const validateBody = (req: Request) => {
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    throw new BodyError(errors.array())
   }
 }
 
-export {runServer}
+const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunction) => {
+  if (err instanceof ErrorWithCode) {
+    // Handle custom errors with specific status codes
+    res.status(err.code).send({ error: err.message })
+  } else if (err instanceof BodyError) {
+    // Type guard to check for a specific structure indicating validation errors
+    res.status(400).send({ message: err.message, errors: err.errors })
+  } else if (err instanceof Error) {
+    // Generic error handler for other types of errors
+    res.status(500).send({ error: err.message })
+  } else {
+    // Fallback for when error is not an instance of Error
+    res.status(500).send({ error: 'An unknown error occurred.' })
+  }
+}
+
+export {runServer,validateBody}
