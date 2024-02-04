@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express'
 import sqlite3 from 'sqlite3'
 import { queryAsync } from '../../database'
-import { PlaylistSong, PlaylistSongData, SQLAction, SongOrder } from '../../../interfaces/express/ResponseBody'
+import { PlaylistSongRow, PlaylistSongDataRow } from '../../../interfaces/express/ResponseBody'
 import { ErrorWithCode } from '../../../interfaces/express/Error'
 import { body } from 'express-validator'
 import { validateBody } from '../server'
@@ -14,9 +14,9 @@ const playlistSongsRoute = (db: sqlite3.Database) => {
     async (req: Request, res: Response, next: NextFunction) => {  
       try {
         const playlist_id = req.params.playlist_id
-        const playlist = await queryAsync<PlaylistSongData>(
+        const playlist = await queryAsync<PlaylistSongDataRow>(
           db,
-          `SELECT ps.playlist_id,s.song_id,s.title,s.artist,ps.playlist_order
+          `SELECT ps.playlist_id,s.song_id,s.title,s.artist,ps.playlist_order,s.duration_seconds
           FROM playlist_songs ps
           JOIN songs s ON ps.song_id = s.song_id
           WHERE ps.playlist_id = ?
@@ -38,10 +38,9 @@ const playlistSongsRoute = (db: sqlite3.Database) => {
       try {
         validateBody(req)
         const body = req.body
-        const newPlaylist = await queryAsync<PlaylistSong>(
+        const newPlaylist = await queryAsync<PlaylistSongRow>(
           db,
-          `INSERT INTO playlist_songs (playlist_id,song_id,playlist_order) VALUES (?,?,-1) 
-          RETURNING playlist_id,song_id;`,
+          `INSERT INTO playlist_songs (playlist_id,song_id,playlist_order) VALUES (?,?,-1) RETURNING *`,
           [body.playlist_id,body.song_id]
         )
     
@@ -95,19 +94,17 @@ const playlistSongsRoute = (db: sqlite3.Database) => {
       try {
         const playlist_id = req.params.playlist_id
         const song_id = req.params.song_id
-        const deletedSong = await queryAsync<PlaylistSong>(
+        const deletedSong = await queryAsync<PlaylistSongRow>(
           db,
-          `DELETE FROM playlist_songs 
-          WHERE playlist_id = ? AND song_id = ? 
-          RETURNING playlist_id,song_id,playlist_order;`,
+          `DELETE FROM playlist_songs WHERE playlist_id = ? AND song_id = ? RETURNING *`,
           [playlist_id,song_id]
         )
     
         if (deletedSong.length) {
           const deletedSongOrder = deletedSong[0].playlist_order
-          const updatedSong = await queryAsync<PlaylistSong>(
+          const updatedSong = await queryAsync<PlaylistSongRow>(
             db,
-            "UPDATE playlist_songs SET playlist_order = playlist_order - 1 WHERE playlist_order > ?",
+            "UPDATE playlist_songs SET playlist_order = playlist_order - 1 WHERE playlist_order > ? RETURNING *",
             [deletedSongOrder]
           )
           res.json(deletedSong[0])

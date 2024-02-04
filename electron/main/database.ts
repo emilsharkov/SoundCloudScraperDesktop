@@ -15,7 +15,8 @@ const setupDatabase = (): sqlite3.Database => {
                     song_id INTEGER PRIMARY KEY AUTOINCREMENT,
                     title TEXT NOT NULL,
                     artist TEXT NOT NULL,
-                    song_order INTEGER NOT NULL
+                    song_order INTEGER NOT NULL,
+                    duration_seconds INTEGER NOT NULL,
                 );
             `).run(`
                 CREATE TABLE IF NOT EXISTS playlists (

@@ -1,52 +1,67 @@
-import { PutPlaylistSongBodyItem } from "../express/RequestBody";
+export interface SongNameArgs {
+    name: string;
+}
 
-export interface Mp3Metadata {
-    title: string;
-    artist: string;
-    imgPath: string;
-    duration: number;
+export interface SongIDsArgs {
+    song_ids: number[];
 }
 
 export interface EditMetadataArgs {
-    originalTitle: string;
-    metadata: Mp3Metadata;
+    song_id: number;
+    title: string;
+    artist: string;
 }
 
-export interface SongNameArgs {
-    songName: string;
+export interface SwitchSongOrderArgs {
+    song_id: number;
+    to: number;
+    from: number;
 }
 
-export interface SongNamesArgs {
-    songNames: string[];
+export interface DeleteSongFromAppArgs {
+    song_id: number
+}
+
+export interface CreatePlaylistArgs {
+    name: string;
+}
+
+export interface EditPlaylistArgs {
+    playlist_id: number;
+    name: string;
+}
+
+export interface DeletePlaylistArgs {
+    playlist_id: number
+}
+
+export interface GetSongsInPlaylistArgs {
+    playlist_id: number
 }
 
 export interface SongURLArgs {
     songURL: string;
 }
 
-export interface PlaylistNameArgs {
-    playlistName: string;
-}
-
-export interface ChangePlaylistNameArgs {
-    oldPlaylistName: string;
-    newPlaylistName: string;
+export interface SwitchPlaylistOrderArgs {
+    playlist_id: number;
+    to: number;
+    from: number;
 }
 
 export interface AddSongToPlaylistArgs {
-    playlistName: string;
-    songTitle: string;
-    songOrder: number;
+    playlist_id: number;
+    song_id: number;
 }
 
-export interface ReorderSongsArgs {
-    playlistName: string;
-    songOrderings: PutPlaylistSongBodyItem[];
+export interface DeleteSongInPlaylistArgs {
+    playlist_id: number;
+    song_id: number;
 }
 
-export interface DeletePlaylistSongArgs {
-    playlistName: string;
-    songTitle: string;
+export interface ExportSongsArgs {
+    destination: string;
+    song_ids: number[];
 }
 
 export interface Song {

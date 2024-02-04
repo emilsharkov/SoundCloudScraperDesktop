@@ -2,9 +2,8 @@ import express, { Request, Response, NextFunction } from 'express'
 import sqlite3 from 'sqlite3'
 import { body, validationResult } from 'express-validator';
 import { queryAsync } from '../../database'
-import { Song } from '../../../interfaces/express/ResponseBody'
-import { PostSongBody,PutSongBody } from '../../../interfaces/express/RequestBody'
-import { BodyError, ErrorWithCode } from '../../../interfaces/express/Error'
+import { SongRow } from '../../../interfaces/express/ResponseBody'
+import { ErrorWithCode } from '../../../interfaces/express/Error'
 import { validateBody } from '../server';
 
 const router = express.Router()
@@ -14,10 +13,25 @@ const songsRoute = (db: sqlite3.Database) => {
   router.get("/", 
     async (req: Request, res: Response, next: NextFunction) => {  
       try {
-        const songs = await queryAsync<Song>(
+        const songs = await queryAsync<SongRow>(
           db,
-          `SELECT song_id,title,artist,song_order FROM songs ORDER BY song_order`,
+          `SELECT * FROM songs ORDER BY song_order`,
           []
+        )
+        res.json(songs)
+      } catch (err) {
+        next(err)
+      }
+  })
+
+  router.get("/:song_id", 
+    async (req: Request, res: Response, next: NextFunction) => {  
+      try {
+        const song_id = req.params.song_id
+        const songs = await queryAsync<SongRow>(
+          db,
+          `SELECT * FROM songs WHERE song_id = ?`,
+          [song_id]
         )
         res.json(songs)
       } catch (err) {
@@ -29,15 +43,16 @@ const songsRoute = (db: sqlite3.Database) => {
     [ 
       body('title').notEmpty(), 
       body('artist').notEmpty(), 
+      body('duration_seconds').isNumeric(), 
     ],
     async (req: Request, res: Response, next: NextFunction) => {
       try {
         validateBody(req)
         const body = req.body
-        const newSong = await queryAsync<Song>(
+        const newSong = await queryAsync<SongRow>(
           db,
-          "INSERT INTO songs (title,artist,song_order) VALUES (?,?,-1) RETURNING song_id,title,artist,song_order",
-          [body.title, body.artist]
+          "INSERT INTO songs (title,artist,duration_seconds,song_order) VALUES (?,?,?,-1) RETURNING *",
+          [body.title,body.artist,body.duration_seconds]
         )
     
         if (newSong.length) {
@@ -61,9 +76,9 @@ const songsRoute = (db: sqlite3.Database) => {
         validateBody(req)
         const song_id = req.params.song_id
         const body = req.body
-        const updatedSong = await queryAsync<Song>(
+        const updatedSong = await queryAsync<SongRow>(
           db,
-          "UPDATE songs SET title = ?, artist = ? WHERE song_id = ? RETURNING song_id,title,artist,song_order",
+          "UPDATE songs SET title = ?, artist = ? WHERE song_id = ? RETURNING *",
           [body.title, body.artist, song_id]
         )
     
@@ -87,7 +102,7 @@ const songsRoute = (db: sqlite3.Database) => {
         validateBody(req)
         const body = req.body
         const {from,to} = body
-        
+
         db.serialize(() => {
           db.run(`BEGIN TRANSACTION;`);
 
@@ -116,17 +131,17 @@ const songsRoute = (db: sqlite3.Database) => {
     async (req: Request, res: Response, next: NextFunction) => {
       try {
         const song_id = req.params.song_id
-        const deletedSong = await queryAsync<Song>(
+        const deletedSong = await queryAsync<SongRow>(
           db,
-          "DELETE FROM songs WHERE song_id = ? RETURNING song_id,title,artist,song_order",
+          "DELETE FROM songs WHERE song_id = ? RETURNING *",
           [song_id]
         )
     
         if (deletedSong.length) {
           const deletedSongOrder = deletedSong[0].song_order
-          const updatedSong = await queryAsync<Song>(
+          const updatedSong = await queryAsync<SongRow>(
             db,
-            "UPDATE songs SET song_order = song_order - 1 WHERE song_order > ?",
+            "UPDATE songs SET song_order = song_order - 1 WHERE song_order > ? RETURNING *",
             [deletedSongOrder]
           )
           res.json(deletedSong[0])

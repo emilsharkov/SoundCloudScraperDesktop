@@ -2,7 +2,7 @@ import express, { Request, Response, NextFunction } from 'express'
 import sqlite3 from 'sqlite3'
 import { body } from 'express-validator';
 import { queryAsync } from '../../database'
-import { Playlist } from '../../../interfaces/express/ResponseBody'
+import { PlaylistRow } from '../../../interfaces/express/ResponseBody'
 import { ErrorWithCode } from '../../../interfaces/express/Error'
 import { validateBody } from '../server';
 
@@ -13,9 +13,9 @@ const playlistsRoute = (db: sqlite3.Database) => {
   router.get("/", 
     async (req: Request, res: Response, next: NextFunction) => {  
       try {
-        const playlists = await queryAsync<Playlist>(
+        const playlists = await queryAsync<PlaylistRow>(
           db,
-          "SELECT playlist_id,name FROM playlists ORDER BY playlist_id",
+          "SELECT * FROM playlists ORDER BY playlist_id",
           []
         )
         res.json(playlists)
@@ -32,9 +32,9 @@ const playlistsRoute = (db: sqlite3.Database) => {
       try {
         validateBody(req)
         const body = req.body
-        const newPlaylist = await queryAsync<Playlist>(
+        const newPlaylist = await queryAsync<PlaylistRow>(
           db,
-          "INSERT INTO playlists (name) VALUES (?) RETURNING playlist_id,name",
+          "INSERT INTO playlists (name) VALUES (?) RETURNING *",
           [body.name]
         )
     
@@ -58,9 +58,9 @@ const playlistsRoute = (db: sqlite3.Database) => {
         validateBody(req)
         const playlist_id = req.params.playlist_id
         const body = req.body
-        const updatedPlaylist = await queryAsync<Playlist>(
+        const updatedPlaylist = await queryAsync<PlaylistRow>(
           db,
-          "UPDATE playlists SET name = ? WHERE playlist_id = ? RETURNING playlist_id,name",
+          "UPDATE playlists SET name = ? WHERE playlist_id = ? RETURNING *",
           [body.name,playlist_id]
         )
     
@@ -78,9 +78,9 @@ const playlistsRoute = (db: sqlite3.Database) => {
     async (req: Request, res: Response, next: NextFunction) => {
       try {
         const playlist_id = req.params.playlist_id
-        const deletedPlaylist = await queryAsync<Playlist>(
+        const deletedPlaylist = await queryAsync<PlaylistRow>(
           db,
-          "DELETE FROM playlists WHERE playlist_id = ? RETURNING playlist_id,name",
+          "DELETE FROM playlists WHERE playlist_id = ? RETURNING *",
           [playlist_id]
         )
     

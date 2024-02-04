@@ -6,6 +6,7 @@ import { applyElectronHandlers } from './electronHandlers'
 import { setupDatabase } from './database'
 import { runServer } from './server/server'
 import sqlite3 from 'sqlite3'
+import { initDirs } from './utils'
 // The built directory structure
 //
 // ├─┬ dist-electron
@@ -78,6 +79,7 @@ async function createWindow() {
   })
 
   update(win)
+  initDirs()
   runServer()
 }
 
