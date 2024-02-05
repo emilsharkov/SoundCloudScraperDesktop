@@ -9,7 +9,7 @@ interface SongRow extends SqlRow {
 }
 
 interface PlaylistRow extends SqlRow {
-    playlist_id: string;
+    playlist_id: number;
     name: string;
 }
 

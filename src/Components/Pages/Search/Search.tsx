@@ -2,8 +2,7 @@ import { useState, useEffect, useMemo, KeyboardEvent } from "react"
 import useElectronHandler from "@/Hooks/useElectronHandler"
 import SearchSongRow from "./SearchSongRow"
 import { Table,TableBody,TableCell,TableHead,TableHeader,TableRow } from "@/Components/ui/table"
-import { Song } from "@/Interfaces/electronHandlerReturns"
-import { SongNameArgs } from "@/Interfaces/electronHandlerInputs"
+import { Song, SongNameArgs } from "@/Interfaces/electronHandlerInputs"
 import { Clock } from 'lucide-react'
 import { Search as SearchGlass } from 'lucide-react';
 import { Heart } from 'lucide-react'
@@ -14,7 +13,7 @@ import RowSkeleton from "@/Components/Shared/RowSkeleton"
 
 const Search = (): JSX.Element => {
     const [searchBarInput, setSearchBarInput] = useState<string>('');
-    const { result, error, receivedData, setArgs } = useElectronHandler<SongNameArgs, Song[]>('search-song');
+    const {result,error,receivedData,setArgs} = useElectronHandler<SongNameArgs,Song[]>('search-song');
 
     const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
@@ -24,7 +23,7 @@ const Search = (): JSX.Element => {
 
     const handleSubmit = () => {
         if (searchBarInput !== '') {
-            setArgs({ songName: searchBarInput });
+            setArgs({ name: searchBarInput });
         }
     }
 

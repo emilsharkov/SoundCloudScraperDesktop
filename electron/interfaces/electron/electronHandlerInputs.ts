@@ -10,6 +10,7 @@ export interface EditMetadataArgs {
     song_id: number;
     title: string;
     artist: string;
+    newImagePath: string;
 }
 
 export interface SwitchSongOrderArgs {
@@ -62,6 +63,11 @@ export interface DeleteSongInPlaylistArgs {
 export interface ExportSongsArgs {
     destination: string;
     song_ids: number[];
+}
+
+export interface ChangeSongImageArgs {
+    song_id: number;
+    newImagePath: string;
 }
 
 export interface Song {

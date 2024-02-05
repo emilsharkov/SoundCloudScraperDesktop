@@ -70,6 +70,20 @@ const changeSongMetadata = (songPath: string, artist: string) => {
     nid3.update({artist: artist}, songPath);
 }
 
+const editSongImage = async(song_id: number, newImagePath: string) => {
+    const fileSplit = newImagePath.split('/')
+    const newImageMime = fileSplit[fileSplit.length - 1].split('.')[1]
+    const newFileLocation = `${workingDir}/images/${song_id}.${newImageMime}`
+    const oldImageLocation = `${workingDir}/images/${song_id}.png`
+    
+    fs.unlinkSync(oldImageLocation)
+    fs.copyFileSync(newImagePath, newFileLocation)
+    if(newFileLocation.indexOf('.png') === -1) {
+        await convertToPng(newFileLocation)
+        fs.unlinkSync(newFileLocation)
+    }
+}
+
 const fetchData = async <T extends object>(url: string, options: RequestInit = {}) => {
     const response = await fetch(url,options)
     const data: T | ErrorResponse = await response.json()
@@ -87,5 +101,6 @@ export {
     editMp3CoverArt,
     downloadThumbnail,
     convertToPng,
-    getImgPathFromURL
+    getImgPathFromURL,
+    editSongImage
 }

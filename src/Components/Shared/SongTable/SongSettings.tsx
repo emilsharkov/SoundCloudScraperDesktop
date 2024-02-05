@@ -15,19 +15,18 @@ import {
 } from "@/Components/ui/dropdown-menu"
 import { useState } from "react"
 import EditMetadataDialog from "./EditMetadataDialog"
-import { Mp3Metadata } from "@/Interfaces/electronHandlerInputs"
 import { useAppDispatch, useAppSelector } from "@/Redux/hooks"
 import { setQueuedSongs } from "@/Redux/Slices/queuedSongsSlice"
 import AddToPlaylistMenu from "./AddToPlaylistMenu"
+import { SongRow } from "@/Interfaces/electronHandlerReturns"
 
 export interface SongSettingsProps {
-    songMetadata: Mp3Metadata;
+    row: SongRow;
     isPlaylist: boolean;
-    index: number;
 }
 
 const SongSettings = (props: SongSettingsProps) => {
-    const { songMetadata,isPlaylist,index } = props
+    const { row,isPlaylist } = props
     const [openEditDialog, setOpenEditDialog] = useState<boolean>(false)
 
     const queuedSongs = useAppSelector((state) => state.queuedSongs.value)
@@ -40,7 +39,7 @@ const SongSettings = (props: SongSettingsProps) => {
                     <Button variant="outline"><MoreVertical/></Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56">
-                    <DropdownMenuLabel>{songMetadata.title}</DropdownMenuLabel>
+                    <DropdownMenuLabel>{row.title}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
                         <DropdownMenuItem onClick={() => setOpenEditDialog(true)}>
@@ -48,15 +47,12 @@ const SongSettings = (props: SongSettingsProps) => {
                             <span>Edit Metadata</span>
                         </DropdownMenuItem>
                         
-                        <DropdownMenuItem onClick={() => dispatch(setQueuedSongs([...queuedSongs,songMetadata.title]))}>
+                        <DropdownMenuItem onClick={() => dispatch(setQueuedSongs([...queuedSongs,row.song_id]))}>
                             <ListEnd className="mr-2 h-4 w-4"/>
                             <span>Add to Queue</span>
                         </DropdownMenuItem>
                         
-                        <AddToPlaylistMenu 
-                            songName={songMetadata.title} 
-                            songIndex={index}
-                        />
+                        <AddToPlaylistMenu row={row}/>
                         
                         {isPlaylist && 
                             <DropdownMenuItem >
@@ -75,7 +71,7 @@ const SongSettings = (props: SongSettingsProps) => {
             <EditMetadataDialog 
                 open={openEditDialog}
                 setOpen={setOpenEditDialog}
-                songMetadata={songMetadata}
+                row={row}
                 isPlaylist={isPlaylist}
             />
         </>

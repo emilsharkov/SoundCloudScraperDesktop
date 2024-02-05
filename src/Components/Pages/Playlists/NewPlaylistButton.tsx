@@ -10,35 +10,24 @@ import {
 import { Input } from "@/Components/ui/input"
 import { Label } from "@/Components/ui/label"
 import useElectronHandler from "@/Hooks/useElectronHandler"
-import { PlaylistNameArgs } from "@/Interfaces/electronHandlerInputs"
-import { PlaylistName } from "@/Interfaces/electronHandlerReturns"
 import { Button } from "@/Components/ui/button"
 import { useEffect, useState } from "react"
 import { useAppDispatch } from "@/Redux/hooks"
-import { setToastError } from "@/Redux/Slices/toastErrorSlice"
 import { refreshPlaylists } from "@/Redux/Slices/refreshDataSlice"
+import { CreatePlaylistArgs } from "@/Interfaces/electronHandlerInputs"
+import { PlaylistRow } from "@/Interfaces/electronHandlerReturns"
 
 
-export interface NewPlaylistButtonProps {
-    playlists: PlaylistName[] | null,
-}
-
-const NewPlaylistButton = (props: NewPlaylistButtonProps) => {
-    const {playlists} = props
+const NewPlaylistButton = () => {
     const [open,setOpen] = useState<boolean>(false)
     const [name,setName] = useState<string>('')
     const [isSubmitted,setIsSubmitted] = useState<boolean>(false)
-    const {result,error,receivedData,setArgs} = useElectronHandler<PlaylistNameArgs,PlaylistName[]>('create-playlist')
+    const {result,error,receivedData,setArgs} = useElectronHandler<CreatePlaylistArgs,PlaylistRow[]>('create-playlist')
     const dispatch = useAppDispatch()
 
     const createPlaylist = () => {
-        if(playlists?.some(playlist => playlist.name === name)) {
-            setOpen(false)
-            dispatch(setToastError('Please choose a unique playlist name!'))
-        } else {
-            setArgs({playlistName: name})
-            setIsSubmitted(true)
-        }
+        setArgs({name: name})
+        setIsSubmitted(true)
     }
 
     useEffect(() => {
@@ -70,7 +59,7 @@ const NewPlaylistButton = (props: NewPlaylistButtonProps) => {
                 </div>
                 <DialogFooter>
                     <Button 
-                        disabled={name === '' || !playlists || isSubmitted} 
+                        disabled={name === '' || isSubmitted} 
                         onClick={() => createPlaylist()} 
                     >
                         Save changes

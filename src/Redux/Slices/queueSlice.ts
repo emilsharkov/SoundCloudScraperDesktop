@@ -4,8 +4,8 @@ export type Origin = 'Playlist' | 'Downloads'
 
 interface QueueState {
   origin: Origin | null;
-  defaultQueue: string[];
-  musicQueue: string[];
+  defaultQueue: number[];
+  musicQueue: number[];
 }
 
 const initialState: QueueState = {
@@ -18,10 +18,10 @@ export const queueSlice = createSlice({
   name: 'queue',
   initialState,
   reducers: {
-    setDefaultQueue: (state, action: PayloadAction<string[]>) => {
+    setDefaultQueue: (state, action: PayloadAction<number[]>) => {
       state.defaultQueue = action.payload
     },
-    setMusicQueue: (state, action: PayloadAction<string[]>) => {
+    setMusicQueue: (state, action: PayloadAction<number[]>) => {
       state.musicQueue = action.payload
     },
     setOrigin: (state, action: PayloadAction<Origin | null>) => {

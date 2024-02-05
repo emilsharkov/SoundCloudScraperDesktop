@@ -18,15 +18,15 @@ const useMusicQueue = () => {
     const dispatch = useAppDispatch()
 
     const prevIsShuffled = useRef<boolean>(false)
-    const prevDefaultQueue = useRef<string[]>([])
+    const prevDefaultQueue = useRef<number[]>([])
 
     useEffect(() => {
         if (isShuffled !== prevIsShuffled.current || defaultQueue !== prevDefaultQueue.current) {
             if (audio.src && defaultQueue.length) {
                 if (isShuffled) {
-                    const songsWithoutCurrent = musicQueue.filter((song) => song !== musicQueue[currentQueueIndex])
-                    const shuffledSongs: string[] = songsWithoutCurrent
-                        .map((value: string) => ({ value, sort: Math.random() }))
+                    const songsWithoutCurrent = musicQueue.filter((song_id) => song_id !== musicQueue[currentQueueIndex])
+                    const shuffledSongs: number[] = songsWithoutCurrent
+                        .map((value: number) => ({ value, sort: Math.random() }))
                         .sort((a, b) => a.sort - b.sort)
                         .map(({ value }) => value)
                     const newMusicQueue = [musicQueue[currentQueueIndex], ...shuffledSongs]

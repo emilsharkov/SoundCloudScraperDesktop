@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import type { RootState } from '../store'
 
 interface QueuedSongsState {
-  value: string[]
+  value: number[]
 }
 
 const initialState: QueuedSongsState = {
@@ -10,10 +10,10 @@ const initialState: QueuedSongsState = {
 }
 
 export const queuedSongsSlice = createSlice({
-  name: 'queuedSongs',
+  name: 'number',
   initialState,
   reducers: {
-    setQueuedSongs: (state, action: PayloadAction<string[]>) => {
+    setQueuedSongs: (state, action: PayloadAction<number[]>) => {
       state.value = action.payload
     },
   },

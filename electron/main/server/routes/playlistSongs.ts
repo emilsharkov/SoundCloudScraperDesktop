@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express'
 import sqlite3 from 'sqlite3'
-import { queryAsync } from '../../database'
+import { queryAsync } from '../database'
 import { PlaylistSongRow, PlaylistSongDataRow } from '../../../interfaces/express/ResponseBody'
 import { ErrorWithCode } from '../../../interfaces/express/Error'
 import { body } from 'express-validator'
@@ -38,14 +38,14 @@ const playlistSongsRoute = (db: sqlite3.Database) => {
       try {
         validateBody(req)
         const body = req.body
-        const newPlaylist = await queryAsync<PlaylistSongRow>(
+        const playlistSong = await queryAsync<PlaylistSongRow>(
           db,
           `INSERT INTO playlist_songs (playlist_id,song_id,playlist_order) VALUES (?,?,-1) RETURNING *`,
           [body.playlist_id,body.song_id]
         )
     
-        if (newPlaylist.length) {
-          res.json(newPlaylist[0])
+        if (playlistSong.length) {
+          res.json(playlistSong[0])
         } else {
           throw new ErrorWithCode(500,'Error Adding Songs')
         }

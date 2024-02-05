@@ -1,3 +1,4 @@
+import NewPlaylistButton from "@/Components/Pages/Playlists/NewPlaylistButton"
 import { 
     DropdownMenuItem, 
     DropdownMenuPortal, 
@@ -7,43 +8,62 @@ import {
     DropdownMenuSubTrigger 
 } from "@/Components/ui/dropdown-menu"
 import useElectronHandler from "@/Hooks/useElectronHandler"
-import { AddSongToPlaylistArgs } from "@/Interfaces/electronHandlerInputs"
-import { PlaylistName, PlaylistSongsNames } from "@/Interfaces/electronHandlerReturns"
-import { setCurrentRoute } from "@/Redux/Slices/currentRouteSlice"
+import { AddSongToPlaylistArgs, CreatePlaylistArgs } from "@/Interfaces/electronHandlerInputs"
+import { PlaylistRow, PlaylistSongRow, SongRow } from "@/Interfaces/electronHandlerReturns"
+import { refreshPlaylists } from "@/Redux/Slices/refreshDataSlice"
+import { setToastError } from "@/Redux/Slices/toastErrorSlice"
+import { useAppDispatch, useAppSelector } from "@/Redux/hooks"
 import { ListPlus } from "lucide-react"
 import { useEffect } from "react"
+import { ToastAction } from "@/Components/ui/toast"
+import { useToast } from "@/Components/ui/use-toast"
 
 export interface AddToPlaylistMenuProps {
-    songName: string;
-    songIndex: number;
+    row: SongRow;
 }
 
 const AddToPlaylistMenu = (props: AddToPlaylistMenuProps) => {
-    const {songName,songIndex} = props
+    const {row} = props
+    const refreshPlaylistsData = useAppSelector((state) => state.refreshData.playlists)
+    const dispatch = useAppDispatch()
+    const { toast } = useToast()
+
     const {
         result: playlists,
         error: playlistsError,
         receivedData: receivedPlaylistsData,
         setArgs: setPlaylistsArgs
-    } = useElectronHandler<object,PlaylistName[]>('get-playlists')
+    } = useElectronHandler<object,PlaylistRow[]>('get-playlists')
 
     const {
         result: addSongToPlaylistResult,
         error: addSongToPlaylistError,
         receivedData: receivedAddSongToPlaylistData,
         setArgs: setAddSongToPlaylistArgs
-    } = useElectronHandler<AddSongToPlaylistArgs,PlaylistSongsNames[]>('add-song-to-playlist')
+    } = useElectronHandler<AddSongToPlaylistArgs,PlaylistSongRow[]>('add-song-to-playlist')
     
-    useEffect(() => setPlaylistsArgs({}),[])
+    useEffect(() => { dispatch(refreshPlaylists()) },[])
+    useEffect(() => setPlaylistsArgs({}),[refreshPlaylistsData])
 
-    const addSongToPlaylist = (e: Event, playlistName: string) => {
+    const addSongToPlaylist = (e: Event, playlist_id: number) => {
         e.preventDefault()
         setAddSongToPlaylistArgs({
-            playlistName: playlistName,
-            songOrder: songIndex,
-            songTitle: songName
+            playlist_id: playlist_id,
+            song_id: row.song_id
         })
     }
+
+    useEffect(() => {
+        if(addSongToPlaylistResult && receivedAddSongToPlaylistData) {
+            if(!addSongToPlaylistError) {
+                toast({
+                    description: `${row.title} added to playlist`,
+                })
+            } else {
+                dispatch(setToastError('Each song may only be added once a playlist'))
+            }
+        }
+    },[addSongToPlaylistResult,addSongToPlaylistError,receivedAddSongToPlaylistData])
 
     return (
         <>
@@ -55,17 +75,17 @@ const AddToPlaylistMenu = (props: AddToPlaylistMenuProps) => {
                 <DropdownMenuPortal>
                     <DropdownMenuSubContent>
                         {playlists && !playlistsError && receivedPlaylistsData &&
-                            playlists.map((playlist: PlaylistName) => {
+                            playlists.map((playlist: PlaylistRow) => {
                                 return (
-                                    <DropdownMenuItem key={playlist.name} onSelect={(e) => addSongToPlaylist(e,playlist.name)}>
+                                    <DropdownMenuItem key={playlist.name} onSelect={(e) => addSongToPlaylist(e,playlist.playlist_id)}>
                                         <span>{playlist.name}</span>
                                     </DropdownMenuItem>
                                 )
                             })
                         }
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => setCurrentRoute('Playlists')}>
-                            <span>Create a Playlist</span>
+                        <DropdownMenuItem onClick={e => e.preventDefault()}>
+                            <NewPlaylistButton/>
                         </DropdownMenuItem>
                     </DropdownMenuSubContent>
                 </DropdownMenuPortal>

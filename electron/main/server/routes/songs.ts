@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express'
 import sqlite3 from 'sqlite3'
 import { body, validationResult } from 'express-validator';
-import { queryAsync } from '../../database'
+import { queryAsync } from '../database'
 import { SongRow } from '../../../interfaces/express/ResponseBody'
 import { ErrorWithCode } from '../../../interfaces/express/Error'
 import { validateBody } from '../server';
@@ -33,7 +33,7 @@ const songsRoute = (db: sqlite3.Database) => {
           `SELECT * FROM songs WHERE song_id = ?`,
           [song_id]
         )
-        res.json(songs)
+        res.json(songs[0])
       } catch (err) {
         next(err)
       }

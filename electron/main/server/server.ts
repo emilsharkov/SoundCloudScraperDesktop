@@ -2,10 +2,10 @@ import express, { Request, Response, NextFunction } from 'express'
 import songsRoute from './routes/songs'
 import playlistsRoute from './routes/playlists'
 import playlistSongsRoute from './routes/playlistSongs'
-import { setupDatabase } from '../database'
+import { setupDatabase } from './database'
 import { BodyError, ErrorWithCode } from '../../interfaces/express/Error'
 import { workingDir } from '../utils'
-import { ValidationError, validationResult } from 'express-validator'
+import { validationResult } from 'express-validator'
 
 const app = express()
 const cors = require('cors')
@@ -23,15 +23,15 @@ const runServer = () => {
   app.use('/playlists', playlistsRoute(db))
   app.use('/playlistSongs', playlistSongsRoute(db))
 
-  // routes to song .mp3 and album art .png
+  // serve mp3 files
   app.use('/songFiles', (req, res, next) => {
-    res.setHeader('Cache-Control', 'no-cache') // Add cache control header
+    res.setHeader('Cache-Control', 'no-cache')
     express.static(`${workingDir}/songs`)(req, res, next)
   })
 
-  // Serve song images
+  // serve album art
   app.use('/songImages', (req, res, next) => {
-      res.setHeader('Cache-Control', 'no-cache') // Add cache control header
+      res.setHeader('Cache-Control', 'no-cache')
       express.static(`${workingDir}/images`)(req, res, next)
   })
 

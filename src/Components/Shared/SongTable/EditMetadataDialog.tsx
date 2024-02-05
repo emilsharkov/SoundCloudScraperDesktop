@@ -10,26 +10,27 @@ import {
 import { Input } from "@/Components/ui/input"
 import { Label } from "@/Components/ui/label"
 import { Button } from "@/Components/ui/button"
-import { EditMetadataArgs, Mp3Metadata } from "@/Interfaces/electronHandlerInputs"
+import { EditMetadataArgs } from "@/Interfaces/electronHandlerInputs"
 import { useEffect, useState } from "react"
 import ImageInput from "./ImageInput"
 import useElectronHandler from "@/Hooks/useElectronHandler"
 import { useAppDispatch } from "@/Redux/hooks"
 import { refreshDownloads, refreshPlaylist } from "@/Redux/Slices/refreshDataSlice"
+import { SongRow } from "@/Interfaces/electronHandlerReturns"
 
 export interface EditMetadataDialogProps {
-    songMetadata: Mp3Metadata;
+    row: SongRow;
     open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
     isPlaylist: boolean;
 }
 
 const EditMetadataDialog = (props: EditMetadataDialogProps) => {
-    const {open,setOpen,songMetadata,isPlaylist} = props
-    const { title,artist,imgPath,duration } = songMetadata
+    const {open,setOpen,row,isPlaylist} = props
+    const {title,artist,duration_seconds,song_id,song_order} = row
     const [newTitle,setNewTitle] = useState<string>(title)
     const [newArtist,setNewArtist] = useState<string>(artist)
-    const [newImgPath,setNewImgPath] = useState<string>(imgPath)
+    const [newImgPath,setNewImgPath] = useState<string>('')
     const {result,error,receivedData,setArgs} = useElectronHandler<EditMetadataArgs,boolean>('edit-mp3-metadata')
     const dispatch = useAppDispatch()
 
@@ -42,13 +43,10 @@ const EditMetadataDialog = (props: EditMetadataDialogProps) => {
 
     const submitDialog = () => {
         setArgs({
-            originalTitle: title,
-            metadata: {
-                title: newTitle,
-                artist: newArtist,
-                imgPath: newImgPath,
-                duration: duration
-            }
+            song_id: song_id,
+            title: newTitle,
+            artist: newArtist,
+            newImagePath: newImgPath
         })
     }
 
@@ -89,7 +87,7 @@ const EditMetadataDialog = (props: EditMetadataDialogProps) => {
                 </div>
                 <DialogFooter>
                     <Button 
-                        disabled={!receivedData || newTitle === title && newArtist === artist && newImgPath === imgPath} 
+                        disabled={!receivedData || newTitle === title && newArtist === artist && newImgPath === ''} 
                         onClick={() => submitDialog()} 
                     >Save changes</Button>
                 </DialogFooter>

@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express'
 import sqlite3 from 'sqlite3'
 import { body } from 'express-validator';
-import { queryAsync } from '../../database'
+import { queryAsync } from '../database'
 import { PlaylistRow } from '../../../interfaces/express/ResponseBody'
 import { ErrorWithCode } from '../../../interfaces/express/Error'
 import { validateBody } from '../server';

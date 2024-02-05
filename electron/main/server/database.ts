@@ -1,6 +1,6 @@
 import sqlite3 from 'sqlite3';
-import { workingDir } from './utils';
-import { SqlRow } from '../interfaces/express/ResponseBody';
+import { workingDir } from '../utils';
+import { SqlRow } from '../../interfaces/express/ResponseBody';
 
 const setupDatabase = (): sqlite3.Database => {
     const db = new sqlite3.Database(`${workingDir}/soundCloudScraperDesktop.db`, (err) => {
@@ -16,7 +16,7 @@ const setupDatabase = (): sqlite3.Database => {
                     title TEXT NOT NULL,
                     artist TEXT NOT NULL,
                     song_order INTEGER NOT NULL,
-                    duration_seconds INTEGER NOT NULL,
+                    duration_seconds INTEGER NOT NULL
                 );
             `).run(`
                 CREATE TABLE IF NOT EXISTS playlists (
