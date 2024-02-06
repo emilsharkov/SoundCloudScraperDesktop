@@ -1,7 +1,7 @@
 import { dialog, ipcMain, IpcMainInvokeEvent, OpenDialogReturnValue } from 'electron'
 import { PlaylistRow, PlaylistSongDataRow, PlaylistSongRow, SongRow, SQLAction } from 'electron/interfaces/express/ResponseBody'
 import { 
-  AddSongToPlaylistArgs, ChangeSongImageArgs, CreatePlaylistArgs, DeletePlaylistArgs, DeleteSongFromAppArgs, 
+  AddSongToPlaylistArgs, CreatePlaylistArgs, DeletePlaylistArgs, DeleteSongFromAppArgs, 
   DeleteSongInPlaylistArgs, EditMetadataArgs, EditPlaylistArgs, ExportSongsArgs, GetSongsInPlaylistArgs,
   Song, SongIDsArgs, SongNameArgs, SongURLArgs, SwitchPlaylistOrderArgs, SwitchSongOrderArgs 
 } from 'electron/interfaces/electron/electronHandlerInputs'
@@ -165,7 +165,7 @@ export const applyElectronHandlers = () => {
 
   handleIpcWithTryCatch<PlaylistRow>('delete-playlist', 
     async (event: Electron.IpcMainInvokeEvent, args: DeletePlaylistArgs) => {
-      return await fetchData<PlaylistRow>(`http://localhost:11738/songs/${args.playlist_id}`,{
+      return await fetchData<PlaylistRow>(`http://localhost:11738/playlists/${args.playlist_id}`,{
           method: 'DELETE',
       })
   })

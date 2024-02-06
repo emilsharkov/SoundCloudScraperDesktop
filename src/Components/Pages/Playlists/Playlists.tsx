@@ -3,16 +3,16 @@ import Playlist from "./Playlist";
 import PlaylistsTable from "./PlaylistsTable";
 
 const Playlists = () => {
-  const [playlistName, setPlaylistName] = useState<string>('');
+  const [playlistID, setPlaylistID] = useState<number>(-1);
 
   return (
     <>
-      {playlistName === '' ? (
-        <PlaylistsTable setPlaylistName={setPlaylistName} />
+      {playlistID === -1 ? (
+        <PlaylistsTable setPlaylistID={setPlaylistID} />
       ) : (
         <Playlist
-          playlistName={playlistName}
-          setPlaylistName={setPlaylistName}
+          playlistID={playlistID}
+          setPlaylistID={setPlaylistID}
         />
       )}
     </>

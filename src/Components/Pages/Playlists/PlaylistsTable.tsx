@@ -1,23 +1,25 @@
 import useElectronHandler from '@/Hooks/useElectronHandler';
 import useFuzzySearch from '@/Hooks/useFuzzySearch';
-import { PlaylistName } from '@/Interfaces/electronHandlerReturns';
+import { PlaylistRow } from '@/Interfaces/electronHandlerReturns';
 import { useEffect } from 'react'
 import NewPlaylistButton from './NewPlaylistButton';
 import { Input } from '@/Components/ui/input';
 import { TableCell, TableRow } from '@/Components/ui/table';
 import { useAppDispatch, useAppSelector } from '@/Redux/hooks';
 import { refreshPlaylists } from '@/Redux/Slices/refreshDataSlice';
+import SearchBar from '@/Components/Shared/SearchBar';
+import PlaylistSettings from './PlaylistSettings';
 
 export interface PlaylistTableProps {
-    setPlaylistName: (playlistName: string) => void;
+    setPlaylistID: (playlist_id: number) => void;
 }
 
 const PlaylistsTable = (props: PlaylistTableProps) => {
-    const {setPlaylistName} = props
+    const {setPlaylistID} = props
     const refreshPlaylistsData = useAppSelector((state) => state.refreshData.playlists)
     const dispatch = useAppDispatch()
-    const {result: playlists,error,receivedData,setArgs} = useElectronHandler<object,PlaylistName[]>('get-playlists')
-    const {searchQuery, setSearchQuery, filteredData} = useFuzzySearch<PlaylistName>(playlists,'name')
+    const {result: playlists,error,receivedData,setArgs} = useElectronHandler<object,PlaylistRow[]>('get-playlists')
+    const {searchQuery, setSearchQuery, filteredData} = useFuzzySearch<PlaylistRow>(playlists,'name')
     
     useEffect(() => { dispatch(refreshPlaylists()) },[])
     useEffect(() => setArgs({}),[refreshPlaylistsData])
@@ -25,28 +27,30 @@ const PlaylistsTable = (props: PlaylistTableProps) => {
     return (
         <div className='flex flex-col w-full h-full items-center'>
             <div className='flex flex-row mt-1 m w-[97%]'>
-                <Input 
+                <SearchBar
                     className='mr-1'
-                    type="text"
-                    placeholder="Find Playlist"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder='Search Playlists'
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
                 />
-                <NewPlaylistButton
-                    playlists={playlists}
-                />
+                <NewPlaylistButton/>
             </div>
             
             {receivedData && !error
-                && filteredData?.map((playlist: PlaylistName, index: number) => {
+                && filteredData?.map((playlist: PlaylistRow, index: number) => {
                     return (
                         <TableRow 
-                            onClick={() => setPlaylistName(playlist.name)} 
                             className='w-full' 
-                            key={playlist.name}
+                            key={playlist.playlist_id}
                         >
-                            <TableCell className="font-medium">
+                            <TableCell 
+                                onClick={() => setPlaylistID(playlist.playlist_id)} 
+                                className="font-medium"
+                            >
                                 {playlist.name}
+                            </TableCell>
+                            <TableCell className=''>
+                                <PlaylistSettings row={playlist}/>
                             </TableCell>
                         </TableRow>
                     )

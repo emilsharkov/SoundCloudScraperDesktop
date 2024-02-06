@@ -6,7 +6,7 @@ import {
     TooltipTrigger,
   } from "@/Components/ui/tooltip"
 import useElectronHandler from "@/Hooks/useElectronHandler"
-import { OpenDialogReturnValue } from "@/Interfaces/electronHandlerReturns"
+import { OpenDialogReturnValue } from "@/Interfaces/electronHandlerReturns";
 import { X } from "lucide-react";
 import { useEffect, useRef, useState } from "react"
 

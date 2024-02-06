@@ -11,28 +11,35 @@ import { Input } from "@/Components/ui/input"
 import { Label } from "@/Components/ui/label"
 import { Button } from "@/Components/ui/button"
 import { EditMetadataArgs } from "@/Interfaces/electronHandlerInputs"
-import { useEffect, useState } from "react"
+import { MouseEventHandler, useEffect, useState } from "react"
 import ImageInput from "./ImageInput"
 import useElectronHandler from "@/Hooks/useElectronHandler"
 import { useAppDispatch } from "@/Redux/hooks"
 import { refreshDownloads, refreshPlaylist } from "@/Redux/Slices/refreshDataSlice"
 import { SongRow } from "@/Interfaces/electronHandlerReturns"
+import { FileEdit } from "lucide-react"
+import { DropdownMenuItem } from "@/Components/ui/dropdown-menu"
 
 export interface EditMetadataDialogProps {
     row: SongRow;
-    open: boolean;
-    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
     isPlaylist: boolean;
+    playlist_id?: number;
 }
 
-const EditMetadataDialog = (props: EditMetadataDialogProps) => {
-    const {open,setOpen,row,isPlaylist} = props
+const EditMetadata = (props: EditMetadataDialogProps) => {
+    const {row,isPlaylist} = props
     const {title,artist,duration_seconds,song_id,song_order} = row
+    const [open,setOpen] = useState<boolean>(false)
     const [newTitle,setNewTitle] = useState<string>(title)
     const [newArtist,setNewArtist] = useState<string>(artist)
     const [newImgPath,setNewImgPath] = useState<string>('')
     const {result,error,receivedData,setArgs} = useElectronHandler<EditMetadataArgs,boolean>('edit-mp3-metadata')
     const dispatch = useAppDispatch()
+
+    const openDialog = (e: Event) => {
+        e.preventDefault()
+        setOpen(true)
+    }
 
     useEffect(() => {
         if(receivedData && !error && result) {
@@ -52,6 +59,12 @@ const EditMetadataDialog = (props: EditMetadataDialogProps) => {
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                <DropdownMenuItem onSelect={openDialog}>
+                    <FileEdit className="mr-2 h-4 w-4"/>
+                    <span>Edit Metadata</span>
+                </DropdownMenuItem>
+            </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>Edit profile</DialogTitle>
@@ -96,4 +109,4 @@ const EditMetadataDialog = (props: EditMetadataDialogProps) => {
     )
 }
 
-export default EditMetadataDialog
+export default EditMetadata

@@ -1,5 +1,5 @@
 import { TableCell, TableRow } from "../../ui/table"
-import SongSettings from "./SongSettings"
+import SongSettings from "./SongSettings/SongSettings"
 import MarqueeText from "./MarqueeText";
 import { GripVertical, PauseIcon, PlayIcon } from "lucide-react";
 import { useState } from "react";
@@ -10,14 +10,14 @@ import { SongRow } from "@/Interfaces/electronHandlerReturns";
 export interface SongTableRowProps {
     currentSong: number;
     row: SongRow;
-    isPlaylist: boolean;
     onClick: () => void;
+    playlistID?: number;
 }
 
 const SECONDS_PER_MINUTE = 60
 
 const SongTableRow = (props: SongTableRowProps) => {
-    const {currentSong,row,isPlaylist,onClick} = props
+    const {currentSong,row,onClick,playlistID} = props
     const [isHovered,setIsHovered] = useState<boolean>(false)
 
     const onMouseEnter = () => setIsHovered(true)
@@ -63,8 +63,8 @@ const SongTableRow = (props: SongTableRowProps) => {
 
             <TableCell>
                 <SongSettings 
-                    isPlaylist={isPlaylist} 
                     row={row}
+                    playlistID={playlistID}
                 />
             </TableCell>
 

@@ -1,94 +1,66 @@
 import ReactDragListView from 'react-drag-listview';
 import { DragListViewProps } from 'react-drag-listview'
-import { SongOrder, SongTitle } from "@/Interfaces/electronHandlerReturns";
-import { Mp3Metadata, PlaylistNameArgs, PutPlaylistSongBodyItem, ReorderSongsArgs, SongNamesArgs } from "@/Interfaces/electronHandlerInputs";
 import useElectronHandler from '@/Hooks/useElectronHandler';
 import SongTable from '@/Components/Shared/SongTable/SongTable';
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/Redux/hooks';
 import { refreshPlaylist } from '@/Redux/Slices/refreshDataSlice';
+import { PlaylistSongDataRow, SongRow } from '@/Interfaces/electronHandlerReturns';
+import { GetSongsInPlaylistArgs } from '@/Interfaces/electronHandlerInputs';
+import SearchBar from '@/Components/Shared/SearchBar';
+import { Button } from '@/Components/ui/button';
+import { ArrowLeft  } from 'lucide-react';
+import useFuzzySearch from '@/Hooks/useFuzzySearch';
+
 
 export interface PlaylistProps {
-    playlistName: string;
-    setPlaylistName: (playlistName: string) => void;
+    playlistID: number;
+    setPlaylistID: (playlist_id: number) => void;
 }
 
 const Playlist = (props: PlaylistProps) => {
-    const {playlistName,setPlaylistName} = props
+    const {playlistID,setPlaylistID} = props
+    const {result: songsInPlaylist,error,receivedData,setArgs} = useElectronHandler<GetSongsInPlaylistArgs,PlaylistSongDataRow[]>('get-songs-in-playlist')
+    const rows = songsInPlaylist?.map((row: PlaylistSongDataRow) => {
+        return {
+            song_id: row.song_id,
+            title: row.title,
+            artist: row.artist,
+            song_order: row.playlist_order,
+            duration_seconds: row.duration_seconds
+        } as SongRow
+    })
+    const {searchQuery, setSearchQuery, filteredData} = useFuzzySearch<SongRow>(rows,'title')
+
     const refreshPlaylistData = useAppSelector((state) => state.refreshData.playlist)
     const dispatch = useAppDispatch()
     
-    const {
-        result: songs,
-        error: songsError,
-        receivedData: receivedSongsData,
-        setArgs: setSongsArgs
-    } = useElectronHandler<PlaylistNameArgs,SongOrder[]>('get-songs-in-playlist')
-
-    const {
-        result: songsMetadata,
-        error: songsMetadataError,
-        receivedData: receivedSongsMetadata,
-        setArgs: setSongsMetadataArgs
-    } = useElectronHandler<SongNamesArgs,Mp3Metadata[]>('get-all-mp3-metadata')
-
-    const {
-        result: songOrder,
-        error: songOrderError,
-        receivedData: receivedSongOrderData,
-        setArgs: setSongOrderArgs
-    } = useElectronHandler<ReorderSongsArgs,SongOrder[]>('edit-song-order')
-
-    console.log(songsMetadata)
 
     useEffect(() => { dispatch(refreshPlaylist()) },[])
-    useEffect(() => setSongsArgs({ playlistName: playlistName }),[refreshPlaylistData])
-
-    useEffect(() => {
-        if(songs && !songsError && receivedSongsData) {
-            console.log(songs)
-            const songNames: string[] = songs
-                .sort((a, b) => (a.song_order > b.song_order) ? 1 : -1)
-                .map(song => song.song_title)
-            setSongsMetadataArgs({songNames: songNames})
-        }
-    },[songs,songsError,receivedSongsData])
-
-    const onDragEnd = (fromIndex: number, toIndex: number): void => {
-        if(!songsMetadata) { return }
-        const updatedSongTitles: Mp3Metadata[] = [...songsMetadata];
-        const draggedItem = updatedSongTitles.splice(fromIndex, 1)[0]
-        updatedSongTitles.splice(toIndex, 0, draggedItem)
-        const songOrderings: PutPlaylistSongBodyItem[] = updatedSongTitles.map((metadata: Mp3Metadata, index: number) => {
-            return { songTitle: metadata.title, songOrder: index}
-        })
-        setSongOrderArgs({
-            playlistName: playlistName,
-            songOrderings: songOrderings
-        })
-    }
-
-    useEffect(() => {
-        if(songOrder && !songOrderError && receivedSongOrderData) {
-            dispatch(refreshPlaylist())
-        }
-    },[songOrder,songOrderError,receivedSongOrderData])
-    
-    const dragProps: DragListViewProps = {
-        onDragEnd: onDragEnd,
-        nodeSelector: 'tr',
-        handleSelector: 'a',
-    }
+    useEffect(() => setArgs({ playlist_id: playlistID }),[refreshPlaylistData])
 
     return(
         <>
-            {!receivedSongsMetadata && !songsMetadataError && songsMetadata &&
-                <ReactDragListView {...dragProps}>
-                    <SongTable 
-                        songMetadata={songsMetadata} 
-                        isPlaylist={true}
-                    />
-                </ReactDragListView>
+            <div className='flex flex-row mt-1'>
+                <Button 
+                    className='ml-2 mr-2'
+                    variant="outline"
+                    onClick={() => setPlaylistID(-1)}
+                >
+                    <ArrowLeft strokeWidth={1.25}/>
+                </Button>
+                <SearchBar
+                    className='w-[90%]'
+                    placeholder='Search Playlist'
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                />
+            </div>
+            {receivedData && !error && rows &&
+                <SongTable 
+                    rows={rows}
+                    playlistID={playlistID}
+                />
             }
         </>
     )

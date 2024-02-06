@@ -1,0 +1,71 @@
+import { Button } from "@/Components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/Components/ui/dialog";
+import { DropdownMenuItem } from "@/Components/ui/dropdown-menu"
+import useElectronHandler from "@/Hooks/useElectronHandler";
+import { DeleteSongFromAppArgs } from "@/Interfaces/electronHandlerInputs";
+import { SongRow } from "@/Interfaces/electronHandlerReturns";
+import { refreshDownloads, refreshPlaylist } from "@/Redux/Slices/refreshDataSlice";
+import { useAppDispatch } from "@/Redux/hooks";
+import { Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+
+export interface DeleteFromComputerProps {
+    row: SongRow;
+    isPlaylist: boolean;
+}
+
+const DeleteFromComputer = (props: DeleteFromComputerProps) => {
+    const {row,isPlaylist} = props
+    const [open,setOpen] = useState<boolean>(false)
+    const {result,error,receivedData,setArgs} = useElectronHandler<DeleteSongFromAppArgs,SongRow>('delete-song-from-app')
+    const dispatch = useAppDispatch()
+
+    const openDialog = (e: Event) => {
+        e.preventDefault()
+        setOpen(true)
+    }
+
+    const submitDialog = () => {
+        setArgs({song_id: row.song_id})
+    }
+
+    useEffect(() => {
+        if(receivedData && !error && result) {
+            setOpen(false)
+            isPlaylist? dispatch(refreshPlaylist()): dispatch(refreshDownloads())
+        }
+    },[receivedData,error,result])
+
+    return (
+        <>
+            <Dialog open={open} onOpenChange={setOpen}>
+                <DialogTrigger asChild>
+                    <DropdownMenuItem onSelect={openDialog}>
+                        <Trash2 className="mr-2 h-4 w-4"/>
+                        <span>Delete From Computer</span>
+                    </DropdownMenuItem>
+                </DialogTrigger>
+                <DialogContent className="w-[80%]">
+                    <DialogHeader>
+                        <DialogTitle>Delete <span className="text-gray-500">{row.title}</span> from Computer</DialogTitle>
+                        <DialogDescription>
+                            Are you sure you want to permanently delete this song? You cannot undo this action.
+                        </DialogDescription>
+                    </DialogHeader>
+                    
+                    <div className="w-full flex flex-row items-center justify-center">
+                        <Button 
+                            disabled={!receivedData} 
+                            onClick={() => submitDialog()} 
+                            className="w-[30%]"
+                        >
+                            Confirm
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
+        </>
+    )
+}
+
+export default DeleteFromComputer

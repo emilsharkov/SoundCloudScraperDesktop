@@ -32,6 +32,12 @@ interface SQLAction extends SqlRow {
     status: string;
 }
 
+interface OpenDialogReturnValue {
+    canceled: boolean;
+    filePaths: string[];
+    bookmarks?: string[];
+}
+
 export type {
     SqlRow,
     SongRow,
@@ -39,4 +45,5 @@ export type {
     PlaylistSongRow,
     PlaylistSongDataRow,
     SQLAction,
+    OpenDialogReturnValue
 }

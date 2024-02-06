@@ -7,19 +7,19 @@ import { setIsPlaying } from "@/Redux/Slices/isPlayingSlice"
 import { SongRow } from "@/Interfaces/electronHandlerReturns"
 
 export interface SongTableProps {
-    rows: SongRow[],
-    isPlaylist: boolean
+    rows: SongRow[];
+    playlistID?: number;
 }
 
 const SongTable = (props: SongTableProps) => {
-    const { rows,isPlaylist } = props
+    const { rows,playlistID } = props
     const currentQueueIndex = useAppSelector((state) => state.currentQueueIndex.value)
     const musicQueue = useAppSelector((state) => state.queue.musicQueue)
     const currentSong = musicQueue.length && currentQueueIndex < musicQueue.length && currentQueueIndex >= 0 ? musicQueue[currentQueueIndex] : -1
     const dispatch = useAppDispatch()
 
     const playSongs = (index: number) => {
-        const origin: Origin = isPlaylist ? 'Playlist': 'Downloads'
+        const origin: Origin = playlistID ? 'Playlist': 'Downloads'
         const song_ids: number[] = rows.map(row => row.song_id)
         dispatch(setDefaultQueue(song_ids))
         dispatch(setMusicQueue(song_ids))
@@ -47,7 +47,7 @@ const SongTable = (props: SongTableProps) => {
                         onClick={() => playSongs(index)}
                         currentSong={currentSong} 
                         row={row} 
-                        isPlaylist={isPlaylist}                    
+                        playlistID={playlistID}
                     />
                 ))}
             </TableBody>

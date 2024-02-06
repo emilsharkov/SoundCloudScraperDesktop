@@ -1,3 +1,4 @@
+import SearchBar from "@/Components/Shared/SearchBar"
 import SongTable from "@/Components/Shared/SongTable/SongTable"
 import { Input } from "@/Components/ui/input"
 import useElectronHandler from "@/Hooks/useElectronHandler"
@@ -18,19 +19,13 @@ const Downloads = () => {
 
     return(
         <div className='flex flex-col w-full h-full items-center'>
-            <Input 
-                className='w-[99%] mt-1'
-                type="text"
+            <SearchBar
+                className="w-[99%] mt-1"
                 placeholder="Search Song"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
             />
-            {receivedData && !error && result &&
-                <SongTable 
-                    rows={filteredData}
-                    isPlaylist={false}
-                />
-            }
+            {receivedData && !error && result && <SongTable rows={filteredData}/>}
         </div>
     )
 }
