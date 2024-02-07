@@ -30,15 +30,9 @@ const getImgPathFromURL = (songID: number, imgURL: string) => {
 }
 
 const convertToPng = async(inputPath: string) => {
-    try {
-        const outputPath = inputPath.slice(0, inputPath.lastIndexOf('.')) + '.png'
-        const image = await Jimp.read(inputPath)
-        await image.writeAsync(outputPath)  
-        console.log('Image converted successfully to PNG:', outputPath)
-    } catch (error) {
-        console.error('Error converting image to PNG:', error)
-        throw error
-    }
+    const outputPath = inputPath.slice(0, inputPath.lastIndexOf('.')) + '.png'
+    const image = await Jimp.read(inputPath)
+    await image.writeAsync(outputPath)  
 }
 
 const downloadThumbnail = async(songID: number, thumbnailURL: string) => {

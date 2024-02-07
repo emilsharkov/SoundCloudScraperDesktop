@@ -2,11 +2,11 @@ import { Button } from "@/Components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/Components/ui/dialog";
 import { DropdownMenuItem } from "@/Components/ui/dropdown-menu"
 import useElectronHandler from "@/Hooks/useElectronHandler";
-import { DeletePlaylistArgs, DeleteSongFromAppArgs } from "@/Interfaces/electronHandlerInputs";
-import { PlaylistRow, SongRow } from "@/Interfaces/electronHandlerReturns";
-import { refreshDownloads, refreshPlaylist, refreshPlaylists } from "@/Redux/Slices/refreshDataSlice";
+import { DeletePlaylistArgs } from "@/Interfaces/electronHandlerInputs";
+import { PlaylistRow } from "@/Interfaces/electronHandlerReturns";
+import { refreshPlaylists } from "@/Redux/Slices/refreshDataSlice";
 import { useAppDispatch } from "@/Redux/hooks";
-import { Trash2 } from "lucide-react";
+import { Trash2, XSquare  } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export interface DeletePlaylistProps {

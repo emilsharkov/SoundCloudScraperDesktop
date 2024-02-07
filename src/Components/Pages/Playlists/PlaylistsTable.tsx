@@ -36,6 +36,8 @@ const PlaylistsTable = (props: PlaylistTableProps) => {
                 <NewPlaylistButton/>
             </div>
             
+
+            {/*TODO ADD TABLE TAG AROUND ROWS*/}
             {receivedData && !error
                 && filteredData?.map((playlist: PlaylistRow, index: number) => {
                     return (

@@ -77,7 +77,6 @@ export const applyElectronHandlers = () => {
               duration_seconds: Math.trunc(song.duration / 1000)
           }),
       }) 
-      console.log(data)
   
       const writer = stream.pipe(fs.createWriteStream(`${workingDir}/songs/${data.song_id}.mp3`))
       writer.on("finish", async () => await downloadThumbnail(data.song_id, song.thumbnail))
@@ -122,7 +121,7 @@ export const applyElectronHandlers = () => {
       })
   })
 
-  handleIpcWithTryCatch<void>('switch-song-order', 
+  handleIpcWithTryCatch<boolean>('switch-song-order', 
     async (event: Electron.IpcMainInvokeEvent, args: SwitchSongOrderArgs) => {
       const data = await fetchData<SQLAction>(`http://localhost:11738/songs/${args.song_id}`,{
         method: 'PUT',
@@ -134,6 +133,8 @@ export const applyElectronHandlers = () => {
           to: args.to
         }),
       })
+
+      return true
   })
 
   handleIpcWithTryCatch<PlaylistRow[]>('get-playlists', 
@@ -159,7 +160,7 @@ export const applyElectronHandlers = () => {
           headers: {
               'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ newName: args.name }),
+          body: JSON.stringify({ name: args.name }),
       })
   })
 
@@ -189,7 +190,7 @@ export const applyElectronHandlers = () => {
       })
   })
 
-  handleIpcWithTryCatch<void>('switch-playlist-order', 
+  handleIpcWithTryCatch<boolean>('switch-playlist-order', 
     async (event: Electron.IpcMainInvokeEvent, args: SwitchPlaylistOrderArgs) => {
       const data = await fetchData<SQLAction>(`http://localhost:11738/playlistSongs/${args.playlist_id}`,{
         method: 'PUT',
@@ -201,11 +202,12 @@ export const applyElectronHandlers = () => {
           to: args.to
         }),
       })
+      return true
   })
 
   handleIpcWithTryCatch<PlaylistSongRow>('delete-song-in-playlist', 
     async (event: Electron.IpcMainInvokeEvent, args: DeleteSongInPlaylistArgs) => {
-      return await fetchData<PlaylistSongRow>(`http://localhost:11738/songs/${args.playlist_id}/${args.song_id}`,{
+      return await fetchData<PlaylistSongRow>(`http://localhost:11738/playlistSongs/${args.playlist_id}/${args.song_id}`,{
           method: 'DELETE',
       })
   })
@@ -218,7 +220,7 @@ export const applyElectronHandlers = () => {
       return result
   })
 
-  handleIpcWithTryCatch<void>('export-songs', 
+  handleIpcWithTryCatch<boolean>('export-songs', 
     async (event: Electron.IpcMainInvokeEvent, args: ExportSongsArgs) => {
       args.song_ids.forEach(async(song_id: number) => {
         const data: SongRow = await fetchData<SongRow>(`http://localhost:11738/songs/${song_id}`)
@@ -233,5 +235,7 @@ export const applyElectronHandlers = () => {
         editMp3CoverArt(newMP3FileName,originalImageFile)
         changeSongMetadata(newMP3FileName,data.artist)
       })
+      
+      return true
   })
 }

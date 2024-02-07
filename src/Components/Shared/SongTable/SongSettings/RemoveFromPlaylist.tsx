@@ -6,7 +6,7 @@ import { DeleteSongFromAppArgs, DeleteSongInPlaylistArgs } from "@/Interfaces/el
 import { PlaylistSongRow, SongRow } from "@/Interfaces/electronHandlerReturns";
 import { refreshDownloads, refreshPlaylist } from "@/Redux/Slices/refreshDataSlice";
 import { useAppDispatch } from "@/Redux/hooks";
-import { Trash2 } from "lucide-react";
+import { Trash2, XSquare } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export interface RemoveFromPlaylistProps {
@@ -46,8 +46,8 @@ const RemoveFromPlaylist = (props: RemoveFromPlaylistProps) => {
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
                     <DropdownMenuItem onSelect={openDialog}>
-                        <Trash2 className="mr-2 h-4 w-4"/>
-                        <span>Delete From Computer</span>
+                        <XSquare className="mr-2 h-4 w-4"/>
+                        <span>Remove From Playlist</span>
                     </DropdownMenuItem>
                 </DialogTrigger>
                 <DialogContent className="w-[80%]">

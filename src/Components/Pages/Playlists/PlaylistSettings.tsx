@@ -10,6 +10,7 @@ import {
 } from "@/Components/ui/dropdown-menu"
 import { PlaylistRow } from "@/Interfaces/electronHandlerReturns"
 import DeletePlaylist from "./DeletePlaylist"
+import EditPlaylistName  from "./EditPlaylistName"
 
 export interface PlaylistSettingsProps {
     row: PlaylistRow;
@@ -28,6 +29,7 @@ const PlaylistSettings = (props: PlaylistSettingsProps) => {
                     <DropdownMenuLabel>{row.name}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
+                        <EditPlaylistName row={row}/>
                         <DeletePlaylist row={row}/>
                     </DropdownMenuGroup>
                 </DropdownMenuContent>

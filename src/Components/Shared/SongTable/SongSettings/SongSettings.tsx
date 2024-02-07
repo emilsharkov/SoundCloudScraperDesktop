@@ -13,10 +13,7 @@ import {
     DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/Components/ui/dropdown-menu"
-import { useState } from "react"
 import EditMetadata from "./EditMetadata"
-import { useAppDispatch, useAppSelector } from "@/Redux/hooks"
-import { setQueuedSongs } from "@/Redux/Slices/queuedSongsSlice"
 import AddToPlaylistMenu from "./AddToPlaylistMenu"
 import { SongRow } from "@/Interfaces/electronHandlerReturns"
 import AddToQueue from "./AddToQueue"

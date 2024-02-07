@@ -34,10 +34,13 @@ const Playlist = (props: PlaylistProps) => {
 
     const refreshPlaylistData = useAppSelector((state) => state.refreshData.playlist)
     const dispatch = useAppDispatch()
-    
 
     useEffect(() => { dispatch(refreshPlaylist()) },[])
     useEffect(() => setArgs({ playlist_id: playlistID }),[refreshPlaylistData])
+
+    const onDragEnd = (fromIndex: number, toIndex: number) => {
+
+    }
 
     return(
         <>
@@ -58,6 +61,7 @@ const Playlist = (props: PlaylistProps) => {
             </div>
             {receivedData && !error && rows &&
                 <SongTable 
+                    onDragEnd={onDragEnd}
                     rows={rows}
                     playlistID={playlistID}
                 />
