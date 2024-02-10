@@ -1,10 +1,9 @@
-import NavbarButtonComponent from './NavbarButton'
+import NavbarButton from './NavbarButton'
 import { LucideIcon, Search } from 'lucide-react';
 import { Download } from 'lucide-react';
 import { Folders } from 'lucide-react';
-import CurrentSongThumbnail from './CurrentSongThumbnail';
 import { setCurrentRoute } from '@/Redux/Slices/currentRouteSlice';
-import { useAppDispatch } from '@/Redux/hooks';
+import { useAppDispatch, useAppSelector } from '@/Redux/hooks';
 
 interface NavbarProps {
     className?: string;
@@ -35,7 +34,7 @@ const Navbar = (props: NavbarProps) => {
                         <ul className='mt-2 space-y-1 text-sm'>
                             {navbarItemList.map((navbarItem: NavbarItemData) => {
                                 return (
-                                    <NavbarButtonComponent 
+                                    <NavbarButton 
                                         key={navbarItem.title} 
                                         title={navbarItem.title} 
                                         icon={navbarItem.icon}

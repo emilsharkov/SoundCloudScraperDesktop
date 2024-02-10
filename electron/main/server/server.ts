@@ -61,7 +61,7 @@ const errorHandler = (err: unknown, req: Request, res: Response, next: NextFunct
     res.status(err.code).send({ error: err.message })
   } else if (err instanceof BodyError) {
     // Type guard to check for a specific structure indicating validation errors
-    res.status(400).send({ message: err.message, errors: err.errors })
+    res.status(400).send({ message: err.message, error: err.errors })
   } else if (err instanceof Error) {
     // Generic error handler for other types of errors
     res.status(500).send({ error: err.message })

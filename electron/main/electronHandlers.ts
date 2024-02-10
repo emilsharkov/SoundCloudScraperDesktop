@@ -8,7 +8,7 @@ import {
 
 import * as fs from "fs"
 import * as SoundCloud from "soundcloud-scraper"
-import { changeSongMetadata, convertToPng, downloadThumbnail, editMp3CoverArt, editSongImage, fetchData, workingDir } from './utils'
+import { changeSongMetadata, downloadThumbnail, editMp3CoverArt, editSongImage, fetchData, validFileSongName, workingDir } from './utils'
 
 type HandlerFunction<T> = (event: IpcMainInvokeEvent, args: any) => Promise<T>
 
@@ -65,6 +65,8 @@ export const applyElectronHandlers = () => {
       const stream = song.trackURL.endsWith('/stream/progressive')
           ? await song.downloadProgressive()
           : await song.downloadHLS()
+
+      const validSongName = validFileSongName(song.title)
   
       const data: SongRow = await fetchData<SongRow>(`http://localhost:11738/songs`,{
           method: 'POST',
@@ -72,7 +74,7 @@ export const applyElectronHandlers = () => {
               'Content-Type': 'application/json',
           },
           body: JSON.stringify({ 
-              title: song.title,
+              title: validSongName,
               artist: song.author.name,
               duration_seconds: Math.trunc(song.duration / 1000)
           }),
@@ -123,7 +125,7 @@ export const applyElectronHandlers = () => {
 
   handleIpcWithTryCatch<boolean>('switch-song-order', 
     async (event: Electron.IpcMainInvokeEvent, args: SwitchSongOrderArgs) => {
-      const data = await fetchData<SQLAction>(`http://localhost:11738/songs/${args.song_id}`,{
+      const data = await fetchData<SQLAction>(`http://localhost:11738/songs`,{
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -222,19 +224,18 @@ export const applyElectronHandlers = () => {
 
   handleIpcWithTryCatch<boolean>('export-songs', 
     async (event: Electron.IpcMainInvokeEvent, args: ExportSongsArgs) => {
-      args.song_ids.forEach(async(song_id: number) => {
-        const data: SongRow = await fetchData<SongRow>(`http://localhost:11738/songs/${song_id}`)
-        const newMP3FileName = `${data.title}.mp3`
-        const originalMP3File = `${workingDir}/songs/${song_id}.mp3`
-        const originalImageFile = `${workingDir}/images/${song_id}.png`
+      const {destination,song_id} = args
+      const data: SongRow = await fetchData<SongRow>(`http://localhost:11738/songs/${song_id}`)
+      const newMP3File = `${destination}/${data.title}.mp3`
+      const originalMP3File = `${workingDir}/songs/${song_id}.mp3`
+      const originalImageFile = `${workingDir}/images/${song_id}.png`
 
-        if(fs.existsSync(newMP3FileName)) {
-          fs.unlinkSync(newMP3FileName)
-        }
-        fs.copyFileSync(originalMP3File, newMP3FileName)
-        editMp3CoverArt(newMP3FileName,originalImageFile)
-        changeSongMetadata(newMP3FileName,data.artist)
-      })
+      if(fs.existsSync(newMP3File)) {
+        fs.unlinkSync(newMP3File)
+      }
+      fs.copyFileSync(originalMP3File, newMP3File)
+      editMp3CoverArt(newMP3File,originalImageFile)
+      changeSongMetadata(newMP3File,data.artist)
       
       return true
   })

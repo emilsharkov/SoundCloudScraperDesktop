@@ -1,5 +1,7 @@
+import DownloadSongs from "@/Components/Shared/DownloadSongs"
 import SearchBar from "@/Components/Shared/SearchBar"
 import SongTable from "@/Components/Shared/SongTable/SongTable"
+import { Button } from "@/Components/ui/button"
 import { Input } from "@/Components/ui/input"
 import useElectronHandler from "@/Hooks/useElectronHandler"
 import useFuzzySearch from "@/Hooks/useFuzzySearch"
@@ -30,19 +32,15 @@ const Downloads = () => {
     useEffect(() => setSongsArgs({}),[refreshDownloadsData])
     useEffect(() => {
         if(switchedOrder && !switchedOrderError && receivedSwitchedOrderData){
-            console.log('anus')
             dispatch(refreshDownloads()) 
         }
     },[switchedOrder,switchedOrderError,receivedSwitchedOrderData])
 
     const onDragEnd = (fromIndex: number, toIndex: number) => {
-        if(songs) {
-            setSwitchedOrderArgs({
-                song_id: songs[fromIndex].song_id,
-                from: fromIndex,
-                to: toIndex
-            })
-        }
+        setSwitchedOrderArgs({
+            from: fromIndex,
+            to: toIndex
+        })
     }
 
     return(
@@ -53,6 +51,8 @@ const Downloads = () => {
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
             />
+            <DownloadSongs songs={songs ?? []}/>
+
             {receivedSongsData && !songsError && songs && 
                 <SongTable
                     rows={filteredData}

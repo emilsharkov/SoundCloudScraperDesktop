@@ -54,7 +54,7 @@ const playlistSongsRoute = (db: sqlite3.Database) => {
       }
   })
   
-  router.put("/", 
+  router.put("/:playlist_id", 
     [
       body('from').isNumeric(), 
       body('to').isNumeric(),
@@ -62,6 +62,7 @@ const playlistSongsRoute = (db: sqlite3.Database) => {
     async (req: Request, res: Response, next: NextFunction) => {
       try {
         validateBody(req)
+        const playlist_id = req.params.playlist_id
         const body = req.body
         const {from,to} = body
 
@@ -69,15 +70,15 @@ const playlistSongsRoute = (db: sqlite3.Database) => {
           db.run(`BEGIN TRANSACTION;`);
 
           if (to < from) {
-              // Moving a song upward
-              db.run(`UPDATE playlist_songs SET playlist_order = -1 WHERE playlist_order = ?;`, [from])
-              db.run(`UPDATE playlist_songs SET playlist_order = playlist_order + 1 WHERE playlist_order >= ? AND playlist_order < ?;`, [to, from])
-              db.run(`UPDATE playlist_songs SET playlist_order = ? WHERE playlist_order = -1;`, [to])
+            // Moving a song upward
+            db.run(`UPDATE playlist_songs SET playlist_order = -1 WHERE playlist_order = ? AND playlist_id = ?;`, [from, playlist_id])
+            db.run(`UPDATE playlist_songs SET playlist_order = playlist_order + 1 WHERE playlist_order >= ? AND playlist_order < ? AND playlist_id = ?;`, [to, from, playlist_id])
+            db.run(`UPDATE playlist_songs SET playlist_order = ? WHERE playlist_order = -1 AND playlist_id = ?;`, [to, playlist_id])
           } else if (to > from) {
-              // Moving a song downward
-              db.run(`UPDATE playlist_songs SET playlist_order = -1 WHERE playlist_order = ?;`, [from])
-              db.run(`UPDATE playlist_songs SET playlist_order = playlist_order - 1 WHERE playlist_order > ? AND playlist_order <= ?;`, [from, to])
-              db.run(`UPDATE playlist_songs SET playlist_order = ? WHERE playlist_order = -1;`, [to])
+            // Moving a song downward
+            db.run(`UPDATE playlist_songs SET playlist_order = -1 WHERE playlist_order = ? AND playlist_id = ?;`, [from, playlist_id])
+            db.run(`UPDATE playlist_songs SET playlist_order = playlist_order - 1 WHERE playlist_order > ? AND playlist_order <= ? AND playlist_id = ?;`, [from, to, playlist_id])
+            db.run(`UPDATE playlist_songs SET playlist_order = ? WHERE playlist_order = -1 AND playlist_id = ?;`, [to, playlist_id])
           }
 
           db.run(`COMMIT;`)

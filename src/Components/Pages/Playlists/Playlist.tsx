@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/Redux/hooks';
 import { refreshPlaylist } from '@/Redux/Slices/refreshDataSlice';
 import { PlaylistSongDataRow, SongRow } from '@/Interfaces/electronHandlerReturns';
-import { GetSongsInPlaylistArgs } from '@/Interfaces/electronHandlerInputs';
+import { GetSongsInPlaylistArgs, SwitchPlaylistOrderArgs } from '@/Interfaces/electronHandlerInputs';
 import SearchBar from '@/Components/Shared/SearchBar';
 import { Button } from '@/Components/ui/button';
 import { ArrowLeft  } from 'lucide-react';
@@ -20,8 +20,21 @@ export interface PlaylistProps {
 
 const Playlist = (props: PlaylistProps) => {
     const {playlistID,setPlaylistID} = props
-    const {result: songsInPlaylist,error,receivedData,setArgs} = useElectronHandler<GetSongsInPlaylistArgs,PlaylistSongDataRow[]>('get-songs-in-playlist')
-    const rows = songsInPlaylist?.map((row: PlaylistSongDataRow) => {
+    const {
+        result: switchedOrder,
+        error: switchedOrderError,
+        receivedData: receivedSwitchedOrderData,
+        setArgs: setSwitchedOrderArgs
+    } = useElectronHandler<SwitchPlaylistOrderArgs,boolean>('switch-playlist-order')
+
+    const {
+        result: songsInPlaylist,
+        error: songsInPlaylistError,
+        receivedData: receivedSongsInPlaylist,
+        setArgs: setSongInPlaylistArgs
+    } = useElectronHandler<GetSongsInPlaylistArgs,PlaylistSongDataRow[]>('get-songs-in-playlist')
+
+    const songs = songsInPlaylist?.map((row: PlaylistSongDataRow) => {
         return {
             song_id: row.song_id,
             title: row.title,
@@ -30,16 +43,25 @@ const Playlist = (props: PlaylistProps) => {
             duration_seconds: row.duration_seconds
         } as SongRow
     })
-    const {searchQuery, setSearchQuery, filteredData} = useFuzzySearch<SongRow>(rows,'title')
+    const {searchQuery, setSearchQuery, filteredData} = useFuzzySearch<SongRow>(songs,'title')
 
     const refreshPlaylistData = useAppSelector((state) => state.refreshData.playlist)
     const dispatch = useAppDispatch()
 
     useEffect(() => { dispatch(refreshPlaylist()) },[])
-    useEffect(() => setArgs({ playlist_id: playlistID }),[refreshPlaylistData])
+    useEffect(() => setSongInPlaylistArgs({ playlist_id: playlistID }),[refreshPlaylistData])
+    useEffect(() => {
+        if(switchedOrder && !switchedOrderError && receivedSwitchedOrderData){
+            dispatch(refreshPlaylist()) 
+        }
+    },[switchedOrder,switchedOrderError,receivedSwitchedOrderData])
 
     const onDragEnd = (fromIndex: number, toIndex: number) => {
-
+        setSwitchedOrderArgs({
+            playlist_id: playlistID,
+            from: fromIndex,
+            to: toIndex
+        })
     }
 
     return(
@@ -59,10 +81,10 @@ const Playlist = (props: PlaylistProps) => {
                     setSearchQuery={setSearchQuery}
                 />
             </div>
-            {receivedData && !error && rows &&
+            {receivedSongsInPlaylist && !songsInPlaylistError && songs &&
                 <SongTable 
                     onDragEnd={onDragEnd}
-                    rows={rows}
+                    rows={songs}
                     playlistID={playlistID}
                 />
             }

@@ -12,7 +12,7 @@ import { Label } from "@/Components/ui/label"
 import { Button } from "@/Components/ui/button"
 import { EditMetadataArgs } from "@/Interfaces/electronHandlerInputs"
 import { MouseEventHandler, useEffect, useState } from "react"
-import ImageInput from "./ImageInput"
+import FileSystemInput from "./FileSystemInput"
 import useElectronHandler from "@/Hooks/useElectronHandler"
 import { useAppDispatch } from "@/Redux/hooks"
 import { refreshDownloads, refreshPlaylist } from "@/Redux/Slices/refreshDataSlice"
@@ -57,6 +57,13 @@ const EditMetadata = (props: EditMetadataDialogProps) => {
         })
     }
 
+    const validateInput = (e: React.ChangeEvent<HTMLInputElement>, setState: (state: string) => void) => {
+        const inputValue = e.target.value;
+        const filteredValue = inputValue.replace(/[\\/:*?"<>|]/g, '');
+        console.log(filteredValue)
+        setState(filteredValue)
+    };
+
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
@@ -76,9 +83,10 @@ const EditMetadata = (props: EditMetadataDialogProps) => {
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label className="text-right">Title</Label>
                         <Input
+                            value={newTitle}
                             defaultValue={newTitle}
                             className="col-span-3"
-                            onChange={(e) => setNewTitle(e.target.value)}
+                            onChange={(e) => validateInput(e,setNewTitle)}
                         />
                     </div>
                 </div>
@@ -87,15 +95,20 @@ const EditMetadata = (props: EditMetadataDialogProps) => {
                         <Label className="text-right">Artist</Label>
                         <Input
                             className="col-span-3"
+                            value={newArtist}
                             defaultValue={newArtist}
-                            onChange={(e) => setNewArtist(e.target.value)}
+                            onChange={(e) => validateInput(e,setNewArtist)}
                         />
                     </div>
                 </div>
                 <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label className="text-right">Image</Label>
-                        <ImageInput newImgPath={newImgPath} setNewImgPath={setNewImgPath} />
+                        <FileSystemInput 
+                            dialogType="file"
+                            path={newImgPath} 
+                            setPath={setNewImgPath}  
+                        />
                     </div>
                 </div>
                 <DialogFooter>

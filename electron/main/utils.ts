@@ -78,10 +78,17 @@ const editSongImage = async(song_id: number, newImagePath: string) => {
     }
 }
 
+const validFileSongName = (inputString: string) => {
+    const pattern = /^[a-zA-Z0-9._ -]+$/;
+    const cleanedString = inputString.replace(/[\\/:*?"<>|]/g, '');
+    return cleanedString.trim() || 'default_song_name';
+}
+
 const fetchData = async <T extends object>(url: string, options: RequestInit = {}) => {
     const response = await fetch(url,options)
     const data: T | ErrorResponse = await response.json()
     if('error' in data) {
+        console.log(data)
         throw new Error(data.error)
     }
     return data as T
@@ -96,5 +103,6 @@ export {
     downloadThumbnail,
     convertToPng,
     getImgPathFromURL,
-    editSongImage
+    editSongImage,
+    validFileSongName
 }
