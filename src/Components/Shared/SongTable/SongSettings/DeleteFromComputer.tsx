@@ -4,8 +4,13 @@ import { DropdownMenuItem } from "@/Components/ui/dropdown-menu"
 import useElectronHandler from "@/Hooks/useElectronHandler";
 import { DeleteSongFromAppArgs } from "@/Interfaces/electronHandlerInputs";
 import { SongRow } from "@/Interfaces/electronHandlerReturns";
+import { clearSource, play } from "@/Redux/Slices/audioSlice";
+import { setCurrentQueueIndex } from "@/Redux/Slices/currentQueueIndexSlice";
+import { setIsPlaying } from "@/Redux/Slices/isPlayingSlice";
+import { setDefaultQueue, setMusicQueue } from "@/Redux/Slices/queueSlice";
+import { setQueuedSongs } from "@/Redux/Slices/queuedSongsSlice";
 import { refreshDownloads, refreshPlaylist } from "@/Redux/Slices/refreshDataSlice";
-import { useAppDispatch } from "@/Redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/Redux/hooks";
 import { Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -18,6 +23,10 @@ const DeleteFromComputer = (props: DeleteFromComputerProps) => {
     const {row,isPlaylist} = props
     const [open,setOpen] = useState<boolean>(false)
     const {result,error,receivedData,setArgs} = useElectronHandler<DeleteSongFromAppArgs,SongRow>('delete-song-from-app')
+    const queue = useAppSelector((state) => state.queue)
+    const queuedSongs = useAppSelector((root) => root.queuedSongs.value)
+    const currentQueueIndex = useAppSelector((root) => root.currentQueueIndex.value)
+    const isPlaying = useAppSelector((root) => root.isPlaying.value)
     const dispatch = useAppDispatch()
 
     const openDialog = (e: Event) => {
@@ -31,6 +40,25 @@ const DeleteFromComputer = (props: DeleteFromComputerProps) => {
 
     useEffect(() => {
         if(receivedData && !error && result) {
+            if(queue.musicQueue.includes(result.song_id)){
+                const filteredDefaultQueue = queue.defaultQueue.filter(song_id => song_id !== result.song_id)
+                const filteredMusicQueue = queue.musicQueue.filter(song_id => song_id !== result.song_id)
+                const filteredQueuedSongs = queuedSongs.filter(song_id => song_id !== result.song_id)
+                const queueOffset = queue.musicQueue.length - filteredMusicQueue.length
+                
+                if(currentQueueIndex >= queue.musicQueue.length - queueOffset) {
+                    dispatch(setCurrentQueueIndex(currentQueueIndex-queueOffset))
+                }
+
+                if(queue.musicQueue.length - queueOffset === -1){
+                    dispatch(clearSource())
+                }
+
+                dispatch(setDefaultQueue(filteredDefaultQueue))
+                dispatch(setMusicQueue(filteredMusicQueue))
+                dispatch(setQueuedSongs(filteredQueuedSongs))
+            }
+
             setOpen(false)
             isPlaylist? dispatch(refreshPlaylist()): dispatch(refreshDownloads())
         }

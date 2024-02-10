@@ -2,7 +2,13 @@ import { Slider } from "@/Components/ui/slider"
 import { useAppSelector } from "@/Redux/hooks";
 import { useEffect, useState } from "react";
 
-const SongSlider = () => {
+export interface SongSliderProps {
+    disabled: boolean;
+}
+
+const SongSlider = (props: SongSliderProps) => {
+    const {disabled} = props
+
     const audio = useAppSelector((state) => state.audio.value)
     const duration = audio.duration ?? 0
     const [seconds,setSeconds] = useState<number>(0)
@@ -22,7 +28,7 @@ const SongSlider = () => {
     return (
         <Slider 
             className="flex-1" 
-            disabled={audio.src === ''}
+            disabled={disabled}
             defaultValue={[0]}
             value={[seconds]}
             max={duration}

@@ -11,6 +11,7 @@ import SearchBar from '@/Components/Shared/SearchBar';
 import { Button } from '@/Components/ui/button';
 import { ArrowLeft  } from 'lucide-react';
 import useFuzzySearch from '@/Hooks/useFuzzySearch';
+import DownloadSongs from '@/Components/Shared/DownloadSongs';
 
 
 export interface PlaylistProps {
@@ -66,7 +67,7 @@ const Playlist = (props: PlaylistProps) => {
 
     return(
         <>
-            <div className='flex flex-row mt-1'>
+            <div className='flex flex-row mt-1 w-[98%]'>
                 <Button 
                     className='ml-2 mr-2'
                     variant="outline"
@@ -75,11 +76,12 @@ const Playlist = (props: PlaylistProps) => {
                     <ArrowLeft strokeWidth={1.25}/>
                 </Button>
                 <SearchBar
-                    className='w-[90%]'
+                    className='w-[90%] mr-2'
                     placeholder='Search Playlist'
                     searchQuery={searchQuery}
                     setSearchQuery={setSearchQuery}
                 />
+                <DownloadSongs songs={songs ?? []}/>    
             </div>
             {receivedSongsInPlaylist && !songsInPlaylistError && songs &&
                 <SongTable 

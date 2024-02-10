@@ -46,7 +46,7 @@ const NewPlaylistButton = () => {
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Edit profile</DialogTitle>
+                    <DialogTitle>Create Playlist</DialogTitle>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-4 items-center gap-4">
@@ -62,7 +62,7 @@ const NewPlaylistButton = () => {
                         disabled={name === '' || isSubmitted} 
                         onClick={() => createPlaylist()} 
                     >
-                        Save changes
+                        Done
                     </Button>
                 </DialogFooter>
             </DialogContent>

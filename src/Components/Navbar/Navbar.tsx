@@ -26,12 +26,12 @@ const Navbar = (props: NavbarProps) => {
     return (
         <div className={props.className}>
             <div className='flex flex-col justify-between m-3 bg-white overflow-auto'>
-                <div className='space-y-3'>
+                <div className='space-y-4'>
                     <div className='flex items-center'>
                         <h2 className='text-xl font-bold'>SoundCloudScraper</h2>
                     </div>
                     <div className='flex-1'>
-                        <ul className='mt-2 space-y-1 text-sm'>
+                        <ul className='mt-2 space-y-3 text-sm'>
                             {navbarItemList.map((navbarItem: NavbarItemData) => {
                                 return (
                                     <NavbarButton 

@@ -44,18 +44,23 @@ const DownloadSongs = (props: DownloadSongsProps) => {
     }
 
     const closeDialog = () => {
-        setOpen(false)
         setDialogSubmitted(false)
         setFolderPath('')
         setDownloadIndex(0)
     }
+
+    useEffect(() => {
+        if(!open) {
+            closeDialog()
+        }
+    },[open])
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button variant='outline' onClick={() => setOpen(true)}>
                     <FolderDown className="mr-2 h-4 w-4"/>
-                    <span>Export Songs</span>
+                    <span>Export</span>
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
@@ -82,7 +87,7 @@ const DownloadSongs = (props: DownloadSongsProps) => {
                 }
                 <DialogFooter>
                     {downloadIndex / songs.length === 1 ? (
-                        <Button onClick={() => closeDialog()}>Close</Button>
+                        <Button onClick={() => setOpen(false)}>Close</Button>
                     ) : (
                         <Button 
                             disabled={songs.length === 0 || !receivedData || folderPath === '' } 

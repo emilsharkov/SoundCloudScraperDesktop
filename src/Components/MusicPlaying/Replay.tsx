@@ -19,9 +19,13 @@ const ReplayIconData = {
     }
 }
 
-const Replay = () => {
+export interface ReplayProps {
+    disabled: boolean;
+}
+
+const Replay = (props: ReplayProps) => {
+    const {disabled} = props
     const replayingType = useAppSelector((state) => state.replayingType.value)
-    const audio = useAppSelector((state) => state.audio.value)
     const dispatch = useAppDispatch()
     const Icon = ReplayIconData[replayingType]
 
@@ -29,7 +33,7 @@ const Replay = () => {
         <Button 
             size="icon" 
             variant="ghost" 
-            disabled={audio.src === ''}
+            disabled={disabled}
             onClick={() => dispatch(toggleReplayingType())}
         >
             <Icon.icon color={Icon.color} strokeWidth={1.5}/>

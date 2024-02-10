@@ -25,7 +25,6 @@ const runServer = () => {
 
   // serve mp3 files
   app.use('/songFiles', (req, res, next) => {
-    res.setHeader('Cache-Control', 'no-cache')
     express.static(`${workingDir}/songs`)(req, res, next)
   })
 

@@ -11,6 +11,7 @@ import {
 import { PlaylistRow } from "@/Interfaces/electronHandlerReturns"
 import DeletePlaylist from "./DeletePlaylist"
 import EditPlaylistName  from "./EditPlaylistName"
+import AddSongToPlaylist from "./AddSongToPlaylist"
 
 export interface PlaylistSettingsProps {
     row: PlaylistRow;
@@ -23,12 +24,13 @@ const PlaylistSettings = (props: PlaylistSettingsProps) => {
         <>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant="outline"><MoreVertical/></Button>
+                    <Button className="p-0" variant="outline"><MoreVertical/></Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56">
                     <DropdownMenuLabel>{row.name}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
+                        <AddSongToPlaylist/>
                         <EditPlaylistName row={row}/>
                         <DeletePlaylist row={row}/>
                     </DropdownMenuGroup>

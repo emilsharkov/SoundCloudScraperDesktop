@@ -32,7 +32,7 @@ const Search = (): JSX.Element => {
             <div className='flex flex-row mt-1 w-[97%]'>
                 <Input
                     className='mr-1'
-                    placeholder='Find Song'
+                    placeholder='Find Songs To Download'
                     value={searchBarInput}
                     onChange={(e) => setSearchBarInput(e.target.value)}
                     onKeyDown={handleKeyDown}
@@ -45,14 +45,14 @@ const Search = (): JSX.Element => {
                 </Button>
             </div>
 
-            <Table>
+            <Table className="w-full max-w-full table-fixed">
                 <TableHeader>
                     <TableRow>
-                        <TableHead className="w-[50px]"></TableHead>
-                        <TableHead className="w-[100px]">Title</TableHead>
-                        <TableHead className="w-[50px]">Artist</TableHead>
-                        <TableHead className="w-[50px]"><Clock /></TableHead>
-                        <TableHead className="w-[100px] flex items-center justify-center"><Heart /></TableHead>
+                        <TableHead className="w-[10%] max-w-[10%]"></TableHead>
+                        <TableHead className="w-[40%] max-w-[40%]">Title</TableHead>
+                        <TableHead className="w-[20%] max-w-[20%]">Artist</TableHead>
+                        <TableHead className="w-[15%] max-w-[15%]"><Clock /></TableHead>
+                        <TableHead className="w-[15%] max-w-[15%]"><Heart /></TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>

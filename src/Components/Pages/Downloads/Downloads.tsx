@@ -44,14 +44,16 @@ const Downloads = () => {
     }
 
     return(
-        <div className='flex flex-col w-full h-full items-center'>
-            <SearchBar
-                className="w-[99%] mt-1"
-                placeholder="Search Song"
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-            />
-            <DownloadSongs songs={songs ?? []}/>
+        <div className='flex flex-col w-full h-full items-center max-w-full'>
+            <div className='flex flex-row w-[96%] mt-1'>
+                <SearchBar
+                    className="mr-2"
+                    placeholder="Search Downloads"
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                />
+                <DownloadSongs songs={songs ?? []}/>    
+            </div>
 
             {receivedSongsData && !songsError && songs && 
                 <SongTable

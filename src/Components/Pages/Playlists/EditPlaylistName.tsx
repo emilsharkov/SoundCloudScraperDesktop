@@ -35,7 +35,6 @@ const EditPlaylistName = (props: EditPlaylistProps) => {
     }
 
     const editName = () => {
-        console.log(name,row.playlist_id)
         setArgs({
             name: name,
             playlist_id: row.playlist_id

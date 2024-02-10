@@ -1,20 +1,20 @@
 import { Button } from "@/Components/ui/button"
-import { play } from "@/Redux/Slices/audioSlice";
 import { setCurrentQueueIndex } from "@/Redux/Slices/currentQueueIndexSlice";
-import { setIsPlaying } from "@/Redux/Slices/isPlayingSlice";
 import { useAppDispatch, useAppSelector } from "@/Redux/hooks";
 import { FastForward, Rewind } from 'lucide-react';
 
-interface skipProps {
+interface SkipProps {
     skipForward: boolean;
+    disabled: boolean;
 }
 
-const Skip = (props: skipProps) => {
-    const { skipForward } = props
+const Skip = (props: SkipProps) => {
+    const { skipForward,disabled } = props
     const audio = useAppSelector((state) => state.audio.value)
     const replayingType = useAppSelector((state) => state.replayingType.value)
     const musicQueue = useAppSelector((state) => state.queue.musicQueue)
     const currentQueueIndex = useAppSelector((state) => state.currentQueueIndex.value)
+    const queue = useAppSelector((state) => state.queue)
     const dispatch = useAppDispatch()
     
     const Icon = skipForward ? FastForward: Rewind
@@ -22,7 +22,7 @@ const Skip = (props: skipProps) => {
     const isReplaying = replayingType === 'REPLAY_PLAYLIST' || replayingType === 'REPLAY_SONG'
     const isLastIndex = currentQueueIndex === musicQueue.length - 1
     const isFirstIndex = currentQueueIndex === 0
-    const disabled = isReplaying ? false : (skipForward ? isLastIndex || musicQueue.length === 1 : isFirstIndex)
+    const queueDisabled = isReplaying ? false : (skipForward ? isLastIndex || musicQueue.length === 1 : isFirstIndex)
 
     const skip = () => {
         if(isReplaying) {
@@ -44,7 +44,7 @@ const Skip = (props: skipProps) => {
         <Button 
             size="icon" 
             variant="ghost" 
-            disabled={disabled || audio.src === '' || musicQueue.length === 1} 
+            disabled={queueDisabled || disabled || musicQueue.length === 1} 
             onClick={() => skip()}
         >
             <Icon strokeWidth={1.5}/>

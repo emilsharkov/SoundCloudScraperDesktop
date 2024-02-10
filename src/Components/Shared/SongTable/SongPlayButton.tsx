@@ -56,7 +56,6 @@ const SongPlayButton = (props: SongPlayButtonProps) => {
 
     return (
         <Button 
-            className="p-2" 
             size="icon" 
             variant="ghost" 
             disabled={audio.src === ''} 

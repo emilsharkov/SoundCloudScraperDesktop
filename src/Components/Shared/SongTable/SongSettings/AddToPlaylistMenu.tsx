@@ -17,14 +17,17 @@ import { ListPlus } from "lucide-react"
 import { useEffect } from "react"
 import { ToastAction } from "@/Components/ui/toast"
 import { useToast } from "@/Components/ui/use-toast"
+import { setDefaultQueue, setMusicQueue } from "@/Redux/Slices/queueSlice"
 
 export interface AddToPlaylistMenuProps {
     row: SongRow;
+    playlist_id?: number;
 }
 
 const AddToPlaylistMenu = (props: AddToPlaylistMenuProps) => {
-    const {row} = props
+    const {row,playlist_id} = props
     const refreshPlaylistsData = useAppSelector((state) => state.refreshData.playlists)
+    const queue = useAppSelector((state) => state.queue)
     const dispatch = useAppDispatch()
     const { toast } = useToast()
 
@@ -40,7 +43,7 @@ const AddToPlaylistMenu = (props: AddToPlaylistMenuProps) => {
         error: addSongToPlaylistError,
         receivedData: receivedAddSongToPlaylistData,
         setArgs: setAddSongToPlaylistArgs
-    } = useElectronHandler<AddSongToPlaylistArgs,PlaylistSongRow[]>('add-song-to-playlist')
+    } = useElectronHandler<AddSongToPlaylistArgs,PlaylistSongRow>('add-song-to-playlist')
     
     useEffect(() => { dispatch(refreshPlaylists()) },[])
     useEffect(() => setPlaylistsArgs({}),[refreshPlaylistsData])
@@ -56,9 +59,13 @@ const AddToPlaylistMenu = (props: AddToPlaylistMenuProps) => {
     useEffect(() => {
         if(addSongToPlaylistResult && receivedAddSongToPlaylistData) {
             if(!addSongToPlaylistError) {
-                toast({
-                    description: `${row.title} added to playlist`,
-                })
+                toast({description: `${row.title} added to playlist`})
+                if(queue.origin === 'Playlist' && playlist_id === queue.playlist_id) {
+                    const newDefaultQueue: number[] = [...queue.defaultQueue,addSongToPlaylistResult.song_id]
+                    const newMusicQueue: number[] = [...queue.musicQueue,addSongToPlaylistResult.song_id]
+                    dispatch(setDefaultQueue(newDefaultQueue))
+                    dispatch(setMusicQueue(newMusicQueue))
+                }
             } else {
                 dispatch(setToastError('Each song may only be added once a playlist'))
             }

@@ -5,6 +5,9 @@ import Spinner from './Spinner';
 import { SongURLArgs } from '@/Interfaces/electronHandlerInputs';
 import Marquee from "react-fast-marquee";
 import MarqueeText from '@/Components/Shared/SongTable/MarqueeText';
+import { SongRow } from '@/Interfaces/electronHandlerReturns';
+import { useAppDispatch, useAppSelector } from '@/Redux/hooks';
+import { setDefaultQueue, setMusicQueue } from '@/Redux/Slices/queueSlice';
 
 interface SongSuggestionProps {
     title: string;
@@ -22,13 +25,20 @@ const SearchSongRow = (props: SongSuggestionProps) => {
     const {title,thumbnail,duration,likes,artist,url} = props
     const rowRef = useRef<HTMLTableRowElement>(null)
     const [isClicked,setIsClicked] = useState<boolean>(false)
-    const {result,error,receivedData,setArgs} = useElectronHandler<SongURLArgs,void>('download-song')
+    const {result,error,receivedData,setArgs} = useElectronHandler<SongURLArgs,SongRow>('download-song')
+    const queue = useAppSelector((state) => state.queue)
+    const dispatch = useAppDispatch()
 
     useEffect(() => {
-        if(isClicked && receivedData && result === undefined) {
-            setIsClicked(false)
+        if(receivedData && !error && result) {
+            if(queue.origin === 'Downloads') {
+                const newDefaultQueue: number[] = [...queue.defaultQueue,result.song_id]
+                const newMusicQueue: number[] = [...queue.musicQueue,result.song_id]
+                dispatch(setDefaultQueue(newDefaultQueue))
+                dispatch(setMusicQueue(newMusicQueue))
+            }
         }
-    },[receivedData,isClicked,result])
+    },[receivedData,error,result])
 
     useEffect(() => {
         if(isClicked) {
@@ -51,9 +61,9 @@ const SearchSongRow = (props: SongSuggestionProps) => {
 
     return (
         <TableRow ref={rowRef} key={url} onClick={() => setIsClicked(true)}>
-            <TableCell>{isClicked && !receivedData && result !== undefined ? <Spinner/>: <img className='h-12 w-12 max-w-none' src={thumbnail}/>}</TableCell>
-            <TableCell className='max-w-[200px]'><MarqueeText text={title}/></TableCell>
-            <TableCell className='max-w-[100px]'><MarqueeText text={artist}/></TableCell>
+            <TableCell>{isClicked && !receivedData && result !== undefined ? <Spinner/>: <img className='h-10 w-10 max-w-none' src={thumbnail}/>}</TableCell>
+            <TableCell><MarqueeText classname="font-semibold" text={title}/></TableCell>
+            <TableCell><MarqueeText text={artist}/></TableCell>
             <TableCell>{durationFormatted()}</TableCell>
             <TableCell className="text-center">{likeFormatted}</TableCell>
         </TableRow>

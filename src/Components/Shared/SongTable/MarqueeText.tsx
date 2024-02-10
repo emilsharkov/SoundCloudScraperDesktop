@@ -4,10 +4,11 @@ import Marquee from "react-fast-marquee"
 export interface MarqueeTextProps {
     text: string;
     speed?: number;
+    classname?: string;
 }
 
 const MarqueeText = (props: MarqueeTextProps) => {
-    const {text,speed} = props
+    const {text,speed,classname} = props
     const [isHovered,setIsHovered] = useState<boolean>(false)
 
     const onMouseEnter = () => {
@@ -20,7 +21,7 @@ const MarqueeText = (props: MarqueeTextProps) => {
 
     return(
         <div 
-            className={`whitespace-nowrap overflow-hidden`} 
+            className={`${classname} whitespace-nowrap overflow-hidden`} 
             onMouseEnter={onMouseEnter} 
             onMouseLeave={onMouseLeave}
         >

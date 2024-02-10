@@ -20,8 +20,11 @@ export const audioSlice = createSlice({
       state.value.pause()
     },
     setCurrentSong: (state, action: PayloadAction<number>) => {
-      state.value.currentTime = 0
-      state.value.src = `http://localhost:11738/songFiles/${action.payload}.mp3`
+      const newSrc = `http://localhost:11738/songFiles/${action.payload}.mp3`
+      if(newSrc != state.value.src) {
+        state.value.currentTime = 0
+        state.value.src = newSrc
+      }
     },
     clearSource: (state, action: PayloadAction<void>) => {
       state.value.src = ''

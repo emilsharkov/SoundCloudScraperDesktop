@@ -14,9 +14,11 @@ export const Routes = (props: RoutesProps) => {
     const toRender = routes.filter((child) => child.props.path === currentRoute) as React.ReactElement<RouteProps>[]
 
     return (
-        <ScrollArea className={`${props.className} rounded-md border`}>
-            {toRender.length === 1 ? toRender[0].props.component: null}
-            <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+        <>
+            <ScrollArea className={`${props.className} rounded-md border`}>
+                {toRender.length === 1 ? toRender[0].props.component: null}
+                <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+        </>
     )
 }

@@ -4,8 +4,12 @@ import { DropdownMenuItem } from "@/Components/ui/dropdown-menu"
 import useElectronHandler from "@/Hooks/useElectronHandler";
 import { DeleteSongFromAppArgs, DeleteSongInPlaylistArgs } from "@/Interfaces/electronHandlerInputs";
 import { PlaylistSongRow, SongRow } from "@/Interfaces/electronHandlerReturns";
+import { clearSource } from "@/Redux/Slices/audioSlice";
+import { setCurrentQueueIndex } from "@/Redux/Slices/currentQueueIndexSlice";
+import { setDefaultQueue, setMusicQueue } from "@/Redux/Slices/queueSlice";
+import { setQueuedSongs } from "@/Redux/Slices/queuedSongsSlice";
 import { refreshDownloads, refreshPlaylist } from "@/Redux/Slices/refreshDataSlice";
-import { useAppDispatch } from "@/Redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/Redux/hooks";
 import { Trash2, XSquare } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -18,11 +22,37 @@ const RemoveFromPlaylist = (props: RemoveFromPlaylistProps) => {
     const {row,playlist_id} = props
     const [open,setOpen] = useState<boolean>(false)
     const {result,error,receivedData,setArgs} = useElectronHandler<DeleteSongInPlaylistArgs,PlaylistSongRow>('delete-song-in-playlist')
+    const queue = useAppSelector((state) => state.queue)
+    const queuedSongs = useAppSelector((root) => root.queuedSongs.value)
+    const currentQueueIndex = useAppSelector((root) => root.currentQueueIndex.value)
     const dispatch = useAppDispatch()
 
     const openDialog = (e: Event) => {
         e.preventDefault()
         setOpen(true)
+    }
+
+    const removeFromQueuedPlaylist = () => {
+        if(result){
+            if(queue.musicQueue.includes(result.song_id)){
+                const filteredDefaultQueue = queue.defaultQueue.filter(song_id => song_id !== result.song_id)
+                const filteredMusicQueue = queue.musicQueue.filter(song_id => song_id !== result.song_id)
+                const filteredQueuedSongs = queuedSongs.filter(song_id => song_id !== result.song_id)
+                const queueOffset = queue.musicQueue.length - filteredMusicQueue.length
+                
+                if(currentQueueIndex >= queue.musicQueue.length - queueOffset) {
+                    dispatch(setCurrentQueueIndex(currentQueueIndex-queueOffset))
+                }
+
+                if(queue.musicQueue.length - queueOffset === -1){
+                    dispatch(clearSource())
+                }
+
+                dispatch(setDefaultQueue(filteredDefaultQueue))
+                dispatch(setMusicQueue(filteredMusicQueue))
+                dispatch(setQueuedSongs(filteredQueuedSongs))
+            }
+        }
     }
 
     const submitDialog = () => {
@@ -36,6 +66,9 @@ const RemoveFromPlaylist = (props: RemoveFromPlaylistProps) => {
 
     useEffect(() => {
         if(receivedData && !error && result) {
+            if(queue.origin === 'Playlist' && playlist_id === queue.playlist_id){
+                removeFromQueuedPlaylist()
+            }
             setOpen(false)
             dispatch(refreshPlaylist())
         }

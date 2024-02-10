@@ -6,7 +6,13 @@ import { useAppSelector, useAppDispatch } from '@/Redux/hooks'
 import { setIsPlaying } from "@/Redux/Slices/isPlayingSlice"
 import { pause, play } from "@/Redux/Slices/audioSlice";
 
-const Play = () => {
+export interface PlayProps {
+    disabled: boolean;
+}
+
+const Play = (props: PlayProps) => {
+    const {disabled} = props
+
     const audio = useAppSelector((state) => state.audio.value)
     const isPlaying = useAppSelector((state) => state.isPlaying.value)
     const dispatch = useAppDispatch()
@@ -23,7 +29,7 @@ const Play = () => {
             className="p-2" 
             size="icon" 
             variant="ghost" 
-            disabled={audio.src === ''} 
+            disabled={disabled} 
             onClick={() => dispatch(setIsPlaying(!isPlaying))}
         >
             <Icon strokeWidth={1.25}/>

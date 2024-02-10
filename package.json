@@ -1,6 +1,6 @@
 {
-  "name": "soundcloudscraperdesktop",
-  "version": "2.3.0",
+  "name": "SoundCloudScraper",
+  "version": "2.4.0",
   "main": "dist-electron/main/index.js",
   "description": "Download SoundCloud Songs",
   "author": "Emil Sharkov",

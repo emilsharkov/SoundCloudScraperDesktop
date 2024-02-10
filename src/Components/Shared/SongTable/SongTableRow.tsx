@@ -33,42 +33,42 @@ const SongTableRow = (props: SongTableRowProps) => {
         <TableRow 
             onMouseEnter={onMouseEnter} 
             onMouseLeave={onMouseLeave} 
-            className={currentSong === row.song_id ? 'bg-gray-300 hover:bg-gray-300': ''} 
+            className={`overflow-hidden ${currentSong === row.song_id ? 'bg-gray-300 hover:bg-gray-300': ''}`}
             key={row.title}
         >
-            <TableCell>
+            <TableCell className={isHovered || currentSong === row.song_id ? 'p-0 pl-1': 'pl-4'}>
                 {isHovered || currentSong === row.song_id ? (
                     <SongPlayButton 
-                        songOrigin='Downloads' 
+                        songOrigin={playlistID ? 'Playlist': 'Downloads'} 
                         isCurrentSong={currentSong === row.song_id} 
                         playSong={onClick}/>
-                ): row.song_order}
+                ): row.song_order + 1}
             </TableCell>
 
             <TableCell>
-                <img className='h-12 w-12 max-w-none' src={`http://localhost:11738/songImages/${row.song_id}.png?${new Date().getTime()}`}/>
+                <img className='h-10 w-10 max-w-none' src={`http://localhost:11738/songImages/${row.song_id}.png?${new Date().getTime()}`}/>
             </TableCell>
 
             <TableCell>
-                <MarqueeText text={row.title}/>
+                <MarqueeText classname="font-semibold" text={row.title}/>
             </TableCell>
 
-            <TableCell className='max-w-[50px]'>
-                <MarqueeText text={row.artist}/>
+            <TableCell>
+                <MarqueeText classname="font-normal" text={row.artist}/>
             </TableCell>
 
             <TableCell>
                 {durationFormatted()}
             </TableCell>
 
-            <TableCell>
+            <TableCell className="p-0">
                 <SongSettings 
                     row={row}
                     playlistID={playlistID}
                 />
             </TableCell>
 
-            <TableCell>
+            <TableCell className="p-0">
                 <a><GripVertical/></a>
             </TableCell>
         </TableRow>

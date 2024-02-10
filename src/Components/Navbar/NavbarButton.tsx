@@ -17,7 +17,7 @@ const NavbarButton = (props: NavbarButtonProps) => {
                 onClick={props.onClick} 
             >
                 <props.icon />
-                <span>{props.title}</span>
+                <span className="text-xl font-semibold">{props.title}</span>
             </button>
         </li>
     )

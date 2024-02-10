@@ -4,13 +4,8 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuGroup,
-    DropdownMenuItem,
     DropdownMenuLabel,
-    DropdownMenuPortal,
     DropdownMenuSeparator,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/Components/ui/dropdown-menu"
 import EditMetadata from "./EditMetadata"
@@ -27,14 +22,15 @@ export interface SongSettingsProps {
 
 const SongSettings = (props: SongSettingsProps) => {
     const {row,playlistID} = props
+    
 
     return (
         <>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant="outline"><MoreVertical/></Button>
+                    <Button className="p-0" variant="outline"><MoreVertical/></Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56">
+                <DropdownMenuContent className="">
                     <DropdownMenuLabel>{row.title}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
@@ -43,7 +39,7 @@ const SongSettings = (props: SongSettingsProps) => {
                                                 
                         <AddToQueue row={row}/>
 
-                        <AddToPlaylistMenu row={row}/>
+                        <AddToPlaylistMenu playlist_id={playlistID} row={row}/>
                         
                         {playlistID && <RemoveFromPlaylist row={row} playlist_id={playlistID}/>}
                         

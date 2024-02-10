@@ -7,6 +7,9 @@ import { setupDatabase } from './server/database'
 import { runServer } from './server/server'
 import sqlite3 from 'sqlite3'
 import { initDirs } from './utils'
+
+const path = require('path');
+
 // The built directory structure
 //
 // ├─┬ dist-electron
@@ -50,15 +53,18 @@ const indexHtml = join(process.env.DIST, 'index.html')
 async function createWindow() {
   win = new BrowserWindow({
     title: 'Main window',
+    width: 800, // Set the width of the window
+    height: 600, // Set the height of the window
+    resizable: true, // Prevent the window from being resized
     webPreferences: {
       preload,
-      // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
-      // Consider using contextBridge.exposeInMainWorld
-      // Read more on https://www.electronjs.org/docs/latest/tutorial/context-isolation
       nodeIntegration: true,
       contextIsolation: false,
     },
-  })
+  });
+
+  // Remove the default menu bar
+  // win.setMenu(null);
 
   if (url) { // electron-vite-vue#298
     win.loadURL(url)
