@@ -55,7 +55,7 @@ async function createWindow() {
     title: 'Main window',
     width: 800, // Set the width of the window
     height: 600, // Set the height of the window
-    resizable: true, // Prevent the window from being resized
+    resizable: false, // Prevent the window from being resized
     webPreferences: {
       preload,
       nodeIntegration: true,
@@ -68,7 +68,7 @@ async function createWindow() {
 
   if (url) { // electron-vite-vue#298
     win.loadURL(url)
-    win.webContents.openDevTools()
+    // win.webContents.openDevTools()
   } else {
     win.loadFile(indexHtml)
   }

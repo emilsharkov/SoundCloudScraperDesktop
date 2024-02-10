@@ -47,8 +47,9 @@ const Playlist = (props: PlaylistProps) => {
     const {searchQuery, setSearchQuery, filteredData} = useFuzzySearch<SongRow>(songs,'title')
 
     const refreshPlaylistData = useAppSelector((state) => state.refreshData.playlist)
+    const defaultQueue = useAppSelector((state) => state.queue.defaultQueue)
     const dispatch = useAppDispatch()
-
+    
     useEffect(() => { dispatch(refreshPlaylist()) },[])
     useEffect(() => setSongInPlaylistArgs({ playlist_id: playlistID }),[refreshPlaylistData])
     useEffect(() => {
@@ -63,6 +64,11 @@ const Playlist = (props: PlaylistProps) => {
             from: fromIndex,
             to: toIndex
         })
+
+        const newDefaultQueue = [...defaultQueue]
+        const [item] = newDefaultQueue.splice(fromIndex, 1)
+        newDefaultQueue.splice(toIndex, 0, item)
+        dispatch(setDefaultQueue(newDefaultQueue))
     }
 
     return(

@@ -7,6 +7,8 @@ import useElectronHandler from "@/Hooks/useElectronHandler"
 import useFuzzySearch from "@/Hooks/useFuzzySearch"
 import { SwitchSongOrderArgs } from "@/Interfaces/electronHandlerInputs"
 import { SongRow } from "@/Interfaces/electronHandlerReturns"
+import { setCurrentQueueIndex } from "@/Redux/Slices/currentQueueIndexSlice"
+import { setDefaultQueue } from "@/Redux/Slices/queueSlice"
 import { refreshDownloads } from "@/Redux/Slices/refreshDataSlice"
 import { useAppDispatch, useAppSelector } from "@/Redux/hooks"
 import { useEffect, useState } from "react"
@@ -24,9 +26,12 @@ const Downloads = () => {
         receivedData: receivedSwitchedOrderData,
         setArgs: setSwitchedOrderArgs
     } = useElectronHandler<SwitchSongOrderArgs,boolean>('switch-song-order')
-    const refreshDownloadsData = useAppSelector((state) => state.refreshData.downloads)
-    const dispatch = useAppDispatch()
     const {searchQuery, setSearchQuery, filteredData} = useFuzzySearch<SongRow>(songs,'title')
+
+    const refreshDownloadsData = useAppSelector((state) => state.refreshData.downloads)
+    const defaultQueue = useAppSelector((state) => state.queue.defaultQueue)
+    const dispatch = useAppDispatch()
+
 
     useEffect(() => { dispatch(refreshDownloads()) },[])
     useEffect(() => setSongsArgs({}),[refreshDownloadsData])
@@ -41,6 +46,11 @@ const Downloads = () => {
             from: fromIndex,
             to: toIndex
         })
+
+        const newDefaultQueue = [...defaultQueue]
+        const [item] = newDefaultQueue.splice(fromIndex, 1)
+        newDefaultQueue.splice(toIndex, 0, item)
+        dispatch(setDefaultQueue(newDefaultQueue))
     }
 
     return(
