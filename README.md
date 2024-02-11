@@ -6,8 +6,7 @@ This is a desktop app where you can download songs from SoundCloud and listen to
 - Frontend: React, TypeScript, shadcn ui, Tailwind, ReduxToolkit
 - Backend: Electron, Node, Express, SQLite
 
-## Install
-You can install these executables:
-- Windows:
-- Mac:
-- Linux:
+## How to Run Myself:
+1. Run ```git clone https://github.com/emilsharkov/SoundCloudScraperDesktop``` to clone the repository
+2. Run ```npm install``` to install node dependencies
+3. Run ```npm start``` to start the app
