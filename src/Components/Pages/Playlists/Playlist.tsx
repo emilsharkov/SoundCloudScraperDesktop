@@ -12,6 +12,7 @@ import { Button } from '@/Components/ui/button';
 import { ArrowLeft  } from 'lucide-react';
 import useFuzzySearch from '@/Hooks/useFuzzySearch';
 import DownloadSongs from '@/Components/Shared/DownloadSongs';
+import { setDefaultQueue } from '@/Redux/Slices/queueSlice';
 
 
 export interface PlaylistProps {

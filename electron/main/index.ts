@@ -64,7 +64,7 @@ async function createWindow() {
   });
 
   // Remove the default menu bar
-  // win.setMenu(null);
+  win.setMenu(null);
 
   if (url) { // electron-vite-vue#298
     win.loadURL(url)
