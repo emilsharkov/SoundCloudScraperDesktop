@@ -1,4 +1,7 @@
 import { Slider } from "@/Components/ui/slider"
+import useElectronHandler from "@/Hooks/useElectronHandler";
+import { SongIDsArgs } from "@/Interfaces/electronHandlerInputs";
+import { SongRow } from "@/Interfaces/electronHandlerReturns";
 import { useAppSelector } from "@/Redux/hooks";
 import { useEffect, useState } from "react";
 
@@ -10,8 +13,25 @@ const SongSlider = (props: SongSliderProps) => {
     const {disabled} = props
 
     const audio = useAppSelector((state) => state.audio.value)
-    const duration = audio.duration ?? 0
+    const musicQueue = useAppSelector((state) => state.queue.musicQueue)
+    const currentQueueIndex = useAppSelector((state) => state.currentQueueIndex.value)
     const [seconds,setSeconds] = useState<number>(0)
+    const [duration,setDuration] = useState<number>(0)
+    const {result,error,receivedData,setArgs} = useElectronHandler<SongIDsArgs,SongRow[]>('get-mp3-metadata')
+
+    useEffect(() => {
+        if(musicQueue.length && currentQueueIndex !== -1) {
+            setArgs({
+                song_ids: [musicQueue[currentQueueIndex]]
+            })
+        }
+    },[musicQueue,currentQueueIndex])
+
+    useEffect(() => {
+        if(receivedData && !error && result) {
+            setDuration(result[0].duration_seconds)
+        }
+    },[result,error,receivedData])
 
     useEffect(() => {
         const handleTimeUpdate = () => setSeconds(audio.currentTime ?? 0)
@@ -28,7 +48,7 @@ const SongSlider = (props: SongSliderProps) => {
     return (
         <Slider 
             className="flex-1" 
-            disabled={disabled}
+            disabled={disabled || !!error || !result || !receivedData}
             defaultValue={[0]}
             value={[seconds]}
             max={duration}
