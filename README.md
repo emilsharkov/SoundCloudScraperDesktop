@@ -12,4 +12,6 @@ This is a desktop app where you can download songs from SoundCloud and listen to
 3. Run ```npm start``` to start the app
 
 ## Install Program
-https://www.dropbox.com/scl/fi/qgj2r9m6y6vfonog0ns9i/SoundCloudScraper_2.4.0.zip?rlkey=6xt583wenr1zdncskpq9cgcil&e=2&dl=0
+- Windows: https://www.dropbox.com/scl/fi/qgj2r9m6y6vfonog0ns9i/SoundCloudScraper_2.4.0.zip?rlkey=6xt583wenr1zdncskpq9cgcil&e=2&dl=0
+- MacOS: after setting up your repo, run ```tsc && vite build && electron-builder -m``` to build (has to be built on mac)
+- Linux: after setting up your repo, run ```tsc && vite build && electron-builder -l``` to build (has to be built on linux)
