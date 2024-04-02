@@ -13,7 +13,7 @@ This will only run the program in dev through node. To generate an executable lo
 3. Run ```npm start``` to start the app
 
 ## Install Program
-To install the app to your computer via an executable (haven't tested on mac or linux so if it doesnt work check above step):
+To install the app to your computer via an executable (haven't tested on mac or linux so if it doesn't work check above step):
 - Windows: https://www.dropbox.com/scl/fi/qgj2r9m6y6vfonog0ns9i/SoundCloudScraper_2.4.0.zip?rlkey=6xt583wenr1zdncskpq9cgcil&e=2&dl=0
 - MacOS: after setting up your repo, run ```tsc && vite build && electron-builder -m``` to build (has to be built on mac)
 - Linux: after setting up your repo, run ```tsc && vite build && electron-builder -l``` to build (has to be built on linux)
